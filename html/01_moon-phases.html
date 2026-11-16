@@ -1,0 +1,1777 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>月亮變變變</title>
+<style>
+  :root{
+    --bg:#0a0f24;
+    --panel:rgba(22,31,70,.78);
+    --panel2:rgba(255,255,255,.05);
+    --line:rgba(160,180,255,.18);
+    --ink:#f2f4ff;
+    --muted:#aab3dc;
+    --moon:#ffd977;
+    --sky:#7cc8ff;
+    --ccw:#6ee7b7;
+    --cw:#ff9ec4;
+    --ecl:#ffd166;
+    --sun:#ffd166;
+    --earth:#5cb8ff;
+    --radius:20px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #26336f 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 25%, #1a2355 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.7;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.55;
+    background-image:
+      radial-gradient(1.2px 1.2px at 20px 30px,#fff,transparent),
+      radial-gradient(1px 1px at 140px 80px,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 210px 190px,#ffeebb,transparent),
+      radial-gradient(1px 1px at 60px 220px,#fff,transparent),
+      radial-gradient(1px 1px at 180px 20px,#cfe3ff,transparent);
+    background-size:260px 260px;
+  }
+  .wrap{max-width:1720px;margin:0 auto;padding:0 20px 72px}
+  /* 上方工具列：左邊導覽，右上角小測驗 */
+  .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:8px 20px;background:rgba(10,15,36,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav.top{display:flex;gap:8px;flex-wrap:wrap}
+  nav.top a{color:var(--muted);text-decoration:none;padding:4px 14px;border-radius:999px;border:1px solid var(--line);font-size:15px}
+  nav.top a[aria-current]{color:#0a0f24;background:var(--moon);border-color:transparent;font-weight:700}
+  .top-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+  .top-ctrl{display:flex;align-items:center;gap:8px}
+  .top-ctrl[hidden]{display:none}
+  .top-ctrl .btn{padding:4px 12px;font-size:14px}
+  .top-ctrl .ctrl-label{font-size:14px;font-weight:700}
+  .top-ctrl input[type=range]{width:110px}
+  .top-ctrl .st-tag{margin-right:0}
+  .quiz-link{color:#1d1a0b;background:var(--sun);text-decoration:none;font-weight:800;padding:6px 16px;border-radius:999px;font-size:15px}
+  .quiz-link:hover{filter:brightness(1.08)}
+
+  /* 寬螢幕：兩大項並排，一個畫面放得下（畫布填滿剩下的高度） */
+  .stage{display:grid;grid-template-columns:3fr 2fr;gap:16px;height:calc(100vh - 78px);min-height:820px;max-height:1100px;margin:12px 0 16px}
+  #moon, #orbit{scroll-margin-top:64px}
+  #orbit{margin-top:34px}
+  .stage > .panel{display:flex;flex-direction:column;min-height:0;min-width:0;padding:12px 16px;overflow:hidden}
+  .stage .panel-head, .stage .sub-head{margin-bottom:6px}
+  .stage h2{font-size:19px;margin:0}
+  .st-tag{display:inline-block;font-size:13px;font-weight:800;color:#0a0f24;background:var(--moon);border-radius:999px;padding:1px 10px;margin-right:8px;vertical-align:2px}
+  .st-tag.blue{background:var(--earth)}
+  .canvas-box.fill{flex:1 1 0;min-height:220px;position:relative}
+  .canvas-box.fill canvas{position:absolute;inset:0;width:100%;height:100%}
+  .stage .legend{font-size:12.5px;margin-top:6px;gap:2px 12px}
+  .stage .banner{margin:0 0 8px;padding:6px 12px;font-size:14px}
+  .tilt-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .tilt-row input[type=range]{flex:1 1 160px;width:auto;max-width:340px}
+  .tilt-row .tilt-end{color:var(--muted);font-size:13px;white-space:nowrap}
+  .tilt-row .check{font-size:14px;white-space:nowrap}
+  .tilt-row .check input{width:18px}
+  .tilt-row .dir-badge{margin-left:auto}
+  .stage .tilt{margin-top:6px}
+  .stage .dir-badge{margin:0;padding:2px 10px;font-size:14px}
+  .panel-ctrls{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+  .panel-ctrls .btn{padding:5px 12px;font-size:14px}
+  .panel-ctrls .seg{flex-wrap:wrap}
+  .panel-ctrls .seg button{padding:4px 11px;font-size:14px}
+  .panel-ctrls .ctrl-label{font-size:14px}
+  .panel-ctrls input[type=range]{width:110px}
+  .panel-ctrls input[type=number]{width:74px;font:inherit;font-size:14px;padding:3px 6px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink)}
+  .panel-ctrls .check{font-size:14px}
+  .stage .face-row{margin:0 0 6px}
+  .stage .timebar{margin-top:8px;padding:6px 12px 2px}
+  .stage .phase-name{margin-top:6px}
+  .stage #pName{font-size:28px}
+  .stage .desc{margin:2px 0 6px;font-size:15px;line-height:1.55}
+  .stage .facts{grid-template-columns:repeat(3,1fr);gap:6px}
+  .stage .facts div{padding:5px 10px}
+  .stage .facts dd{font-size:15px;line-height:1.5}
+  .facts div.w2{grid-column:span 2}
+
+  .rule{
+    background:linear-gradient(90deg,rgba(255,217,119,.2),rgba(255,217,119,.06));
+    border:1px solid rgba(255,217,119,.55);border-radius:16px;padding:12px 16px;margin-bottom:16px;font-size:18px
+  }
+  .rule em{font-style:normal;color:var(--moon);font-weight:800}
+
+  h2{font-size:20px;margin:0 0 10px;line-height:1.4}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;backdrop-filter:blur(6px)}
+  section + section{margin-top:18px}
+
+  .banner{
+    background:linear-gradient(90deg,rgba(255,158,196,.22),rgba(255,158,196,.08));
+    border:1px solid rgba(255,158,196,.5);color:#ffe0ec;
+    border-radius:14px;padding:10px 14px;margin-bottom:14px;font-weight:600
+  }
+
+  .lab{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+  @media (max-width:880px){.lab{grid-template-columns:1fr}}
+
+  .panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .hint{color:var(--muted);font-size:14px}
+  .canvas-box{width:100%;position:relative}
+  canvas{display:block;width:100%}
+  #space{touch-action:none;cursor:grab;border-radius:14px}
+  #space:active{cursor:grabbing}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .legend i.dash{height:0;border-top:2px dashed rgba(255,255,255,.7);border-radius:0}
+  .legend i.tag{width:auto;height:auto;padding:0 4px;font-style:normal;font-size:11px;background:var(--moon);color:#2a2200;font-weight:800}
+  .dir-badge{
+    display:inline-flex;align-items:center;gap:6px;margin:8px 0 2px;
+    padding:4px 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:15px
+  }
+  .dir-badge b.ccw{color:var(--ccw)} .dir-badge b.cw{color:var(--cw)}
+
+  .tilt{margin-top:10px}
+  .tilt label{font-weight:700;font-size:15px}
+  .tilt input{width:100%}
+  .tilt-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;gap:8px}
+  @media (max-width:480px){.tilt-labels{font-size:11.5px;gap:4px}.tilt-labels span{white-space:nowrap}}
+  input[type=range]{accent-color:var(--moon)}
+
+  #view{border-radius:14px}
+  #view.third{touch-action:none;cursor:grab}
+  #view.third:active{cursor:grabbing}
+  #modeSeg{margin-bottom:8px}
+  #modeSeg button{padding:5px 12px;font-size:14px}
+  .view-cap{color:var(--muted);font-size:14px}
+  .face-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 10px}
+  .face-row .seg button{padding:5px 12px;font-size:14px}
+  .phase-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+  #pName{font-size:34px;font-weight:800;color:var(--moon);line-height:1.2}
+  .chip{font-size:14px;padding:3px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line)}
+  .chip.wax{color:var(--ccw);border-color:rgba(110,231,183,.5)}
+  .chip.wane{color:var(--cw);border-color:rgba(255,158,196,.5)}
+  .desc{margin:6px 0 10px;color:#dfe4ff}
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
+  .facts div{background:var(--panel2);border-radius:12px;padding:8px 12px}
+  .facts div.wide{grid-column:1 / -1}
+  .facts div.hl{background:rgba(255,217,119,.12);outline:1px solid rgba(255,217,119,.45)}
+  .facts dt{font-size:13px;color:var(--muted)}
+  .facts dd{margin:0;font-weight:700}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px 26px;align-items:center}
+  .ctrl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ctrl-label{font-weight:700;font-size:15px}
+  .ctrl-label small{font-weight:400;color:var(--muted)}
+  .timebar{margin-top:10px;background:var(--panel2);border-radius:14px;padding:10px 14px 4px}
+  .timebar-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:15px}
+  .timebar-head label{font-weight:700}
+  #hourText{font-weight:800;color:var(--moon);font-size:18px}
+  .daybar{height:8px;border-radius:999px;margin:8px 8px 0;
+    background:linear-gradient(90deg,#141a45 0%,#141a45 19%,#f0a060 25%,#7cc8ff 31%,#7cc8ff 69%,#f0a060 75%,#141a45 81%,#141a45 100%)}
+  .timebar input{width:100%;margin:4px 0 0}
+  .timebar-ticks{position:relative;height:2.9em;margin:0 8px;font-size:12px;color:var(--muted);line-height:1.3}
+  .timebar-ticks span{position:absolute;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap}
+  .timebar-ticks span:first-child{transform:none;text-align:left}
+  .timebar-ticks span:last-child{transform:translateX(-100%);text-align:right}
+  .btn{
+    background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink);
+    border-radius:12px;padding:7px 14px;font:inherit;font-size:15px;cursor:pointer
+  }
+  .btn:hover{background:rgba(255,255,255,.14)}
+  .btn.primary{background:var(--moon);color:#1d1a0b;border-color:transparent;font-weight:700}
+  .seg{display:inline-flex;background:rgba(255,255,255,.06);border-radius:999px;padding:4px;border:1px solid var(--line)}
+  .seg button{border:0;background:transparent;color:var(--muted);padding:7px 14px;border-radius:999px;font:inherit;font-size:15px;cursor:pointer}
+  .seg button.active{background:var(--sky);color:#0a0f24;font-weight:700}
+  .seg button.ccw.active{background:var(--ccw)}
+  .seg button.cw.active{background:var(--cw)}
+  .check{cursor:pointer;font-size:15px}
+  .check input{width:18px;height:18px;accent-color:var(--moon);vertical-align:-3px}
+
+  .seq-row{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;padding:10px;border-radius:16px;opacity:.45;transition:opacity .3s,background .3s}
+  .seq-row.active{opacity:1;background:var(--panel2)}
+  .seq-label{font-weight:800;font-size:18px;line-height:1.35}
+  .seq-label small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+  .seq-label.ccw{color:var(--ccw)} .seq-label.cw{color:var(--cw)}
+  .seq-items{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+  .seq-item{
+    background:transparent;border:2px solid transparent;border-radius:14px;color:var(--ink);
+    padding:6px 2px;cursor:pointer;font:inherit;display:flex;flex-direction:column;align-items:center;gap:2px
+  }
+  .seq-item:hover{background:rgba(255,255,255,.06)}
+  .seq-item canvas{width:52px;height:52px}
+  .seq-item b{font-size:14px}
+  .seq-item small{font-size:12px;color:var(--muted)}
+  .seq-row.active .seq-item.current{border-color:var(--moon);background:rgba(255,217,119,.1)}
+  @media (max-width:760px){
+    .seq-row{grid-template-columns:1fr}
+    .seq-items{grid-template-columns:repeat(4,1fr)}
+  }
+  .note{color:#dfe4ff;margin:12px 4px 0}
+  .note b{color:var(--moon)}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card .ico{font-size:30px;line-height:1}
+  .card h3{margin:6px 0 6px;font-size:19px}
+  .card p{margin:0 0 8px;color:#dfe4ff}
+  .card em{font-style:normal;color:var(--moon);font-weight:700}
+  .mnemonic{font-size:22px;font-weight:800;color:var(--moon);letter-spacing:2px;text-align:center;margin:4px 0 10px}
+  .vs{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px 10px;font-size:15px;align-items:center}
+  .vs .h{text-align:center;font-weight:800}
+  .vs .k{color:var(--muted)}
+  .vs .v{text-align:center;background:var(--panel2);border-radius:8px;padding:2px 4px}
+  .vs canvas{width:64px;height:64px;margin:0 auto}
+
+  .quiz{max-width:720px;margin-left:auto;margin-right:auto}
+  .quiz-top{display:flex;justify-content:space-between;color:var(--muted);font-size:15px}
+  .quiz-q{font-size:20px;font-weight:700;margin:8px 0 10px}
+  .quiz-moon{width:120px;height:120px;margin:0 auto 10px}
+  .quiz-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .quiz-opts button{
+    font:inherit;font-size:17px;padding:12px;border-radius:14px;cursor:pointer;
+    background:rgba(255,255,255,.07);border:2px solid var(--line);color:var(--ink)
+  }
+  .quiz-opts button:hover:not(:disabled){background:rgba(255,255,255,.13)}
+  .quiz-opts button.right{border-color:var(--ccw);background:rgba(110,231,183,.18)}
+  .quiz-opts button.wrong{border-color:var(--cw);background:rgba(255,158,196,.15)}
+  .quiz-opts button:disabled{cursor:default}
+  .quiz-opts.long{grid-template-columns:1fr}
+  .quiz-opts.long button{text-align:left;font-size:16px}
+  .quiz-fb{margin-top:12px;min-height:1.7em}
+  .quiz-fb .ok{color:var(--ccw);font-weight:800}
+  .quiz-fb .no{color:var(--cw);font-weight:800}
+  .quiz-end{text-align:center;padding:10px 0}
+  .quiz-end .big{font-size:44px}
+  footer{text-align:center;color:var(--muted);font-size:14px;margin-top:30px}
+
+  /* ---------- 第二站：地球帶著月亮繞太陽跑（原 02_earth-moon-orbit.html，Antigravity 開發） ---------- */
+  .chapter{text-align:center;margin:44px 0 16px;padding-top:28px;border-top:1px dashed rgba(160,180,255,.3);scroll-margin-top:8px}
+  .chapter .emoji-row{font-size:28px;letter-spacing:6px;margin-bottom:4px}
+  .chapter h2{font-size:clamp(24px,4.2vw,36px);margin:0 0 8px;line-height:1.3}
+  .chapter h2 .e{color:var(--earth)}
+  .chapter h2 .m{color:var(--moon)}
+  .chapter h2 .s{color:var(--sun)}
+  .chapter p{color:var(--muted);max-width:760px;margin:0 auto;font-size:17px}
+  .rule.blue{background:linear-gradient(90deg,rgba(92,184,255,.18),rgba(255,217,119,.08));border-color:rgba(124,200,255,.45);font-size:17px}
+  .rule.blue em{color:var(--sun)}
+  #orbit .stage{grid-template-columns:3fr 2fr}
+  #orbit .panel{min-width:0}
+  #orbit canvas{border-radius:14px}
+  #orbitCanvas{touch-action:none;cursor:grab}
+  #orbitCanvas:active{cursor:grabbing}
+  #orbit .legend span{display:inline-flex;align-items:center}
+  #orbit .legend i.line{height:3px;border-radius:2px}
+  .tilt-box{margin-top:10px;background:var(--panel2);border-radius:14px;padding:10px 14px}
+  .tilt-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:15px}
+  .tilt-head label{font-weight:700}
+  .tilt-box input[type=range]{width:100%;margin:6px 0 2px}
+  #tiltText{color:var(--sun);font-weight:700}
+  #dayText{font-weight:800;color:var(--sun);font-size:18px}
+  .season-bar{height:8px;border-radius:999px;margin:8px 8px 0;
+    background:linear-gradient(90deg,#f4a261 0%,#e76f51 25%,#a8dadc 50%,#457b9d 75%,#f4a261 100%)}
+  .sub-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .preset-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+  .preset-btn{
+    background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--ink);
+    border-radius:10px;padding:6px 10px;font:inherit;font-size:13.5px;cursor:pointer;text-align:left;transition:background .15s,border-color .15s
+  }
+  .preset-btn:hover{background:rgba(255,255,255,.14);border-color:var(--sun)}
+  .status-banner{
+    margin-top:10px;padding:10px 14px;border-radius:14px;font-weight:700;font-size:16px;
+    background:rgba(255,255,255,.06);border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap
+  }
+  .status-banner.eclipse{background:linear-gradient(90deg,rgba(255,158,196,.24),rgba(255,209,102,.18));border-color:var(--cw);color:#fff0f6}
+  #orbit .facts{margin-top:8px}
+  #orbit .facts dd{font-size:15px}
+  #orbit .seg{flex-wrap:wrap}
+  #orbit .seg button{padding:6px 13px;font-size:14px}
+  #orbit .seg button.active{background:var(--sun)}
+  #orbit .check{display:inline-flex;align-items:center;gap:6px}
+  .stage + .rule{margin-top:0}
+  .stage .status-banner{margin-top:8px;padding:6px 12px;font-size:15px}
+  .stage .tilt-box{margin-top:6px;padding:6px 12px}
+  .stage .tilt-box input[type=range]{margin:2px 0 0}
+  .stage .preset-bar{margin-bottom:6px}
+  #orbit .stage .tilt-labels{display:none}
+  #orbit .stage .facts dd{font-size:14px}
+  #orbit .stage .facts dt{font-size:12px}
+  #orbit .tilt-labels span{white-space:normal}
+  #orbit .tilt-labels span:last-child{text-align:right}
+  #orbit .timebar-ticks .mo{font-weight:inherit}
+  @media (max-width:480px){#orbit .timebar-ticks .mo{display:none}}
+  .story-cap{margin-top:10px;background:var(--panel2);border-radius:14px;padding:12px 16px;min-height:10.5em}
+  .story-top{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+  .story-dots{display:flex;gap:6px}
+  .story-dots button{width:18px;height:18px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.12);cursor:pointer;padding:0}
+  .story-dots button.on{background:var(--sun);border-color:transparent}
+  #storyTitle{margin:6px 0 4px;font-size:20px;color:var(--sun);line-height:1.4}
+  #storyText{margin:0;color:#dfe4ff}
+  .story-ctrl{margin-top:10px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <nav class="top">
+    <a href="../index.html" title="回首頁" aria-label="回首頁">🏠</a>
+    <a href="#moon" aria-current="page">🌙 月亮變變變</a>
+    <a href="02_earth-moon-orbit.html">🌍 地球帶著月亮跑</a>
+    <a href="03_eclipses.html">📅 未來20年日食月食</a>
+    <a href="04_planets.html">🪐 八大行星</a>
+  </nav>
+  <div class="top-right">
+    <a class="quiz-link" href="05_quiz.html">⭐ 小測驗 →</a>
+    <div class="top-ctrl" id="ctrlMoon">
+      <button class="btn primary" id="play">▶ 播放</button>
+      <button class="btn" id="prev">◀ 前一天</button>
+      <button class="btn" id="next">後一天 ▶</button>
+      <span class="ctrl-label">速度</span>
+      <input type="range" id="speed" min="0.2" max="4" step="0.1" value="1">
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <section class="stage" id="moon">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>① 從太空看：地球自轉、月亮公轉</h2>
+        <span class="hint">👆 拖曳月亮讓它繞地球轉</span>
+      </div>
+      <div id="imagineBanner" class="banner" hidden>🧪 想像實驗模式：真實的月亮是「逆時針」繞地球（從北極上方看）。現在讓月亮反過來轉，看看月相的順序會怎麼變？</div>
+      <div class="canvas-box fill"><canvas id="space" aria-label="從太空看太陽、地球、月亮，以及黃道面和月道面"></canvas></div>
+      <div class="legend">
+        <span><i style="background:rgba(255,209,102,.55)"></i>黃道面：地球繞太陽的平面</span>
+        <span><i style="background:rgba(124,200,255,.55)"></i>月道面：月亮繞地球的平面</span>
+        <span><i class="dash"></i>交點線：兩個平面交叉的地方</span>
+        <span><i style="background:rgba(255,158,122,.95);height:3px;vertical-align:3px"></i>最高點到最低點的連線：看月道面往哪一邊斜</span>
+        <span><i style="background:rgba(0,0,0,.6)"></i>地球的影子</span>
+        <span><i style="background:#fff;height:3px;vertical-align:3px"></i>地球自轉軸（北極、南極），旁邊的黃色虛線是垂直黃道面的方向</span>
+        <span><i class="tag">右</i>從地球面向月亮時的左右手，太陽那一邊會變黃</span>
+      </div>
+      <div class="tilt">
+        <div class="tilt-row"><label for="tilt">🎥 觀看角度</label><span class="tilt-end">側面</span><input type="range" id="tilt" min="0" max="90" value="40"><span class="tilt-end" id="tiltTop">北極上方 ⬇</span><label class="check"><input type="checkbox" id="fromSouth"> 改從南極看</label><div class="dir-badge" id="dirBadge"></div></div>
+      </div>
+      <div class="panel-ctrls">
+        <div class="ctrl">
+          <span class="ctrl-label">公轉方向 <small>（從北極上方看）</small></span>
+          <div class="seg" id="dirSeg">
+            <button data-dir="1" class="ccw active">↺ 逆時針（真實）</button>
+            <button data-dir="-1" class="cw">↻ 順時針（想像）</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">我住在</span>
+          <div class="seg" id="hemiSeg">
+            <button data-s="0" class="active">北半球（台灣）</button>
+            <button data-s="1">南半球（澳洲）</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">季節</span>
+          <div class="seg" id="seasonSeg">
+            <button data-season="0">🌸 3月 春分</button>
+            <button data-season="90">☀️ 6月 夏至</button>
+            <button data-season="180">🍁 9月 秋分</button>
+            <button data-season="270" class="active">❄️ 12月 冬至</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label class="check"><input type="checkbox" id="useYear"> 月道面方向照真實年份</label>
+          <input type="number" id="nodeYear" min="1900" max="2100" step="1" value="2026" disabled>
+          <span class="hint" id="nodeYearInfo"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>② 小朋友抬頭看到的天空</h2>
+        <div class="seg" id="modeSeg">
+          <button data-m="eye" class="active">👀 小朋友的眼睛</button>
+          <button data-m="third">🎥 旁觀者</button>
+        </div>
+      </div>
+      <div class="face-row">
+        <span class="view-cap" id="viewCap">住在台灣（北半球），面向南方看天空</span>
+        <div class="seg" id="faceSeg">
+          <button data-f="S" class="active">面向南方</button>
+          <button data-f="N">🔄 轉身面向北方</button>
+        </div>
+      </div>
+      <div class="canvas-box fill"><canvas id="view" aria-label="從地球上看到的天空、太陽和月亮"></canvas></div>
+      <div class="timebar">
+        <div class="timebar-head"><label for="hour">🕐 時間：拉拉看，讓地球轉一轉</label><span id="hourText"></span></div>
+        <div class="daybar" aria-hidden="true"></div>
+        <input type="range" id="hour" min="0" max="24" step="0.1" value="19">
+        <div class="timebar-ticks" aria-hidden="true">
+          <span style="left:0">🌙<br>半夜</span>
+          <span style="left:25%">🌅<br>早上 6 點</span>
+          <span style="left:50%">☀️<br>中午</span>
+          <span style="left:75%">🌇<br>晚上 6 點</span>
+          <span style="left:100%">🌙<br>半夜</span>
+        </div>
+      </div>
+      <div class="phase-name"><span id="pName">眉月</span><span id="pTrend" class="chip"></span></div>
+      <p class="desc" id="pDesc"></p>
+      <dl class="facts">
+        <div class="hl wide"><dt>哪一邊亮？</dt><dd id="fLit"></dd></div>
+        <div><dt>農曆大約</dt><dd id="fDay"></dd></div>
+        <div><dt>現在看得到嗎？</dt><dd id="fSee"></dd></div>
+        <div><dt>月亮升起</dt><dd id="fRise"></dd></div>
+        <div><dt>亮的部分</dt><dd id="fPct"></dd></div>
+        <div class="w2"><dt>什麼時候看得到？</dt><dd id="fWhen"></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 重點整理（第一站） -->
+  <div class="rule">🔑 <b>分辨左邊亮還是右邊亮：</b><em>亮的那一面，永遠朝著太陽！</em>面向月亮的時候，太陽在你的右手邊，月亮就是右邊亮；太陽在左手邊，月亮就是左邊亮。</div>
+
+  <section class="panel">
+    <h2>③ 月相的順序：轉的方向不一樣，順序就反過來！</h2>
+    <div class="seq-row" data-dir="1">
+      <div class="seq-label ccw">↺ 逆時針<small>真實的月亮</small></div>
+      <div class="seq-items"></div>
+    </div>
+    <div class="seq-row" data-dir="-1">
+      <div class="seq-label cw">↻ 順時針<small>想像的月亮</small></div>
+      <div class="seq-items"></div>
+    </div>
+    <p class="note">🔍 <b>小發現：</b>月亮在<b>同一個位置</b>，看起來的形狀一模一樣（因為太陽照的方向沒變）。可是轉的方向相反，<b>先出現哪個形狀</b>就相反了！所以在想像世界裡，<b>上弦月會變成左邊亮</b>。（這裡畫的是月亮在正南方時的樣子）</p>
+  </section>
+
+  <section>
+    <div class="cards">
+      <div class="card">
+        <div class="ico">🔦</div>
+        <h3>亮面永遠朝著太陽</h3>
+        <p>月亮像一顆大球，太陽永遠照亮朝向太陽的那一半。所以<em>太陽在哪一邊，月亮就哪一邊亮</em>。</p>
+        <p>傍晚太陽在西邊下山，這時看到的上弦月亮面朝西（右邊）；清晨太陽從東邊升起，這時看到的下弦月亮面朝東（左邊）。</p>
+      </div>
+      <div class="card">
+        <div class="ico">🌍</div>
+        <h3>地球自轉：東升西落</h3>
+        <p>地球一天自己轉一圈（從北極上方看是<em>逆時針</em>），所以太陽、月亮看起來都是<em>從東邊升起、往西邊落下</em>。</p>
+        <p>月亮在地平線上面才看得到；白天如果月亮在天上，也看得到喔！</p>
+      </div>
+      <div class="card">
+        <div class="ico">🌐</div>
+        <h3>自轉軸斜了 23.4 度</h3>
+        <p>地球的自轉軸不是直的，而是斜了大約 <em>23.4 度</em>，而且一直指向同一個方向（北極星）。所以北回歸線在北緯 23.4 度左右，剛好通過嘉義。</p>
+        <p>6 月夏至時北極<em>朝向</em>太陽，台灣的太陽很高、白天很長；12 月冬至時北極<em>背對</em>太陽，太陽很低。有趣的是，冬天的滿月反而特別高！換換「季節」看看。</p>
+      </div>
+      <div class="card">
+        <div class="ico">🧭</div>
+        <h3>為什麼看月亮要面向南方？</h3>
+        <p>太陽和月亮在天上走的路差不多，從台灣（北半球）看，這條路在<em>偏南的天空</em>。面向北方的話，月亮就在你背後，你會看到北極星和北斗七星。</p>
+        <p>面向南方時，<em>東邊在左手、西邊在右手</em>，所以亮面朝西的上弦月是右邊亮。左右會跟著你轉身改變，但<em>亮面朝西</em>不會變，所以口訣是說東、西。</p>
+      </div>
+      <div class="card">
+        <div class="ico">🏹</div>
+        <h3>為什麼叫「上弦」「下弦」？</h3>
+        <p>半個月亮的直直邊，很像弓上面綁的那條<em>弦</em>（是「弓弦」的弦，不是「玄」喔）。</p>
+        <p>農曆<em>上半月</em>（初七、初八）看到的半月叫<em>上弦月</em>；農曆<em>下半月</em>（廿二、廿三）看到的叫<em>下弦月</em>。</p>
+      </div>
+      <div class="card">
+        <div class="ico">🔑</div>
+        <h3>記憶口訣（北半球）</h3>
+        <div class="mnemonic">上上上西西<br>下下下東東</div>
+        <div class="vs">
+          <span></span><span class="h">上弦月</span><span class="h">下弦月</span>
+          <span></span><canvas id="vsUp"></canvas><canvas id="vsDown"></canvas>
+          <span class="k">農曆</span><span class="v">上半月</span><span class="v">下半月</span>
+          <span class="k">看得到</span><span class="v">上半夜</span><span class="v">下半夜</span>
+          <span class="k">在天空</span><span class="v">西半邊</span><span class="v">東半邊</span>
+          <span class="k">亮面朝</span><span class="v">西（右）</span><span class="v">東（左）</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ico">💿</div>
+        <h3>黃道面和月道面</h3>
+        <p><em>黃道面</em>是地球繞太陽走的平面；<em>月道面</em>是月亮繞地球走的平面。</p>
+        <p>兩個平面斜了大約 <em>5 度</em>，所以新月和滿月時，月亮通常從太陽或地球影子的上面、下面經過，不會每個月都有日食和月食。把「觀看角度」拉到側面看看！</p>
+        <p>月道面斜的方向不是永遠固定：它<em>18.6 年</em>會慢慢轉一圈。圖裡預設用好記的方向（3 月、9 月是食季）；在 ① 下面勾選「月道面方向照真實年份」，就會照你填的那一年（例如 2026 年）的方向畫。</p>
+        <p>小心別搞混：地球旁邊標「斜 23.4°」的是<em>地球自轉軸</em>，和月道面是兩回事喔。</p>
+      </div>
+      <div class="card">
+        <div class="ico">🔄</div>
+        <h3>順時針還是逆時針？看你從哪一面看！</h3>
+        <p>從<em>北極上方</em>往下看，月亮是<em>逆時針</em>繞地球。可是從<em>南極下方</em>往上看，同一個月亮看起來卻是<em>順時針</em>！試試勾選「改從南極看」。</p>
+        <p>同樣的道理，南半球的人看到的月亮是<em>左右顛倒</em>的：他們的上弦月是左邊亮。</p>
+      </div>
+      <div class="card">
+        <div class="ico">🧪</div>
+        <h3>想像實驗：如果月亮順時針轉？</h3>
+        <p>新月過後，月亮會先跑到太陽的西邊，所以第一彎月牙會在<em>清晨的東方天空</em>出現，而且是<em>左邊亮</em>。</p>
+        <p>整個月相順序都倒過來了：上弦月左邊亮、下弦月右邊亮。把方向切換到「順時針」玩玩看！</p>
+      </div>
+    </div>
+  </section>
+
+
+  <footer>🌍 地球 · 🌙 月亮 · ☀️ 太陽　｜　圖中的大小和距離都有放大縮小，方便觀察喔！</footer>
+</div>
+
+<script>
+(() => {
+  const DEG = Math.PI / 180;
+  const TAU = Math.PI * 2;
+  const SYNODIC = 29.53;
+  const LAT = 23.5 * DEG;
+  const OBLIQUITY = 23.44 * DEG;  // 地球自轉軸傾角
+  const INCLINATION = 5.1 * DEG;  // 月道面和黃道面的夾角
+  const $ = s => document.querySelector(s);
+  const norm = a => ((a % TAU) + TAU) % TAU;
+  const FONT = '"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif';
+
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const scale = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
+  const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
+  const unit = a => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return scale(a, 1 / l); };
+  const SUN = [-1, 0, 0];  // 太陽在 -x 方向（畫面左邊）
+
+  const PHASES = [
+    { name: '新月', day: '初一',
+      desc: '月亮跑到太陽和地球中間，亮的那面背對我們，所以幾乎看不到。' },
+    { name: '眉月', day: '初三、四',
+      desc: '新月過後，出現細細彎彎像眉毛的月牙，正在一天一天變胖。' },
+    { name: '上弦月', day: '初七、八',
+      desc: '一半亮一半暗！直直的邊像弓弦。它出現在農曆上半月，所以叫「上弦」。' },
+    { name: '盈凸月', day: '十一、二',
+      desc: '亮的部分超過一半了，還在繼續變胖！' },
+    { name: '滿月', day: '十五、六',
+      desc: '地球在太陽和月亮中間，月亮亮的那面整個朝向我們，圓圓的！' },
+    { name: '虧凸月', day: '十八、九',
+      desc: '過了滿月，月亮開始一天一天變瘦。' },
+    { name: '下弦月', day: '廿二、三',
+      desc: '又是一半亮一半暗，但亮的方向和上弦月相反。它出現在農曆下半月，所以叫「下弦」。' },
+    { name: '殘月', day: '廿六、七',
+      desc: '只剩細細的月牙，再過幾天就是新月了。' },
+  ];
+
+  // 世界座標：黃道面是 z=0，太陽在 -x 方向，地球在原點，+z 是北方
+  // phi：月亮在月道面上的角度（從北極上方看，+x 為 0，逆時針增加）
+  const state = {
+    phi: norm(Math.PI + 50 * DEG),
+    dir: 1,          // 1 = 逆時針（真實），-1 = 順時針（想像）
+    south: false,
+    playing: false,   // 預設暫停，按右上角「播放」才開始
+    speed: 1,
+    tilt: 40 * DEG,
+    dragging: false,
+    hinted: false,
+    hour: 19,        // 觀察者當地時間（0～24）
+    faceNorth: false, // 面向北方（北半球預設面向南、南半球預設面向北）
+    third: false,     // ② 用旁觀者的天球圖
+    domeAz: Math.PI,  // 天球圖鏡頭看的方位（0 北、90° 東、180° 南）：預設站在小朋友背後
+    domeEl: 28 * DEG, // 天球圖鏡頭往下看的角度
+    season: 270,      // 太陽黃經：0 春分、90 夏至、180 秋分、270 冬至（11 月最接近冬至）
+    year: 2026,       // 月道面的方向照哪一年畫（18.6 年轉一圈）
+    nodeLon: 180,     // 升交點的黃經（度）：預設 180°（簡化），勾選「照真實年份」才用 nodeLonOfYear(year)
+    seasonTarget: 270, // 按季節按鈕後，season 慢慢轉到這裡（看得出地球繞太陽走）
+    view: { limb: 0, moonAlt: 0, sunAlt: 0, behind: false, frameDefault: true },
+  };
+
+  const ageAngle = (phi, dir) => norm(dir === 1 ? phi - Math.PI : Math.PI - phi);
+  const phiFromAge = (A, dir) => norm(dir === 1 ? Math.PI + A : Math.PI - A);
+
+  // 升交點的黃經（度）：月道面由南往北穿過黃道面的那個方向。它 18.6 年順時針轉一圈，
+  // 所以每一年都不一樣；這裡取那一年年中的值（2026 年約 333°）。公式和 03_eclipses.html 相同。
+  const nodeLonOfYear = y => {
+    const T = (y + 0.5 - 2000) / 100;
+    return (((125.0445479 - 1934.1362891 * T + 0.0020754 * T * T) % 360) + 360) % 360;
+  };
+  // 月亮的方向（單位向量）。這裡的座標裡太陽固定在 -x，phi 是月亮相對太陽的方向，
+  // 所以月亮的黃經 = 太陽黃經（season）+ phi − 180°。
+  // 月道面斜 5.1°，月亮離黃道面的高度 = 5.1° × sin(月亮黃經 − 升交點黃經)。
+  // 升交點的方向在一年之內幾乎固定，所以從太陽這邊看，月道面會跟著季節轉。
+  function moonVec(phi) {
+    const z = Math.tan(INCLINATION) * Math.sin(phi + (state.season - 180 - state.nodeLon) * DEG);
+    const n = Math.hypot(1, z);
+    return [Math.cos(phi) / n, Math.sin(phi) / n, z / n];
+  }
+
+  // 月亮在正南方時（北半球）的樣子：cosT = 太陽-地球-月亮夾角的 cos，side = 亮面在右(+1)/左(-1)
+  function moonLook(phi) {
+    return { cosT: -Math.cos(phi), side: Math.sin(phi) < 0 ? 1 : -1 };
+  }
+
+  function phaseIndex(A) {
+    const d = A / DEG;
+    if (d < 12 || d >= 348) return 0;
+    if (d < 78) return 1;
+    if (d < 102) return 2;
+    if (d < 168) return 3;
+    if (d < 192) return 4;
+    if (d < 258) return 5;
+    if (d < 282) return 6;
+    return 7;
+  }
+
+  // 觀察者：站在地球上，跟著地球自轉。中午面向太陽，晚上 6 點太陽在西方地平線
+  // 地球自轉軸：斜 23.44°，傾斜的方向固定在太空中，所以跟太陽的相對方向依季節改變。
+  // season＝太陽的黃經（3 月春分 0、6 月夏至 90、9 月秋分 180、12 月冬至 270）。
+  // 畫面裡太陽固定在 -x，所以轉動的是自轉軸：夏至時北極朝向太陽，冬至時背對太陽。
+  function earthFrame() {
+    const eps = OBLIQUITY;
+    const ang = (270 - state.season) * DEG;
+    const A = [Math.sin(eps) * Math.cos(ang), Math.sin(eps) * Math.sin(ang), Math.cos(eps)];
+    const e1 = unit(add(SUN, A, -dot(SUN, A)));  // 赤道面上朝向太陽（當地中午）
+    const e2 = cross(A, e1);                      // 赤道面上的晚上 6 點方向
+    return { eps, A, e1, e2 };
+  }
+
+  // 觀察者：站在地球上，跟著地球繞自轉軸轉。中午面向太陽，晚上 6 點太陽在西方地平線
+  function observer(hour = state.hour) {
+    const { A, e1, e2 } = earthFrame();
+    const lat = (state.south ? -1 : 1) * LAT;
+    const H = (hour - 12) / 24 * TAU;
+    const Zn = add(scale(add(scale(e1, Math.cos(H)), e2, Math.sin(H)), Math.cos(lat)), A, Math.sin(lat));
+    const E = unit(cross(A, Zn));     // 東
+    const N = cross(Zn, E);           // 北
+    const F = state.faceNorth ? N : scale(N, -1); // 面向的方向
+    const Rt = cross(F, Zn);                      // 右手邊
+    return { lat, H, Zn, E, N, F, Rt, A, e1, e2 };
+  }
+
+  // 星星（赤經：小時、赤緯：度）
+  const DIPPER = [[11.06,61.75],[11.03,56.38],[11.9,53.69],[12.26,57.03],[12.9,55.96],[13.4,54.93],[13.79,49.31]];
+  const DIPPER_LINES = [[0,1],[1,2],[2,3],[3,0],[3,4],[4,5],[5,6]];
+  const CRUX = [[12.44,-63.1],[12.52,-57.1],[12.8,-59.7],[12.25,-58.75]];
+  const CRUX_LINES = [[0,1],[2,3]];
+  // 赤道座標 → 黃道座標（繞春分方向轉 eps）→ 畫面座標（繞 z 轉，讓太陽落在 -x）
+  const starVec = ([ra, dec]) => {
+    const a = ra * 15 * DEG, d = dec * DEG;
+    const eps = OBLIQUITY;
+    const x = Math.cos(d) * Math.cos(a), y = Math.cos(d) * Math.sin(a), z = Math.sin(d);
+    const ye = y * Math.cos(eps) + z * Math.sin(eps), ze = -y * Math.sin(eps) + z * Math.cos(eps);
+    const th = (180 - state.season) * DEG;
+    return [x * Math.cos(th) - ye * Math.sin(th), x * Math.sin(th) + ye * Math.cos(th), ze];
+  };
+
+  const CRATERS = [[-0.35,-0.3,0.16],[0.25,-0.45,0.1],[0.4,0.15,0.18],[-0.1,0.38,0.13],[-0.52,0.22,0.08],[0.05,-0.05,0.09],[0.6,-0.18,0.07],[-0.2,-0.62,0.07]];
+
+  function drawCraters(ctx, r, color) {
+    ctx.fillStyle = color;
+    for (const [x, y, s] of CRATERS) {
+      ctx.beginPath(); ctx.arc(x * r, y * r, s * r, 0, TAU); ctx.fill();
+    }
+  }
+
+  // 畫出從地球看到的月亮；opt.rot 讓亮面（side=+1 時的右邊）轉向指定方向
+  function drawMoon(ctx, cx, cy, r, cosT, side, opt = {}) {
+    const da = opt.darkAlpha ?? 1;
+    ctx.save();
+    ctx.translate(cx, cy);
+    if (opt.flip) ctx.rotate(Math.PI);
+    if (opt.rot) ctx.rotate(opt.rot);
+
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU);
+    ctx.fillStyle = `rgba(39,45,75,${da})`; ctx.fill();
+    if (opt.craters && da > 0.3) drawCraters(ctx, r, `rgba(0,0,0,${0.2 * da})`);
+
+    const N = 60;
+    ctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      const u = -1 + 2 * i / N, w = Math.sqrt(1 - u * u);
+      i ? ctx.lineTo(side * r * w, u * r) : ctx.moveTo(side * r * w, u * r);
+    }
+    for (let i = N; i >= 0; i--) {
+      const u = -1 + 2 * i / N, w = Math.sqrt(1 - u * u);
+      ctx.lineTo(side * r * cosT * w, u * r);
+    }
+    ctx.closePath();
+
+    if (opt.glow) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(255,225,140,0.6)';
+      ctx.shadowBlur = r * 0.35;
+      ctx.fillStyle = '#fff6da'; ctx.fill();
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.clip();
+    const g = ctx.createRadialGradient(-r * 0.2, -r * 0.25, r * 0.1, 0, 0, r);
+    g.addColorStop(0, '#fffbea'); g.addColorStop(1, '#eadb9f');
+    ctx.fillStyle = g; ctx.fillRect(-r, -r, 2 * r, 2 * r);
+    if (opt.craters) drawCraters(ctx, r, 'rgba(160,140,90,0.28)');
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU);
+    ctx.strokeStyle = `rgba(255,255,255,${0.14 * da})`; ctx.lineWidth = Math.max(1, r * 0.03); ctx.stroke();
+    ctx.restore();
+  }
+
+  // 太空視角的地球、月亮：背對太陽的那一半是暗的。
+  // night.ang＝畫面上「背對太陽」的方向（0＝太陽在左邊）；night.mode：'half' 一半暗、'none' 太陽在鏡頭這邊、'full' 太陽在後面
+  const night = { ang: 0, mode: 'half' };
+  function drawNight(ctx, x, y, r) {
+    if (night.mode === 'none') return;
+    ctx.save();
+    ctx.translate(x, y);
+    if (night.mode === 'full') {
+      ctx.fillStyle = 'rgba(4,7,22,0.6)'; ctx.fillRect(-r, -r, 2 * r, 2 * r);
+    } else {
+      ctx.rotate(night.ang);
+      const s = ctx.createLinearGradient(-r * 0.15, 0, r * 0.15, 0);
+      s.addColorStop(0, 'rgba(4,7,22,0)'); s.addColorStop(1, 'rgba(4,7,22,0.8)');
+      ctx.fillStyle = s; ctx.fillRect(-r * 0.15, -r * 1.1, r * 1.3, 2.2 * r);
+    }
+    ctx.restore();
+  }
+  function drawMoonBody(ctx, x, y, r) {
+    ctx.save();
+    ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.clip();
+    const g = ctx.createRadialGradient(x - r * 0.4, y - r * 0.3, r * 0.1, x, y, r);
+    g.addColorStop(0, '#fffbea'); g.addColorStop(1, '#cfc4a0');
+    ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+    ctx.save(); ctx.translate(x, y); drawCraters(ctx, r, 'rgba(120,105,70,0.3)'); ctx.restore();
+    drawNight(ctx, x, y, r);
+    ctx.restore();
+  }
+
+  // 會自轉的地球：陸地跟著轉，台灣（或澳洲）永遠在觀察者的位置
+  const LANDS = [[45,90,.42],[22,78,.16],[52,15,.2],[5,20,.33],[45,-100,.36],[-15,-60,.27],[-25,134,.2],[72,-40,.14],[-88,0,.35]];
+  // 地球上經緯度 (L, G) 的方向；G 從觀察者的經度算起，加上自轉角 H
+  const surface = (o, L, G) => add(scale(add(scale(o.e1, Math.cos(G)), o.e2, Math.sin(G)), Math.cos(L)), o.A, Math.sin(L));
+  function drawEarth(ctx, P, er, o, obsLon, cam) {
+    const c = P([0, 0, 0]);
+    ctx.save();
+    ctx.beginPath(); ctx.arc(c.x, c.y, er, 0, TAU); ctx.clip();
+    const g = ctx.createRadialGradient(c.x - er * 0.4, c.y - er * 0.3, er * 0.1, c.x, c.y, er);
+    g.addColorStop(0, '#7fd3ff'); g.addColorStop(1, '#1f5fbf');
+    ctx.fillStyle = g; ctx.fillRect(c.x - er, c.y - er, 2 * er, 2 * er);
+    ctx.fillStyle = '#4fbf6a';
+    for (const [la, lo, s] of LANDS) {
+      const v = surface(o, la * DEG, lo * DEG - obsLon + o.H);
+      const f = dot(v, cam);
+      if (f <= 0) continue;
+      const p = P(v, er);
+      ctx.beginPath(); ctx.arc(p.x, p.y, er * s * (0.45 + 0.55 * f), 0, TAU); ctx.fill();
+    }
+    // 赤道（看得出地球斜斜的）
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    let pen = false;
+    for (let i = 0; i <= 72; i++) {
+      const v = surface(o, 0, i / 72 * TAU);
+      if (dot(v, cam) < 0) { pen = false; continue; }
+      const p = P(v, er);
+      pen ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+      pen = true;
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+    drawNight(ctx, c.x, c.y, er);
+    ctx.restore();
+  }
+
+  function arrowHead(ctx, x1, y1, x2, y2, size, color) {
+    const a = Math.atan2(y2 - y1, x2 - x1);
+    ctx.save(); ctx.translate(x2, y2); ctx.rotate(a);
+    ctx.beginPath(); ctx.moveTo(size * 0.4, 0); ctx.lineTo(-size, -size * 0.65); ctx.lineTo(-size, size * 0.65); ctx.closePath();
+    ctx.fillStyle = color; ctx.fill(); ctx.restore();
+  }
+  function polyline(ctx, pts) {
+    ctx.beginPath();
+    pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+  }
+  function tag(ctx, x, y, text, on, fs) {
+    ctx.font = `800 ${fs}px ${FONT}`;
+    const w = ctx.measureText(text).width + 10, h = fs + 6;
+    ctx.fillStyle = on ? '#ffd977' : 'rgba(255,255,255,0.18)';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x - w / 2, y - h / 2, w, h, 5); else ctx.rect(x - w / 2, y - h / 2, w, h);
+    ctx.fill();
+    ctx.fillStyle = on ? '#2a2200' : '#e8ecff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(text, x, y + 1);
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  function makeStars(n) {
+    const out = [];
+    for (let i = 0; i < n; i++) out.push([Math.random(), Math.random(), Math.random() * 1.2 + 0.3, Math.random() * 0.6 + 0.2]);
+    return out;
+  }
+  function drawStars(ctx, w, h, stars, k = 1) {
+    if (k <= 0) return;
+    for (const [x, y, r, a] of stars) {
+      ctx.fillStyle = `rgba(255,255,255,${a * k})`;
+      ctx.beginPath(); ctx.arc(x * w, y * h, r, 0, TAU); ctx.fill();
+    }
+  }
+
+  function setupCanvas(el, ratio) {
+    const o = { el, ctx: el.getContext('2d'), w: 0, h: 0 };
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      // .fill 的盒子：畫布填滿面板剩下的空間（寬螢幕一個畫面放得下）；其他照寬高比
+      const box = el.parentElement, fill = box.classList.contains('fill');
+      const w = box.clientWidth;
+      const h = fill ? box.clientHeight : Math.round(w * ratio);
+      if (!w || !h || (w === o.w && h === o.h)) return;
+      if (!fill) el.style.height = h + 'px';
+      el.width = Math.round(w * dpr); el.height = Math.round(h * dpr);
+      o.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      o.w = w; o.h = h;
+    };
+    new ResizeObserver(resize).observe(el.parentElement);
+    resize();
+    return o;
+  }
+
+  const S = setupCanvas($('#space'), 0.85);
+  const V = setupCanvas($('#view'), 0.9);
+  const starsS = makeStars(110), starsV = makeStars(80);
+
+  // ---------- ① 太空視角 ----------
+  function renderSpace(t) {
+    const { ctx, w, h } = S;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#060a1c'; ctx.fillRect(0, 0, w, h);
+    drawStars(ctx, w, h, starsS);
+
+    const cx = w * 0.5, cy = h * 0.5;
+    const sa = Math.sin(state.tilt), ca = Math.cos(state.tilt);
+    // 月亮軌道半徑：盡量畫大（太陽大小不跟著變）。寬度要放得下外圈 8 個月相小圖、文字和旁邊的太陽；
+    // 高度依觀看角度算：斜著看時軌道是扁的可以放大，從正上方、正下方看時才受高度限制
+    const R = Math.min((w * 0.5 - 105) / 1.27, (h / 2 - 35) / (1.27 * Math.abs(sa) + 0.12));
+    // 畫面跟著季節轉：計算用的座標裡太陽固定在 -x，畫的時候整個繞黃道面的垂直線轉 psi，
+    // 這樣自轉軸和月道面在畫面上固定不動，太陽和陽光換方向（像地球繞著太陽走）。
+    // Ps＝畫面座標的投影，P＝計算座標的投影；cam＝計算座標裡指向鏡頭的方向
+    const psi = (state.season - 270) * DEG, cps = Math.cos(psi), sps = Math.sin(psi);
+    const rz = v => [v[0] * cps - v[1] * sps, v[0] * sps + v[1] * cps, v[2]];
+    const camS = [0, -ca, sa];
+    const cam = [camS[0] * cps + camS[1] * sps, -camS[0] * sps + camS[1] * cps, camS[2]];
+    const Ps = (v, k = 1) => ({ x: cx + v[0] * k, y: cy - (v[1] * k * sa + v[2] * k * ca), d: dot(v, camS) * k });
+    const P = (v, k = 1) => Ps(rz(v), k);
+    S.geom = { P, R };
+    const dirColor = state.dir === 1 ? '#6ee7b7' : '#ff9ec4';
+    const fs = Math.max(11, Math.min(14, w / 45));
+    const er = R * 0.21, mr = R * 0.085;
+
+    // 黃道面
+    const ecl = [[-R * 1.8, -R * 1.5, 0], [R * 1.8, -R * 1.5, 0], [R * 1.8, R * 1.5, 0], [-R * 1.8, R * 1.5, 0]].map(v => Ps(v));
+    polyline(ctx, ecl); ctx.closePath();
+    ctx.fillStyle = 'rgba(255,209,102,0.07)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,209,102,0.35)'; ctx.lineWidth = 1; ctx.stroke();
+    if (Math.abs(sa) > 0.2) {
+      const lp = Ps([-R * 1.5, R * 1.36, 0]);
+      ctx.fillStyle = 'rgba(255,215,120,0.9)'; ctx.font = `700 ${fs}px ${FONT}`; ctx.textAlign = 'center';
+      ctx.fillText('黃道面', lp.x, lp.y);
+    }
+
+    // 太陽：畫在畫布邊緣，方向跟著季節換（計算座標的 -x 轉到畫面上）
+    // edgeOf(a)＝黃道面上方向角 a 的那個方向，在畫面上碰到畫布邊緣的位置和方向
+    const edgeOf = dir3 => {
+      const ux = dir3[0], uy = -dir3[1] * sa, L = Math.hypot(ux, uy);
+      if (L < 0.2) return null; // 幾乎正對或背對鏡頭，畫面上看不出方向
+      const nx = ux / L, ny = uy / L;
+      const tx = nx > 0 ? (w - cx) / nx : nx < 0 ? -cx / nx : Infinity;
+      const ty = ny > 0 ? (h - cy) / ny : ny < 0 ? -cy / ny : Infinity;
+      const tt = Math.min(tx, ty);
+      return { nx, ny, x: cx + nx * tt, y: cy + ny * tt };
+    };
+    const sunR = h * 0.2;
+    const sunS = rz(SUN);
+    const se = edgeOf(sunS);
+    // 其他季節太陽會在哪一邊（淡淡的小記號），看得出地球繞太陽一圈
+    const SEASON_MARK = [[0, '3月'], [90, '6月'], [180, '9月'], [270, '12月']];
+    for (const [sv, name] of SEASON_MARK) {
+      const dd = ((state.season - sv) % 360 + 540) % 360 - 180;
+      if (Math.abs(dd) < 25) continue;
+      const a = (sv - 90) * DEG;
+      const e = edgeOf([Math.cos(a), Math.sin(a), 0]);
+      if (!e) continue;
+      const mx = Math.max(34, Math.min(w - 34, e.x - e.nx * 22)), my = Math.max(40, Math.min(h - 16, e.y - e.ny * 22));
+      ctx.beginPath(); ctx.arc(mx, my, 9, 0, TAU);
+      ctx.fillStyle = 'rgba(255,209,102,0.28)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,209,102,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = 'rgba(255,225,160,0.6)'; ctx.font = `600 ${fs - 2}px ${FONT}`; ctx.textAlign = 'center';
+      ctx.fillText(`${name}的太陽`, Math.max(40, Math.min(w - 40, mx)), my + 22);
+    }
+    let g;
+    if (se) {
+      const sx = se.x + se.nx * sunR * 0.35, sy = se.y + se.ny * sunR * 0.35;
+      g = ctx.createRadialGradient(sx, sy, sunR * 0.5, sx, sy, sunR * 2.4);
+      g.addColorStop(0, 'rgba(255,214,102,0.4)'); g.addColorStop(1, 'rgba(255,214,102,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      g = ctx.createRadialGradient(sx, sy, 0, sx, sy, sunR);
+      g.addColorStop(0, '#fff7d1'); g.addColorStop(0.6, '#ffd166'); g.addColorStop(1, '#ff9f43');
+      ctx.beginPath(); ctx.arc(sx, sy, sunR, 0, TAU); ctx.fillStyle = g; ctx.fill();
+      ctx.fillStyle = '#7a3f00'; ctx.font = `700 ${fs + 2}px ${FONT}`; ctx.textAlign = 'center';
+      ctx.fillText('太陽', Math.max(26, Math.min(w - 26, sx - se.nx * sunR * 0.6)), Math.max(20, Math.min(h - 10, sy - se.ny * sunR * 0.6 + 5)));
+      night.mode = 'half'; night.ang = Math.atan2(-se.ny, -se.nx);
+    } else {
+      // 從側面看、而且太陽剛好在鏡頭這邊或地球後面
+      const toward = dot(sunS, camS) > 0;
+      night.mode = toward ? 'none' : 'full';
+      ctx.fillStyle = 'rgba(255,230,160,0.9)'; ctx.font = `700 ${fs}px ${FONT}`; ctx.textAlign = 'center';
+      ctx.fillText(toward ? '☀ 太陽在你（鏡頭）這一邊' : '☀ 太陽在地球後面', cx, h - 14);
+    }
+
+    // 陽光：從太陽那邊平行照過來（計算座標裡沿著 +x）
+    ctx.lineWidth = 1.2;
+    const gapW = R * 0.8, offW = (t * 0.0004 * R) % gapW, span = R * 2.6;
+    for (let i = -3; i <= 3; i++) {
+      const yy = i * R * 0.5;
+      const p0 = P([-span, yy, 0]), p1 = P([span, yy, 0]);
+      ctx.strokeStyle = 'rgba(255,220,130,0.14)';
+      ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+      for (let x = -span + offW; x < span; x += gapW) {
+        const a0 = P([x - 5, yy, 0]), a1 = P([x, yy, 0]);
+        if (Math.hypot(a1.x - a0.x, a1.y - a0.y) > 0.5) arrowHead(ctx, a0.x, a0.y, a1.x, a1.y, 5, 'rgba(255,220,130,0.35)');
+      }
+    }
+    ctx.fillStyle = 'rgba(255,230,160,0.85)'; ctx.font = `600 ${fs}px ${FONT}`; ctx.textAlign = 'left';
+    ctx.fillText('☀ 陽光從太陽那邊照過來（換季節，太陽就換邊）', 10, 22);
+
+    // 地球的影子（往背對太陽的方向延伸）
+    {
+      const s0 = P([0, 0, 0]), s1 = P([R * 2.2, 0, 0]);
+      if (Math.hypot(s1.x - s0.x, s1.y - s0.y) > 2) {
+        g = ctx.createLinearGradient(s0.x, s0.y, s1.x, s1.y);
+        g.addColorStop(0, 'rgba(0,0,0,0.5)'); g.addColorStop(1, 'rgba(0,0,0,0.05)');
+        ctx.beginPath(); ctx.moveTo(s0.x, s0.y); ctx.lineTo(s1.x, s1.y);
+        ctx.strokeStyle = g; ctx.lineWidth = er * 2; ctx.stroke();
+      }
+    }
+
+    // 月道面
+    const PR = R * 1.1;
+    const ring = (rad) => { const pts = []; for (let i = 0; i <= 120; i++) pts.push(P(moonVec(i / 120 * TAU), rad)); return pts; };
+    polyline(ctx, ring(PR)); ctx.closePath();
+    ctx.fillStyle = 'rgba(124,200,255,0.11)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(124,200,255,0.45)'; ctx.lineWidth = 1; ctx.stroke();
+    polyline(ctx, ring(R * 0.55)); ctx.strokeStyle = 'rgba(124,200,255,0.14)'; ctx.stroke();
+    if (Math.abs(sa) > 0.2) {
+      const lp = P(moonVec(112.5 * DEG), R * 0.75);
+      ctx.fillStyle = 'rgba(160,215,255,0.9)'; ctx.font = `700 ${fs}px ${FONT}`; ctx.textAlign = 'center';
+      ctx.fillText('月道面（斜 5°）', lp.x, lp.y);
+    }
+    // 交點線（月道面和黃道面交叉的地方）
+    // 交點線的方向在太空中固定，所以在計算座標裡跟著季節轉（畫面上不動）
+    const nd = (180 + state.nodeLon - state.season) * DEG, nv = [Math.cos(nd), Math.sin(nd), 0]; // 月亮走到升交點時的 phi
+    const n1 = P(nv, -PR * 1.15), n2 = P(nv, PR * 1.15);
+    ctx.beginPath(); ctx.moveTo(n1.x, n1.y); ctx.lineTo(n2.x, n2.y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.setLineDash([5, 5]); ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
+    // 最高點到最低點的連線（和交點線垂直），看得出月道面現在往哪一邊斜
+    {
+      const hi = P(moonVec(nd + 90 * DEG), PR), lo = P(moonVec(nd - 90 * DEG), PR);
+      const HL = 'rgba(255,158,122,0.95)';
+      ctx.beginPath(); ctx.moveTo(hi.x, hi.y); ctx.lineTo(lo.x, lo.y);
+      ctx.strokeStyle = HL; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = HL;
+      ctx.beginPath(); ctx.arc(hi.x, hi.y, 4, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(lo.x, lo.y, 4, 0, TAU); ctx.fill();
+      ctx.font = `700 ${fs}px ${FONT}`; ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom'; ctx.fillText('▲ 最高', hi.x, hi.y - 7);
+      ctx.textBaseline = 'top'; ctx.fillText('▼ 最低', lo.x, lo.y + 7);
+      ctx.textBaseline = 'alphabetic';
+    }
+
+    // 月亮軌道
+    polyline(ctx, ring(R));
+    ctx.strokeStyle = dirColor; ctx.globalAlpha = 0.55; ctx.lineWidth = 2; ctx.setLineDash([3, 6]); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+
+    // 公轉方向箭頭
+    for (let k = 0; k < 4; k++) {
+      const a0 = (22.5 + 90 * k) * DEG;
+      const pts = [];
+      for (let i = 0; i <= 10; i++) pts.push(P(moonVec(a0 + state.dir * 0.28 * i / 10), R));
+      polyline(ctx, pts); ctx.strokeStyle = dirColor; ctx.lineWidth = 3; ctx.stroke();
+      arrowHead(ctx, pts[8].x, pts[8].y, pts[10].x, pts[10].y, 9, dirColor);
+    }
+
+    // 8 個月相位置
+    for (let k = 0; k < 8; k++) {
+      const phi = phiFromAge(k * 45 * DEG, state.dir);
+      const v = moonVec(phi);
+      const p = P(v, R);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, TAU); ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.fill();
+      if (Math.abs(sa) > 0.3) {
+        const q = P(v, R * 1.27);
+        const ir = Math.max(7, Math.min(12, R * 0.07));
+        const look = moonLook(phi);
+        drawMoon(ctx, q.x, q.y, ir, look.cosT, look.side, { flip: state.south });
+        const key = k === 2 || k === 6;
+        ctx.fillStyle = key ? '#ffd977' : 'rgba(230,236,255,0.85)';
+        ctx.font = `${key ? 700 : 500} ${fs - 1}px ${FONT}`; ctx.textAlign = 'center';
+        ctx.fillText(PHASES[k].name, q.x, q.y >= cy - 2 ? q.y + ir + fs + 1 : q.y - ir - 5);
+      }
+    }
+
+    // 地球、觀察者、月亮
+    const o = observer();
+    const m = moonVec(state.phi);
+    const mw = scale(m, R);
+    const mp = P(mw);
+    const obsLon = (state.south ? 151 : 121) * DEG;
+    const opos = scale(o.Zn, er);
+    const op = P(opos);
+    const obsFront = dot(o.Zn, cam) > -0.05;
+    const moonUp = dot(o.Zn, m) > 0;
+
+    const drawEarthAll = () => {
+      drawEarth(ctx, P, er, o, obsLon, cam);
+
+      // 穿過地球的線：地球裡面那段畫成半透明細線，外面那段畫實線。
+      // 自轉軸和黃道面的垂直線都從地心出發，23.4° 的角就有共同的頂點
+      const c0 = P([0, 0, 0]);
+      const throughLine = (p, q, color, width, dash = []) => {
+        for (const inside of [true, false]) {
+          ctx.save();
+          ctx.beginPath();
+          if (!inside) ctx.rect(0, 0, w, h);
+          ctx.arc(c0.x, c0.y, er, 0, TAU);
+          ctx.clip(inside ? 'nonzero' : 'evenodd');
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = color; ctx.globalAlpha = inside ? 0.55 : 1;
+          ctx.lineWidth = inside ? Math.max(1, width * 0.6) : width;
+          ctx.setLineDash(dash); ctx.stroke();
+          ctx.restore();
+        }
+      };
+      // 自轉軸在虛線的左邊（-1）還是右邊（+1）；兩條線在畫面上疊在一起時當作左邊
+      const nx = P([0, 0, 1], er * 1.55).x, axx = P(o.A, er * 1.55).x;
+      const axisSide = Math.abs(axx - nx) < 4 ? -1 : Math.sign(axx - nx);
+      const showNormal = Math.abs(ca) > 0.2;
+
+      // 黃道面的垂直線（虛線）＋角度弧線
+      if (showNormal) {
+        throughLine(c0, P([0, 0, 1], er * 1.9), 'rgba(255,209,102,1)', 2.2, [5, 3]);
+        const arc = [];
+        for (let i = 0; i <= 12; i++) arc.push(P(unit(add(scale([0, 0, 1], 1 - i / 12), o.A, i / 12)), er * 1.45));
+        polyline(ctx, arc); ctx.strokeStyle = 'rgba(255,209,102,0.95)'; ctx.lineWidth = 2; ctx.stroke();
+      }
+      // 自轉軸：從南極端穿過地心到北極端
+      const nTip = P(o.A, er * 2.1), sTip = P(scale(o.A, -1), er * 2.1);
+      throughLine(sTip, nTip, '#ffffff', 2.5);
+      ctx.beginPath(); ctx.arc(c0.x, c0.y, 2.5, 0, TAU); ctx.fillStyle = '#ffffff'; ctx.fill();
+      // 面向鏡頭的那個極點畫一個小圓點
+      for (const s of [1, -1]) {
+        if (dot(scale(o.A, s), cam) <= 0) continue;
+        const pp = P(scale(o.A, s), er);
+        ctx.beginPath(); ctx.arc(pp.x, pp.y, 3, 0, TAU); ctx.fill();
+      }
+
+      // 文字：「北極」在自轉軸那一側，「23.4°」在虛線另一側，不會疊在一起
+      ctx.font = `700 ${fs - 1}px ${FONT}`;
+      const axisLen = Math.hypot(nTip.x - c0.x, nTip.y - c0.y);
+      const along = (tip, k) => {
+        const ux = tip.x - c0.x, uy = tip.y - c0.y, ul = Math.hypot(ux, uy) || 1;
+        return [tip.x + ux / ul * k, tip.y + uy / ul * k];
+      };
+      ctx.fillStyle = '#ffffff';
+      if (axisLen < er * 0.65) {
+        // 自轉軸幾乎正對著鏡頭，縮成一小段
+        ctx.textAlign = axisSide < 0 ? 'right' : 'left';
+        ctx.fillText('北極', nTip.x + axisSide * 8, nTip.y - 6);
+      } else if (showNormal) {
+        ctx.textAlign = axisSide < 0 ? 'right' : 'left';
+        ctx.fillText('北極', nTip.x + axisSide * 8, nTip.y + 4);
+      } else {
+        const [lx, ly] = along(nTip, 16);
+        ctx.textAlign = 'center'; ctx.fillText('北極', lx, ly + 4);
+      }
+      if (axisLen >= er * 0.65) {
+        const [lx, ly] = along(sTip, 16);
+        ctx.textAlign = 'center'; ctx.fillText('南極', lx, ly + 4);
+      }
+      if (showNormal) {
+        const nm = P([0, 0, 1], er * 1.55);
+        ctx.fillStyle = 'rgba(255,215,120,1)';
+        ctx.textAlign = axisSide < 0 ? 'left' : 'right';
+        ctx.fillText('23.4°', nm.x - axisSide * 7, nm.y + 4);
+      }
+
+      // 自轉方向箭頭：畫在赤道外圈「面向鏡頭」的那一段，不壓在地球和自轉軸上
+      const aFront = Math.atan2(dot(o.e2, cam), dot(o.e1, cam));
+      const pts = [];
+      for (let i = 0; i <= 16; i++) {
+        const a = aFront + (-55 + 110 * i / 16) * DEG;
+        pts.push(P(add(scale(o.e1, Math.cos(a)), o.e2, Math.sin(a)), er * 1.35));
+      }
+      polyline(ctx, pts); ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 2; ctx.stroke();
+      arrowHead(ctx, pts[14].x, pts[14].y, pts[16].x, pts[16].y, 7, '#9fd8ff');
+      // 「自轉」寫在箭頭起點的外側（中間那段常常和南極的軸交叉）
+      let ox = pts[0].x - c0.x, oy = pts[0].y - c0.y, ol = Math.hypot(ox, oy);
+      if (ol < er * 0.5) { ox = -1; oy = 0; ol = 1; }
+      ctx.fillStyle = '#9fd8ff'; ctx.font = `700 ${fs - 1}px ${FONT}`; ctx.textAlign = 'center';
+      ctx.fillText('自轉', pts[0].x + ox / ol * (fs + 4), pts[0].y + oy / ol * (fs + 4) + 4);
+
+      // 觀察者
+      if (obsFront) {
+        const head = P(o.Zn, er * 1.6);
+        ctx.beginPath(); ctx.moveTo(op.x, op.y); ctx.lineTo(head.x, head.y);
+        ctx.strokeStyle = '#ffb3d1'; ctx.lineWidth = 3; ctx.stroke();
+        ctx.beginPath(); ctx.arc(head.x, head.y, 4, 0, TAU); ctx.fillStyle = '#ffb3d1'; ctx.fill();
+        ctx.fillStyle = '#ffd1e3'; ctx.font = `700 ${fs}px ${FONT}`; ctx.textAlign = 'center';
+        ctx.fillText('我', head.x + (head.x >= cx ? 12 : -12), head.y + 4);
+      }
+    };
+
+    // 視線：月亮在地平線上才看得到
+    ctx.beginPath(); ctx.moveTo(op.x, op.y); ctx.lineTo(mp.x, mp.y);
+    ctx.strokeStyle = moonUp ? 'rgba(255,217,119,0.75)' : 'rgba(170,180,220,0.3)';
+    ctx.setLineDash(moonUp ? [] : [4, 5]); ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
+
+    const drawMoonAll = () => {
+      if (!state.hinted) {
+        const pulse = 1 + 0.25 * Math.sin(t * 0.005);
+        ctx.beginPath(); ctx.arc(mp.x, mp.y, mr * 1.9 * pulse, 0, TAU);
+        ctx.strokeStyle = 'rgba(255,217,119,0.7)'; ctx.lineWidth = 2; ctx.stroke();
+      }
+      drawMoonBody(ctx, mp.x, mp.y, mr);
+      // 從地球面向月亮時的左右手（頭朝北；南半球頭朝南）
+      const up = state.south ? scale(o.A, -1) : o.A;
+      const rv = unit(cross(m, up));
+      const rightSun = dot(rv, SUN) > 0;
+      const tr = P(add(mw, rv, mr + 16)), tl = P(add(mw, rv, -(mr + 16)));
+      tag(ctx, tr.x, tr.y, '右', rightSun, fs - 1);
+      tag(ctx, tl.x, tl.y, '左', !rightSun, fs - 1);
+      // 「月亮」寫在軌道內側，避開軌道外圈的 8 個月相小圖示
+      const lbl = P(scale(m, R - mr - 16));
+      ctx.fillStyle = '#ffe9a8'; ctx.font = `700 ${fs}px ${FONT}`; ctx.textAlign = 'center';
+      ctx.fillText('月亮', lbl.x, lbl.y + 4);
+    };
+    if (mp.d < 0) { drawMoonAll(); drawEarthAll(); } else { drawEarthAll(); drawMoonAll(); }
+
+    ctx.fillStyle = '#ffe7a3'; ctx.font = `700 ${fs + 1}px ${FONT}`; ctx.textAlign = 'right';
+    ctx.fillText('🕐 ' + clockText(state.hour, true), w - 10, 22);
+  }
+
+  // ---------- ② 小朋友看到的天空 ----------
+  const SKY = {
+    night: [[7, 11, 32], [27, 37, 80]],
+    twi: [[38, 40, 110], [236, 140, 96]],
+    day: [[58, 128, 218], [170, 215, 255]],
+  };
+  const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
+  const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+  function skyColors(altDeg) {
+    if (altDeg >= 8) return SKY.day;
+    if (altDeg >= 0) { const k = altDeg / 8; return [mix(SKY.twi[0], SKY.day[0], k), mix(SKY.twi[1], SKY.day[1], k)]; }
+    if (altDeg >= -12) { const k = (altDeg + 12) / 12; return [mix(SKY.night[0], SKY.twi[0], k), mix(SKY.night[1], SKY.twi[1], k)]; }
+    return SKY.night;
+  }
+
+  // ---------- ② 旁觀者：天球圖 ----------
+  // 小朋友站在圓形地面中央，頭上罩著透明半球（天空），太陽、月亮畫在半球上真實的方向。
+  // 鏡頭在旁邊斜上方看（正投影），可以拖曳轉動。向量都用地面座標 [東, 北, 上]
+  const COMPASS = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
+  const compassName = loc => COMPASS[Math.round(norm(Math.atan2(loc[0], loc[1])) / (45 * DEG)) % 8];
+  function renderDome(ctx, w, h, fs, o, m, cosT, night, c0, c1) {
+    const bg = ctx.createLinearGradient(0, 0, 0, h);
+    bg.addColorStop(0, rgb(mix(c0, [6, 10, 28], 0.55))); bg.addColorStop(1, rgb(mix(c1, [6, 10, 28], 0.75)));
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
+    drawStars(ctx, w, h, starsV, night * 0.6);
+
+    const az = state.domeAz, el = state.domeEl;
+    const f = [Math.sin(az) * Math.cos(el), Math.cos(az) * Math.cos(el), -Math.sin(el)]; // 鏡頭看的方向
+    const r = [Math.cos(az), -Math.sin(az), 0];                                           // 畫面右邊
+    const u = cross(r, f);                                                                 // 畫面上面
+    const fh = [Math.sin(az), Math.cos(az), 0];                                           // 鏡頭看的水平方向
+    const cx = w / 2, cy = h * 0.6, Rd = Math.min(w * 0.38, h * 0.46);
+    const Q = (v, k = 1) => ({ x: cx + dot(v, r) * Rd * k, y: cy - dot(v, u) * Rd * k });
+    const local = (v, ob = o) => [dot(v, ob.E), dot(v, ob.N), dot(v, ob.Zn)];
+    const ring = (fn, n = 72) => { const pts = []; for (let i = 0; i <= n; i++) pts.push(Q(fn(i / n * TAU))); return pts; };
+
+    // 地面（圓形）和東西南北
+    polyline(ctx, ring(t => [Math.cos(t), Math.sin(t), 0])); ctx.closePath();
+    ctx.fillStyle = night > 0.5 ? 'rgba(20,40,32,0.92)' : 'rgba(40,82,52,0.92)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(200,230,210,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.strokeStyle = 'rgba(200,230,210,0.25)'; ctx.lineWidth = 1;
+    for (const d of [[1, 0, 0], [0, 1, 0]]) {
+      const a = Q(d), b = Q(scale(d, -1));
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    }
+    ctx.font = `800 ${fs - 1}px ${FONT}`; ctx.textAlign = 'center';
+    for (const [name, d] of [['北', [0, 1, 0]], ['東', [1, 0, 0]], ['南', [0, -1, 0]], ['西', [-1, 0, 0]]]) {
+      const p = Q(d, 1.12);
+      ctx.fillStyle = name === '北' ? '#ffb3b3' : '#d8e4ff';
+      ctx.fillText(name, p.x, p.y + 5);
+    }
+
+    // 太陽、月亮一天走的路（把時間從 0 點跑到 24 點）
+    const paths = [[SUN, '#ffd166'], [m, '#cfe3ff']].map(([v, color]) => {
+      const pts = [];
+      for (let i = 0; i <= 96; i++) {
+        const loc = local(v, observer(i / 4));
+        pts.push({ ...Q(loc), up: loc[2] > 0 });
+      }
+      return { pts, color };
+    });
+    const drawPath = (pts, color, above) => {
+      ctx.strokeStyle = color; ctx.lineWidth = above ? 2 : 1.2;
+      ctx.globalAlpha = above ? 0.85 : 0.3; ctx.setLineDash(above ? [] : [3, 5]);
+      ctx.beginPath();
+      let pen = false;
+      for (const p of pts) {
+        if (p.up !== above) { pen = false; continue; }
+        pen ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+        pen = true;
+      }
+      ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+    };
+    for (const { pts, color } of paths) drawPath(pts, color, false);  // 地平線下的那段（虛線）
+
+    // 透明半球：上半個圓＋靠近鏡頭的那半圈地平線
+    ctx.beginPath();
+    ctx.arc(cx, cy, Rd, Math.PI, 0);
+    for (let i = 0; i <= 36; i++) {
+      const t = i / 36 * Math.PI, p = Q(add(scale(r, Math.cos(t)), fh, -Math.sin(t)));
+      ctx.lineTo(p.x, p.y);
+    }
+    ctx.closePath();
+    const dg = ctx.createRadialGradient(cx, cy - Rd * 0.3, Rd * 0.1, cx, cy, Rd);
+    dg.addColorStop(0, `rgba(${c1[0]},${c1[1]},${c1[2]},0.10)`); dg.addColorStop(1, `rgba(${c0[0]},${c0[1]},${c0[2]},0.30)`);
+    ctx.fillStyle = dg; ctx.fill();
+    ctx.strokeStyle = 'rgba(190,215,255,0.55)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(cx, cy, Rd, Math.PI, 0); ctx.stroke();
+    // 半球上的格線：高度 30°、60° 的圈，以及通過頭頂的南北線（子午線）
+    ctx.strokeStyle = 'rgba(190,215,255,0.22)'; ctx.lineWidth = 1; ctx.setLineDash([2, 4]);
+    for (const altDeg of [30, 60]) {
+      const a = altDeg * DEG;
+      polyline(ctx, ring(t => [Math.cos(a) * Math.cos(t), Math.cos(a) * Math.sin(t), Math.sin(a)])); ctx.stroke();
+    }
+    const mer = []; for (let i = 0; i <= 36; i++) { const t = i / 36 * Math.PI; mer.push(Q([0, Math.cos(t), Math.sin(t)])); }
+    polyline(ctx, mer); ctx.stroke(); ctx.setLineDash([]);
+    const zen = Q([0, 0, 1]);
+    ctx.fillStyle = 'rgba(220,230,255,0.75)'; ctx.font = `600 ${fs - 4}px ${FONT}`; ctx.textAlign = 'left';
+    ctx.beginPath(); ctx.arc(zen.x, zen.y, 2.5, 0, TAU); ctx.fill();
+    ctx.fillText('天頂', zen.x + 6, zen.y - 4);
+
+    for (const { pts, color } of paths) drawPath(pts, color, true);   // 地平線上的那段（實線）
+
+    // 小朋友和面向的方向
+    // 面向的箭頭畫在地上，文字寫在箭頭尖端外面，避開小朋友的頭
+    const F = local(o.F);
+    const fa = Q([F[0], F[1], 0], 0.08), fb = Q([F[0], F[1], 0], 0.42);
+    ctx.strokeStyle = '#ffb3d1'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(fa.x, fa.y); ctx.lineTo(fb.x, fb.y); ctx.stroke();
+    arrowHead(ctx, fa.x, fa.y, fb.x, fb.y, 8, '#ffb3d1');
+    const fl = Q([F[0], F[1], 0], 0.6);
+    ctx.fillStyle = '#ffd1e3'; ctx.font = `700 ${fs - 3}px ${FONT}`; ctx.textAlign = 'center';
+    ctx.fillText(state.faceNorth ? '面向北方' : '面向南方', fl.x, fl.y + 4);
+    const feet = Q([0, 0, 0]), neck = Q([0, 0, 0.16]), head = Q([0, 0, 0.205]);
+    ctx.strokeStyle = '#ffb3d1'; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(feet.x, feet.y); ctx.lineTo(neck.x, neck.y); ctx.stroke();
+    const arm = Q([0, 0, 0.12]);
+    ctx.beginPath(); ctx.moveTo(arm.x - Rd * 0.05, arm.y + Rd * 0.015); ctx.lineTo(arm.x + Rd * 0.05, arm.y + Rd * 0.015); ctx.stroke();
+    ctx.lineCap = 'butt';
+    ctx.beginPath(); ctx.arc(head.x, head.y, Math.max(5, Rd * 0.04), 0, TAU); ctx.fillStyle = '#ffb3d1'; ctx.fill();
+
+    // 太陽、月亮（在地平線下就畫淡一點）
+    const sLoc = local(SUN), mLoc = local(m);
+    const sP = Q(sLoc), mP = Q(mLoc);
+    ctx.globalAlpha = sLoc[2] > 0 ? 1 : 0.35;
+    const sg = ctx.createRadialGradient(sP.x, sP.y, 2, sP.x, sP.y, Rd * 0.16);
+    sg.addColorStop(0, 'rgba(255,220,120,0.7)'); sg.addColorStop(1, 'rgba(255,220,120,0)');
+    ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(sP.x, sP.y, Rd * 0.16, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(sP.x, sP.y, Rd * 0.055, 0, TAU); ctx.fillStyle = '#fff1b8'; ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // 視線：月亮在地平線上時，從小朋友的眼睛連到月亮
+    if (mLoc[2] > 0) {
+      ctx.strokeStyle = 'rgba(255,217,119,0.85)'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(head.x, head.y); ctx.lineTo(mP.x, mP.y); ctx.stroke(); ctx.setLineDash([]);
+    }
+    ctx.globalAlpha = mLoc[2] > 0 ? 1 : 0.4;
+    // 亮面朝著畫面上太陽的位置
+    const rot = Math.atan2(sP.y - mP.y, sP.x - mP.x);
+    drawMoon(ctx, mP.x, mP.y, Rd * 0.07, cosT, 1, { rot, craters: true, glow: mLoc[2] > 0 });
+    ctx.globalAlpha = 1;
+
+    ctx.font = `700 ${fs - 2}px ${FONT}`; ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffe9a8'; ctx.fillText(sLoc[2] > 0 ? '太陽' : '太陽（地平線下）', sP.x, sP.y + Rd * 0.055 + fs);
+    ctx.fillStyle = '#e6eeff'; ctx.fillText(mLoc[2] > 0 ? '月亮' : '月亮（地平線下）', mP.x, mP.y - Rd * 0.07 - 6);
+
+    // 左上角：月亮在哪個方向、多高
+    const mAlt = Math.round(Math.asin(Math.max(-1, Math.min(1, mLoc[2]))) / DEG);
+    const info = mAlt > 0 ? `🌙 月亮在${compassName(mLoc)}方的天空，高 ${mAlt}°` : '🌙 月亮在地平線下面';
+    ctx.font = `700 ${fs - 2}px ${FONT}`; ctx.textAlign = 'left';
+    const tw = Math.min(ctx.measureText(info).width + 16, w * 0.62);
+    ctx.fillStyle = 'rgba(6,10,28,0.75)';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(8, 8, tw, fs + 10, 8); else ctx.rect(8, 8, tw, fs + 10);
+    ctx.fill();
+    ctx.fillStyle = '#ffe7a3'; ctx.fillText(info, 16, 8 + fs + 1, tw - 16);
+    ctx.fillStyle = 'rgba(200,215,255,0.8)'; ctx.font = `600 ${fs - 4}px ${FONT}`;
+    ctx.fillText('👆 拖曳可以轉動視角', 10, h - 10);
+  }
+
+  function renderView() {
+    const { ctx, w, h } = V;
+    ctx.clearRect(0, 0, w, h);
+    const o = observer();
+    const m = moonVec(state.phi);
+    const hy = h * 0.8, top = h * 0.07;
+    const fs = Math.max(13, w / 26);
+    // 橫的：往左右偏幾度（東西方向，±90° 在兩邊）；直的：從前方地平線往上抬幾度，
+    // 經過頭頂（90°）再往後。這樣太陽、月亮經過頭頂附近也會平順移動，不會跳來跳去。
+    // 頭頂（90°）剛好在畫面最上面；超過 90° 就是背後的天空，不畫
+    const mapFor = (F, Rt) => v => {
+      const side = Math.asin(Math.max(-1, Math.min(1, dot(v, Rt))));
+      const up = Math.atan2(dot(v, o.Zn), dot(v, F));
+      const alt = Math.asin(Math.max(-1, Math.min(1, dot(v, o.Zn))));
+      return { x: w / 2 + side / (Math.PI / 2) * w * 0.42, y: hy - up / (90 * DEG) * (hy - top), alt, up };
+    };
+    const map = mapFor(o.F, o.Rt);
+    const sp = map(SUN), mp = map(m);
+    const sunAltDeg = sp.alt / DEG;
+    const night = Math.max(0, Math.min(1, (-sunAltDeg - 2) / 10));
+    const isBehind = p => p.alt > 0 && p.up > 90 * DEG;  // 過了頭頂，在背後
+    const behind = isBehind(mp);
+
+    // 月亮的亮面方向（小朋友看到的樣子）；月亮在背後時，用「轉身後」的畫面算
+    const cosT = dot(m, SUN);
+    const tv = add(SUN, m, -dot(SUN, m));
+    const lmap = behind ? mapFor(scale(o.F, -1), scale(o.Rt, -1)) : map;
+    const lp = lmap(m);
+    let limb = 0;
+    if (Math.hypot(tv[0], tv[1], tv[2]) > 1e-6) {
+      const p2 = lmap(unit(add(m, unit(tv), 0.03)));
+      limb = Math.atan2(p2.y - lp.y, p2.x - lp.x);
+    }
+
+    const [c0, c1] = skyColors(sunAltDeg);
+    if (state.third) {
+      renderDome(ctx, w, h, fs, o, m, cosT, night, c0, c1);
+    } else {
+      const g = ctx.createLinearGradient(0, 0, 0, hy);
+      g.addColorStop(0, rgb(c0)); g.addColorStop(1, rgb(c1));
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      drawStars(ctx, w, hy, starsV, night);
+
+      // 北斗七星、北極星；南十字星、南天極（晚上才看得到）
+      if (night > 0.05) {
+        const group = (list, lines, name) => {
+          const pts = list.map(s => map(starVec(s)));
+          ctx.strokeStyle = `rgba(200,215,255,${0.35 * night})`; ctx.lineWidth = 1;
+          // 只畫在前方天空的星星（直的角度在 -90°～90° 之間，跨到背後的連線不畫）
+          const front = p => p.up > -Math.PI / 2 && p.up <= Math.PI / 2;
+          for (const [a, b] of lines) {
+            if (!front(pts[a]) || !front(pts[b])) continue;
+            ctx.beginPath(); ctx.moveTo(pts[a].x, pts[a].y); ctx.lineTo(pts[b].x, pts[b].y); ctx.stroke();
+          }
+          ctx.fillStyle = `rgba(255,255,255,${night})`;
+          for (const p of pts) if (front(p)) { ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, TAU); ctx.fill(); }
+          const cxs = pts.reduce((s, p) => s + p.x, 0) / pts.length, cys = pts.reduce((s, p) => s + p.y, 0) / pts.length;
+          if (pts.every(front) && cys < hy) {
+            ctx.fillStyle = `rgba(200,215,255,${0.9 * night})`; ctx.font = `600 ${fs - 3}px ${FONT}`; ctx.textAlign = 'center';
+            ctx.fillText(name, cxs, cys + fs + 4);
+          }
+        };
+        group(DIPPER, DIPPER_LINES, '北斗七星');
+        group(CRUX, CRUX_LINES, '南十字星');
+        const np = map(o.A), spole = map(scale(o.A, -1));
+        ctx.font = `700 ${fs - 2}px ${FONT}`; ctx.textAlign = 'left';
+        if (np.alt > 0 && !isBehind(np)) {
+          ctx.fillStyle = `rgba(255,250,220,${night})`;
+          ctx.beginPath(); ctx.arc(np.x, np.y, 3.5, 0, TAU); ctx.fill();
+          ctx.fillText('北極星', np.x + 7, np.y + 4);
+        }
+        if (spole.alt > 0 && !isBehind(spole)) {
+          ctx.fillStyle = `rgba(200,215,255,${0.8 * night})`;
+          ctx.fillText('+ 南天極', spole.x - 4, spole.y + 4);
+        }
+      }
+
+      // 太陽（在背後時不畫，天空顏色照樣跟著太陽變亮）
+      if (sunAltDeg > -12 && !isBehind(sp)) {
+        const r = w * 0.05;
+        const sg = ctx.createRadialGradient(sp.x, sp.y, r * 0.5, sp.x, sp.y, r * 4);
+        sg.addColorStop(0, 'rgba(255,220,120,0.55)'); sg.addColorStop(1, 'rgba(255,220,120,0)');
+        ctx.fillStyle = sg; ctx.fillRect(0, 0, w, h);
+        ctx.beginPath(); ctx.arc(sp.x, sp.y, r, 0, TAU); ctx.fillStyle = '#fff3c4'; ctx.fill();
+      }
+
+      // 月亮：亮面朝太陽的方向
+      if (!behind) drawMoon(ctx, mp.x, mp.y, w * 0.065, cosT, 1, { rot: limb, craters: true, glow: night > 0.3, darkAlpha: 0.15 + 0.85 * night });
+
+      // 地面
+      ctx.beginPath(); ctx.moveTo(0, h);
+      ctx.lineTo(0, hy + h * 0.02);
+      ctx.quadraticCurveTo(w * 0.2, hy - h * 0.035, w * 0.4, hy + h * 0.015);
+      ctx.quadraticCurveTo(w * 0.62, hy + h * 0.05, w * 0.8, hy);
+      ctx.quadraticCurveTo(w * 0.92, hy - h * 0.025, w, hy + h * 0.01);
+      ctx.lineTo(w, h); ctx.closePath();
+      ctx.fillStyle = night > 0.5 ? '#050816' : '#1d3326'; ctx.fill();
+
+      // 小朋友的背影
+      const kx = w / 2, ky = h * 0.93, ks = h * 0.035;
+      ctx.fillStyle = night > 0.5 ? '#2a3466' : '#0f1d14';
+      ctx.beginPath(); ctx.arc(kx, ky - ks * 1.6, ks * 0.55, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(kx, ky, ks * 0.75, ks, 0, Math.PI, TAU); ctx.fill();
+
+      ctx.font = `700 ${fs}px ${FONT}`; ctx.fillStyle = '#b8c6f0';
+      ctx.textAlign = 'left'; ctx.fillText(state.faceNorth ? '← 西' : '← 東', 12, h - 12);
+      ctx.textAlign = 'right'; ctx.fillText(state.faceNorth ? '東 →' : '西 →', w - 12, h - 12);
+      ctx.textAlign = 'center'; ctx.font = `600 ${fs - 2}px ${FONT}`;
+      ctx.fillText(state.faceNorth ? '面向北方' : '面向南方', w / 2, h - 8);
+
+      // 月亮在背後的提示
+      if (behind && mp.alt > 0) {
+        const text = `🌙 月亮在你背後（${state.faceNorth ? '南' : '北'}邊的天空），轉身才看得到`;
+        ctx.font = `700 ${fs - 2}px ${FONT}`;
+        const tw = Math.min(ctx.measureText(text).width + 16, w * 0.66);
+        ctx.fillStyle = 'rgba(6,10,28,0.75)';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(8, 8, tw, fs + 10, 8); else ctx.rect(8, 8, tw, fs + 10);
+        ctx.fill();
+        ctx.fillStyle = '#ffe7a3'; ctx.textAlign = 'left';
+        ctx.fillText(text, 16, 8 + fs + 1, tw - 16);
+      }
+    } // 小朋友的眼睛（第一人稱）結束
+
+    // 放大鏡：看清楚月亮形狀（兩種畫面都顯示小朋友看到的樣子）。天球圖時移到右下角，避開半球
+    const ir = state.third ? Math.min(w * 0.09, h * 0.12) : Math.min(w * 0.12, h * 0.15); // 寬畫布時用高度限制，免得放大鏡太大
+    const ix = w - ir * (state.third ? 1.35 : 1.25), iy = state.third ? h - ir * 1.75 : ir * 1.35;
+    ctx.beginPath(); ctx.arc(ix, iy, ir, 0, TAU);
+    ctx.fillStyle = 'rgba(6,10,28,0.88)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,217,119,0.7)'; ctx.lineWidth = 2; ctx.stroke();
+    drawMoon(ctx, ix, iy, ir * 0.78, cosT, 1, { rot: limb, craters: true });
+    if (mp.alt < 0) {
+      ctx.beginPath(); ctx.arc(ix, iy, ir, 0, TAU); ctx.fillStyle = 'rgba(6,10,28,0.6)'; ctx.fill();
+    }
+    ctx.fillStyle = '#ffe7a3'; ctx.font = `700 ${fs - 3}px ${FONT}`; ctx.textAlign = 'center';
+    const insetText = mp.alt < 0 ? '在地平線下' : state.third ? '🔭 小朋友看到的' : behind ? '🔄 轉身看到的樣子' : '🔭 放大看';
+    if (state.third) { ctx.textAlign = 'right'; ctx.fillText(insetText, w - 6, iy + ir + fs - 1); }
+    else ctx.fillText(insetText, ix, iy + ir + fs - 1);
+
+    // frameDefault：亮面方向是不是用「預設方向」（北半球面向南、南半球面向北）算的
+    const frameDefault = (behind ? !state.faceNorth : state.faceNorth) === state.south;
+    state.view = { limb, moonAlt: mp.alt, sunAlt: sp.alt, behind, frameDefault };
+  }
+
+  // ---------- 文字資訊 ----------
+  const CN = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  function lunarDay(n) {
+    if (n <= 10) return '初' + CN[n];
+    if (n < 20) return '十' + CN[n - 10];
+    if (n === 20) return '二十';
+    if (n < 30) return '廿' + CN[n - 20];
+    return '三十';
+  }
+  function clockText(hr, withMin) {
+    let H, M = 0;
+    if (withMin) {
+      const total = Math.floor(((hr % 24) + 24) % 24 * 6) * 10;
+      H = Math.floor(total / 60) % 24; M = total % 60;
+    } else {
+      H = ((Math.round(hr) % 24) + 24) % 24;
+    }
+    let s;
+    if (H === 0) s = '半夜 12 點';
+    else if (H < 5) s = `凌晨 ${H} 點`;
+    else if (H < 12) s = `早上 ${H} 點`;
+    else if (H === 12) s = '中午 12 點';
+    else if (H < 18) s = `下午 ${H - 12} 點`;
+    else s = `晚上 ${H - 12} 點`;
+    return M ? `${s} ${M} 分` : s;
+  }
+  // e：月亮在太陽東邊幾度（只跟位置有關）
+  function whenText(e, south) {
+    const hi = south ? '北' : '南';
+    if (e < 12 || e >= 348) return '跟太陽一起東升西落，被陽光蓋住，幾乎看不到';
+    if (e < 78) return '傍晚太陽下山後，在西邊天空低低的地方，很快就下山';
+    if (e < 102) return `傍晚高掛在${hi}方天空，上半夜在西邊，半夜下山`;
+    if (e < 168) return '下午就升起，傍晚到半夜都看得到';
+    if (e < 192) return '傍晚從東方升起，整晚都看得到，清晨在西方落下';
+    if (e < 258) return '晚上才升起，一直到清晨都看得到';
+    if (e < 282) return `半夜才從東方升起，清晨高掛在${hi}方天空`;
+    return '天亮前才從東方升起，清晨在東邊天空低低的地方';
+  }
+  const LIMB_TEXT = ['右邊', '右上方', '上面', '左上方', '左邊', '左下方', '下面', '右下方'];
+  function limbText(a) {
+    const d = norm(-a) / DEG;
+    return LIMB_TEXT[Math.floor(((d + 22.5) % 360) / 45)];
+  }
+
+  const el = {
+    name: $('#pName'), trend: $('#pTrend'), desc: $('#pDesc'),
+    lit: $('#fLit'), day: $('#fDay'), see: $('#fSee'),
+    rise: $('#fRise'), pct: $('#fPct'), when: $('#fWhen'),
+    badge: $('#dirBadge'), hourText: $('#hourText'), hour: $('#hour'),
+  };
+  const cache = {};
+  const setText = (key, node, val, html) => {
+    if (cache[key] === val) return;
+    cache[key] = val;
+    html ? (node.innerHTML = val) : (node.textContent = val);
+  };
+
+  function updateInfo() {
+    const A = ageAngle(state.phi, state.dir);
+    const idx = phaseIndex(A);
+    const ageDays = A / TAU * SYNODIC;
+    const pct = Math.round((1 - dot(moonVec(state.phi), SUN)) / 2 * 100);
+    const e = norm(state.phi - Math.PI) / DEG;
+    const { limb, moonAlt, sunAlt, behind, frameDefault } = state.view;
+
+    setText('name', el.name, PHASES[idx].name);
+    setText('desc', el.desc, PHASES[idx].desc);
+    let trend, cls;
+    if (idx === 0) { trend = '最瘦'; cls = 'chip'; }
+    else if (idx === 4) { trend = '最胖'; cls = 'chip'; }
+    else if (A < Math.PI) { trend = '變胖中（盈）'; cls = 'chip wax'; }
+    else { trend = '變瘦中（虧）'; cls = 'chip wane'; }
+    setText('trend', el.trend, trend);
+    el.trend.className = cls;
+
+    // 左右看太陽在月亮的東邊還是西邊；月亮靠近地平線時亮面會偏上或偏下
+    let lit;
+    if (pct <= 2) lit = '幾乎全暗';
+    else if (pct >= 98) lit = '整個都亮';
+    else {
+      const side = moonLook(state.phi).side * (state.south ? -1 : 1) * (frameDefault ? 1 : -1) > 0 ? '右邊' : '左邊';
+      const lt = limbText(limb);
+      const vert = lt.includes('上') ? '上' : lt.includes('下') ? '下' : '';
+      lit = `${side}亮（${vert ? `亮面朝著太陽，現在偏${vert}方` : '朝著太陽'}）`;
+    }
+    setText('lit', el.lit, lit);
+    setText('day', el.day, `${lunarDay(Math.min(30, Math.floor(ageDays) + 1))}（新月後 ${ageDays.toFixed(1)} 天）`);
+    let see;
+    if (moonAlt <= 0) see = '❌ 在地平線下面';
+    else if (idx === 0) see = '☀️ 太靠近太陽，看不到';
+    else if (behind) see = `🔄 在你背後，轉身面向${state.faceNorth ? '南' : '北'}方就看得到`;
+    else if (sunAlt > 0) see = '✅ 看得到（白天也看得到喔！）';
+    else see = '✅ 看得到';
+    setText('see', el.see, see);
+    setText('rise', el.rise, '約 ' + clockText(6 + e / 15));
+    setText('pct', el.pct, `${pct}%`);
+    setText('when', el.when, whenText(e, state.south));
+    setText('hourText', el.hourText, clockText(state.hour, true));
+
+    const sa = Math.sin(state.tilt);
+    let badge;
+    if (Math.abs(sa) < 0.08) badge = '👀 從側面看：看不出是順時針還是逆時針，但看得到兩個平面斜斜的！';
+    else {
+      const looks = state.dir * Math.sign(sa);
+      badge = `從這一面看，月亮是 ${looks === 1 ? '<b class="ccw">逆時針 ↺</b>' : '<b class="cw">順時針 ↻</b>'} 轉`;
+      if (sa < 0) badge += '（從南極那面看）';
+    }
+    setText('badge', el.badge, badge, true);
+
+    const near = Math.round(A / (45 * DEG)) % 8;
+    const key = state.dir + ':' + near;
+    if (cache.seq !== key) {
+      cache.seq = key;
+      for (const d of [1, -1]) seqRows[d].forEach(({ b, k }) => b.classList.toggle('current', d === state.dir && k === near));
+    }
+  }
+
+  // ---------- ③ 月相順序 ----------
+  const seqRows = {};
+  function buildSeq() {
+    document.querySelectorAll('.seq-row').forEach(row => {
+      const dir = +row.dataset.dir;
+      const box = row.querySelector('.seq-items');
+      seqRows[dir] = [];
+      PHASES.forEach((p, k) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'seq-item';
+        const c = document.createElement('canvas');
+        b.append(c);
+        b.insertAdjacentHTML('beforeend', `<b>${p.name}</b><small>${p.day}</small>`);
+        b.addEventListener('click', () => {
+          setDir(dir);
+          state.phi = phiFromAge(k * 45 * DEG, dir);
+          setPlaying(false);
+        });
+        box.append(b);
+        seqRows[dir].push({ b, c, k });
+      });
+    });
+    drawSeqIcons();
+  }
+  function iconCanvas(c, cssSize, cosT, side, flip) {
+    const dpr = window.devicePixelRatio || 1;
+    const d = Math.round(cssSize * dpr);
+    c.width = c.height = d;
+    const x = c.getContext('2d');
+    x.clearRect(0, 0, d, d);
+    drawMoon(x, d / 2, d / 2, d * 0.42, cosT, side, { flip, craters: true });
+  }
+  function drawSeqIcons() {
+    for (const d of [1, -1]) seqRows[d].forEach(({ c, k }) => {
+      const look = moonLook(phiFromAge(k * 45 * DEG, d));
+      iconCanvas(c, 52, look.cosT, look.side, state.south);
+    });
+  }
+
+  // ---------- 控制 ----------
+  const playBtn = $('#play');
+  function setPlaying(p) {
+    state.playing = p;
+    playBtn.textContent = p ? '⏸ 暫停' : '▶ 播放';
+  }
+  function setDir(d) {
+    state.dir = d;
+    document.querySelectorAll('#dirSeg button').forEach(b => b.classList.toggle('active', +b.dataset.dir === d));
+    document.querySelectorAll('.seq-row').forEach(r => r.classList.toggle('active', +r.dataset.dir === d));
+    $('#imagineBanner').hidden = d === 1;
+  }
+  function setSouth(s) {
+    state.south = s;
+    document.querySelectorAll('#hemiSeg button').forEach(b => b.classList.toggle('active', (b.dataset.s === '1') === s));
+    setFace(s);  // 換半球時，回到看得到月亮的方向
+    drawSeqIcons();
+  }
+  function setFace(north) {
+    state.faceNorth = north;
+    document.querySelectorAll('#faceSeg button').forEach(b => {
+      const isN = b.dataset.f === 'N';
+      b.classList.toggle('active', isN === north);
+      // 「轉身」的字樣放在背對月亮的那個方向
+      b.textContent = isN ? (state.south ? '面向北方' : '🔄 轉身面向北方') : (state.south ? '🔄 轉身面向南方' : '面向南方');
+    });
+    $('#viewCap').textContent = `${state.south ? '住在澳洲（南半球）' : '住在台灣（北半球）'}，面向${north ? '北' : '南'}方看天空`;
+    state.domeAz = north ? 0 : Math.PI;  // 天球圖的鏡頭回到小朋友背後
+  }
+
+  playBtn.addEventListener('click', () => setPlaying(!state.playing));
+  const DAY = TAU / SYNODIC;
+  $('#prev').addEventListener('click', () => { setPlaying(false); state.phi = norm(state.phi - state.dir * DAY); });
+  $('#next').addEventListener('click', () => { setPlaying(false); state.phi = norm(state.phi + state.dir * DAY); });
+  $('#speed').addEventListener('input', e => { state.speed = +e.target.value; });
+  // 觀看角度：滑桿從側面（0°）到正上方（90°）；勾選「改從南極那面看」就整個翻到下面
+  const applyTilt = () => {
+    const south = $('#fromSouth').checked;
+    state.tilt = (south ? -1 : 1) * +$('#tilt').value * DEG;
+    $('#tiltTop').textContent = south ? '南極下方 ⬆' : '北極上方 ⬇';
+  };
+  $('#tilt').addEventListener('input', applyTilt);
+  $('#fromSouth').addEventListener('change', applyTilt);
+  el.hour.addEventListener('input', e => { state.hour = +e.target.value % 24; setPlaying(false); });
+  document.querySelectorAll('#seasonSeg button').forEach(b => b.addEventListener('click', () => {
+    state.seasonTarget = +b.dataset.season; // season 會在動畫迴圈裡慢慢轉過去
+    document.querySelectorAll('#seasonSeg button').forEach(x => x.classList.toggle('active', x === b));
+  }));
+  // 年份：月道面斜的方向 18.6 年轉一圈，填哪一年就照那一年的升交點方向畫
+  const monthOfSunLon = lon => { // 太陽走到黃經 lon 大約是幾月（3 月 20 日春分＝0°）
+    const d = new Date(2001, 2, 20 + Math.round((((lon % 360) + 360) % 360) / 360 * 365.25));
+    return `${d.getMonth() + 1} 月${d.getDate() <= 10 ? '上旬' : d.getDate() <= 20 ? '中旬' : '下旬'}`;
+  };
+  // 預設用簡化的方向（升交點黃經 180°：3 月、9 月是食季，12 月新月最高），比較好理解；
+  // 勾選「照真實年份」才改用那一年的升交點方向
+  const SIMPLE_NODE = 180;
+  function setYear(y) {
+    if (!isFinite(y)) return;
+    y = Math.max(1900, Math.min(2100, Math.round(y)));
+    state.year = y;
+    applyNode();
+  }
+  function applyNode() {
+    const real = $('#useYear').checked;
+    $('#nodeYear').disabled = !real;
+    state.nodeLon = real ? nodeLonOfYear(state.year) : SIMPLE_NODE;
+    $('#nodeYearInfo').textContent = real
+      ? `升交點在黃經 ${state.nodeLon.toFixed(0)}°，食季大約在 ${monthOfSunLon(state.nodeLon)}和 ${monthOfSunLon(state.nodeLon + 180)}（18.6 年轉一圈）`
+      : '沒勾選：用好記的方向（3 月、9 月是食季）';
+  }
+  $('#useYear').addEventListener('change', applyNode);
+  $('#nodeYear').addEventListener('input', e => setYear(+e.target.value));
+  $('#nodeYear').addEventListener('change', e => { setYear(+e.target.value); e.target.value = state.year; });
+  setYear(state.year);
+  document.querySelectorAll('#dirSeg button').forEach(b => b.addEventListener('click', () => setDir(+b.dataset.dir)));
+  document.querySelectorAll('#hemiSeg button').forEach(b => b.addEventListener('click', () => setSouth(b.dataset.s === '1')));
+  document.querySelectorAll('#faceSeg button').forEach(b => b.addEventListener('click', () => setFace(b.dataset.f === 'N')));
+  document.querySelectorAll('#modeSeg button').forEach(b => b.addEventListener('click', () => {
+    state.third = b.dataset.m === 'third';
+    document.querySelectorAll('#modeSeg button').forEach(x => x.classList.toggle('active', x === b));
+    V.el.classList.toggle('third', state.third);
+  }));
+
+  // 天球圖：拖曳轉動鏡頭（左右轉方位、上下轉高低）
+  let domeDrag = null;
+  V.el.addEventListener('pointerdown', e => {
+    if (!state.third) return;
+    domeDrag = { x: e.clientX, y: e.clientY, az: state.domeAz, el: state.domeEl };
+    V.el.setPointerCapture(e.pointerId);
+  });
+  V.el.addEventListener('pointermove', e => {
+    if (!domeDrag) return;
+    state.domeAz = norm(domeDrag.az - (e.clientX - domeDrag.x) * 0.01);
+    state.domeEl = Math.max(8 * DEG, Math.min(80 * DEG, domeDrag.el + (e.clientY - domeDrag.y) * 0.008));
+  });
+  ['pointerup', 'pointercancel'].forEach(t => V.el.addEventListener(t, () => { domeDrag = null; }));
+
+  // 拖曳月亮：找軌道上離手指最近的位置（側面看也能拖）
+  function dragTo(e) {
+    const rect = S.el.getBoundingClientRect();
+    const px = e.clientX - rect.left, py = e.clientY - rect.top;
+    const { P, R } = S.geom;
+    let best = state.phi, bd = Infinity;
+    for (let i = 0; i < 360; i++) {
+      const a = i * DEG, p = P(moonVec(a), R);
+      const d = (p.x - px) ** 2 + (p.y - py) ** 2;
+      if (d < bd) { bd = d; best = a; }
+    }
+    state.phi = best;
+  }
+  S.el.addEventListener('pointerdown', e => {
+    state.dragging = true; state.hinted = true;
+    setPlaying(false);
+    S.el.setPointerCapture(e.pointerId);
+    dragTo(e);
+  });
+  S.el.addEventListener('pointermove', e => { if (state.dragging) dragTo(e); });
+  ['pointerup', 'pointercancel'].forEach(t => S.el.addEventListener(t, () => { state.dragging = false; }));
+
+  // 口訣卡片的月亮
+  (function () {
+    const up = moonLook(phiFromAge(90 * DEG, 1));
+    const down = moonLook(phiFromAge(270 * DEG, 1));
+    iconCanvas($('#vsUp'), 64, up.cosT, up.side, false);
+    iconCanvas($('#vsDown'), 64, down.cosT, down.side, false);
+  })();
+
+  // ---------- 開始 ----------
+  buildSeq();
+  setDir(1);
+  // 小測驗搬到 05_quiz.html
+
+
+  // 捲到下面看知識卡時，上面的動畫先停下來
+  let labVisible = true;
+  new IntersectionObserver(es => { labVisible = es[es.length - 1].isIntersecting; })
+    .observe($('#moon'));
+
+  let last = performance.now(), hourShown = -1;
+  function frame(t) {
+    const dt = Math.min(0.05, (t - last) / 1000);
+    last = t;
+    if (!labVisible) { requestAnimationFrame(frame); return; }
+    // 換季節：地球繞太陽往前走（太陽在畫面上逆時針換邊），每秒 120°，暫停時也會轉
+    if (state.season !== state.seasonTarget) {
+      const left = ((state.seasonTarget - state.season) % 360 + 360) % 360;
+      const step = Math.min(left, 120 * dt);
+      state.season = left - step < 0.01 ? state.seasonTarget : (state.season + step) % 360;
+    }
+    if (state.playing && !state.dragging) {
+      // 地球自轉：一天約 5 秒
+      const days = state.speed * dt * 0.2;
+      state.phi = norm(state.phi + state.dir * days * DAY);
+      state.hour = (state.hour + days * 24) % 24;
+    }
+    if (Math.abs(state.hour - hourShown) > 0.05) { el.hour.value = state.hour; hourShown = state.hour; }
+    renderSpace(t);
+    renderView();
+    updateInfo();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

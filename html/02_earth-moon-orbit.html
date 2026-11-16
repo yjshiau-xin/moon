@@ -1,0 +1,2367 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>地球帶著月亮繞太陽跑</title>
+<style>
+  :root{
+    --bg:#0a0f24;
+    --panel:rgba(22,31,70,.78);
+    --panel2:rgba(255,255,255,.05);
+    --line:rgba(160,180,255,.18);
+    --ink:#f2f4ff;
+    --muted:#aab3dc;
+    --moon:#ffd977;
+    --sky:#7cc8ff;
+    --ccw:#6ee7b7;
+    --cw:#ff9ec4;
+    --ecl:#ffd166;
+    --sun:#ffd166;
+    --earth:#5cb8ff;
+    --radius:20px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #26336f 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 25%, #1a2355 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.7;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.55;
+    background-image:
+      radial-gradient(1.2px 1.2px at 20px 30px,#fff,transparent),
+      radial-gradient(1px 1px at 140px 80px,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 210px 190px,#ffeebb,transparent),
+      radial-gradient(1px 1px at 60px 220px,#fff,transparent),
+      radial-gradient(1px 1px at 180px 20px,#cfe3ff,transparent);
+    background-size:260px 260px;
+  }
+  .wrap{max-width:1720px;margin:0 auto;padding:0 20px 72px}
+  /* 上方工具列：左邊導覽，右上角小測驗 */
+  .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:8px 20px;background:rgba(10,15,36,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav.top{display:flex;gap:8px;flex-wrap:wrap}
+  nav.top a{color:var(--muted);text-decoration:none;padding:4px 14px;border-radius:999px;border:1px solid var(--line);font-size:15px}
+  nav.top a[aria-current]{color:#0a0f24;background:var(--moon);border-color:transparent;font-weight:700}
+  .top-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+  .top-ctrl{display:flex;align-items:center;gap:8px}
+  .top-ctrl[hidden]{display:none}
+  .top-ctrl .btn{padding:4px 12px;font-size:14px}
+  .top-ctrl .ctrl-label{font-size:14px;font-weight:700}
+  .top-ctrl input[type=range]{width:110px}
+  .top-ctrl .st-tag{margin-right:0}
+  .quiz-link{color:#1d1a0b;background:var(--sun);text-decoration:none;font-weight:800;padding:6px 16px;border-radius:999px;font-size:15px}
+  .quiz-link:hover{filter:brightness(1.08)}
+
+  /* 寬螢幕：兩大項並排，一個畫面放得下（畫布填滿剩下的高度） */
+  .stage{display:grid;grid-template-columns:3fr 2fr;gap:16px;height:calc(100vh - 78px);min-height:820px;max-height:1100px;margin:12px 0 16px}
+  #moon, #orbit{scroll-margin-top:64px}
+  #orbit{margin-top:0}
+  .stage > .panel{display:flex;flex-direction:column;min-height:0;min-width:0;padding:12px 16px;overflow:hidden}
+  .stage .panel-head, .stage .sub-head{margin-bottom:6px}
+  .stage h2{font-size:19px;margin:0}
+  .st-tag{display:inline-block;font-size:13px;font-weight:800;color:#0a0f24;background:var(--moon);border-radius:999px;padding:1px 10px;margin-right:8px;vertical-align:2px}
+  .st-tag.blue{background:var(--earth)}
+  .canvas-box.fill{flex:1 1 0;min-height:220px;position:relative}
+  .canvas-box.fill canvas{position:absolute;inset:0;width:100%;height:100%}
+  .stage .legend{font-size:12.5px;margin-top:6px;gap:2px 12px}
+  .stage .banner{margin:0 0 8px;padding:6px 12px;font-size:14px}
+  .tilt-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .tilt-row input[type=range]{flex:1 1 160px;width:auto;max-width:340px}
+  .tilt-row .tilt-end{color:var(--muted);font-size:13px;white-space:nowrap}
+  .tilt-row .check{font-size:14px;white-space:nowrap}
+  .tilt-row .check input{width:18px}
+  .tilt-row .dir-badge{margin-left:auto}
+  .stage .tilt{margin-top:6px}
+  .stage .dir-badge{margin:0;padding:2px 10px;font-size:14px}
+  .panel-ctrls{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+  .panel-ctrls .btn{padding:5px 12px;font-size:14px}
+  .panel-ctrls .seg{flex-wrap:wrap}
+  .panel-ctrls .seg button{padding:4px 11px;font-size:14px}
+  .panel-ctrls .ctrl-label{font-size:14px}
+  .panel-ctrls input[type=range]{width:110px}
+  .panel-ctrls .check{font-size:14px}
+  .stage .face-row{margin:0 0 6px}
+  .stage .timebar{margin-top:8px;padding:6px 12px 2px}
+  .stage .phase-name{margin-top:6px}
+  .stage #pName{font-size:28px}
+  .stage .desc{margin:2px 0 6px;font-size:15px;line-height:1.55}
+  .stage .facts{grid-template-columns:repeat(3,1fr);gap:6px}
+  .stage .facts div{padding:5px 10px}
+  .stage .facts dd{font-size:15px;line-height:1.5}
+  .facts div.w2{grid-column:span 2}
+
+  .rule{
+    background:linear-gradient(90deg,rgba(255,217,119,.2),rgba(255,217,119,.06));
+    border:1px solid rgba(255,217,119,.55);border-radius:16px;padding:12px 16px;margin-bottom:16px;font-size:18px
+  }
+  .rule em{font-style:normal;color:var(--moon);font-weight:800}
+
+  h2{font-size:20px;margin:0 0 10px;line-height:1.4}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;backdrop-filter:blur(6px)}
+  section + section{margin-top:18px}
+
+  .banner{
+    background:linear-gradient(90deg,rgba(255,158,196,.22),rgba(255,158,196,.08));
+    border:1px solid rgba(255,158,196,.5);color:#ffe0ec;
+    border-radius:14px;padding:10px 14px;margin-bottom:14px;font-weight:600
+  }
+
+  .lab{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+  @media (max-width:880px){.lab{grid-template-columns:1fr}}
+
+  .panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .hint{color:var(--muted);font-size:14px}
+  .canvas-box{width:100%;position:relative}
+  canvas{display:block;width:100%}
+  #space{touch-action:none;cursor:grab;border-radius:14px}
+  #space:active{cursor:grabbing}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .legend i.dash{height:0;border-top:2px dashed rgba(255,255,255,.7);border-radius:0}
+  .legend i.tag{width:auto;height:auto;padding:0 4px;font-style:normal;font-size:11px;background:var(--moon);color:#2a2200;font-weight:800}
+  .dir-badge{
+    display:inline-flex;align-items:center;gap:6px;margin:8px 0 2px;
+    padding:4px 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:15px
+  }
+  .dir-badge b.ccw{color:var(--ccw)} .dir-badge b.cw{color:var(--cw)}
+
+  .tilt{margin-top:10px}
+  .tilt label{font-weight:700;font-size:15px}
+  .tilt input{width:100%}
+  .tilt-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;gap:8px}
+  @media (max-width:480px){.tilt-labels{font-size:11.5px;gap:4px}.tilt-labels span{white-space:nowrap}}
+  input[type=range]{accent-color:var(--moon)}
+
+  #view{border-radius:14px}
+  #view.third{touch-action:none;cursor:grab}
+  #view.third:active{cursor:grabbing}
+  #modeSeg{margin-bottom:8px}
+  #modeSeg button{padding:5px 12px;font-size:14px}
+  .view-cap{color:var(--muted);font-size:14px}
+  .face-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 10px}
+  .face-row .seg button{padding:5px 12px;font-size:14px}
+  .phase-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+  #pName{font-size:34px;font-weight:800;color:var(--moon);line-height:1.2}
+  .chip{font-size:14px;padding:3px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line)}
+  .chip.wax{color:var(--ccw);border-color:rgba(110,231,183,.5)}
+  .chip.wane{color:var(--cw);border-color:rgba(255,158,196,.5)}
+  .desc{margin:6px 0 10px;color:#dfe4ff}
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
+  .facts div{background:var(--panel2);border-radius:12px;padding:8px 12px}
+  .facts div.wide{grid-column:1 / -1}
+  .facts div.hl{background:rgba(255,217,119,.12);outline:1px solid rgba(255,217,119,.45)}
+  .facts dt{font-size:13px;color:var(--muted)}
+  .facts dd{margin:0;font-weight:700}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px 26px;align-items:center}
+  .ctrl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ctrl-label{font-weight:700;font-size:15px}
+  .ctrl-label small{font-weight:400;color:var(--muted)}
+  .timebar{margin-top:10px;background:var(--panel2);border-radius:14px;padding:10px 14px 4px}
+  .timebar-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:15px}
+  .timebar-head label{font-weight:700}
+  #hourText{font-weight:800;color:var(--moon);font-size:18px}
+  .daybar{height:8px;border-radius:999px;margin:8px 8px 0;
+    background:linear-gradient(90deg,#141a45 0%,#141a45 19%,#f0a060 25%,#7cc8ff 31%,#7cc8ff 69%,#f0a060 75%,#141a45 81%,#141a45 100%)}
+  .timebar input{width:100%;margin:4px 0 0}
+  .timebar-ticks{position:relative;height:2.9em;margin:0 8px;font-size:12px;color:var(--muted);line-height:1.3}
+  .timebar-ticks span{position:absolute;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap}
+  .timebar-ticks span:first-child{transform:none;text-align:left}
+  .timebar-ticks span:last-child{transform:translateX(-100%);text-align:right}
+  .btn{
+    background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink);
+    border-radius:12px;padding:7px 14px;font:inherit;font-size:15px;cursor:pointer
+  }
+  .btn:hover{background:rgba(255,255,255,.14)}
+  .btn.primary{background:var(--moon);color:#1d1a0b;border-color:transparent;font-weight:700}
+  .seg{display:inline-flex;background:rgba(255,255,255,.06);border-radius:999px;padding:4px;border:1px solid var(--line)}
+  .seg button{border:0;background:transparent;color:var(--muted);padding:7px 14px;border-radius:999px;font:inherit;font-size:15px;cursor:pointer}
+  .seg button.active{background:var(--sky);color:#0a0f24;font-weight:700}
+  .seg button.ccw.active{background:var(--ccw)}
+  .seg button.cw.active{background:var(--cw)}
+  .check{cursor:pointer;font-size:15px}
+  .check input{width:18px;height:18px;accent-color:var(--moon);vertical-align:-3px}
+
+  .seq-row{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;padding:10px;border-radius:16px;opacity:.45;transition:opacity .3s,background .3s}
+  .seq-row.active{opacity:1;background:var(--panel2)}
+  .seq-label{font-weight:800;font-size:18px;line-height:1.35}
+  .seq-label small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+  .seq-label.ccw{color:var(--ccw)} .seq-label.cw{color:var(--cw)}
+  .seq-items{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+  .seq-item{
+    background:transparent;border:2px solid transparent;border-radius:14px;color:var(--ink);
+    padding:6px 2px;cursor:pointer;font:inherit;display:flex;flex-direction:column;align-items:center;gap:2px
+  }
+  .seq-item:hover{background:rgba(255,255,255,.06)}
+  .seq-item canvas{width:52px;height:52px}
+  .seq-item b{font-size:14px}
+  .seq-item small{font-size:12px;color:var(--muted)}
+  .seq-row.active .seq-item.current{border-color:var(--moon);background:rgba(255,217,119,.1)}
+  @media (max-width:760px){
+    .seq-row{grid-template-columns:1fr}
+    .seq-items{grid-template-columns:repeat(4,1fr)}
+  }
+  .note{color:#dfe4ff;margin:12px 4px 0}
+  .note b{color:var(--moon)}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card .ico{font-size:30px;line-height:1}
+  .card h3{margin:6px 0 6px;font-size:19px}
+  .card p{margin:0 0 8px;color:#dfe4ff}
+  .card em{font-style:normal;color:var(--moon);font-weight:700}
+  .mnemonic{font-size:22px;font-weight:800;color:var(--moon);letter-spacing:2px;text-align:center;margin:4px 0 10px}
+  .vs{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px 10px;font-size:15px;align-items:center}
+  .vs .h{text-align:center;font-weight:800}
+  .vs .k{color:var(--muted)}
+  .vs .v{text-align:center;background:var(--panel2);border-radius:8px;padding:2px 4px}
+  .vs canvas{width:64px;height:64px;margin:0 auto}
+
+  .quiz{max-width:720px;margin-left:auto;margin-right:auto}
+  .quiz-top{display:flex;justify-content:space-between;color:var(--muted);font-size:15px}
+  .quiz-q{font-size:20px;font-weight:700;margin:8px 0 10px}
+  .quiz-moon{width:120px;height:120px;margin:0 auto 10px}
+  .quiz-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .quiz-opts button{
+    font:inherit;font-size:17px;padding:12px;border-radius:14px;cursor:pointer;
+    background:rgba(255,255,255,.07);border:2px solid var(--line);color:var(--ink)
+  }
+  .quiz-opts button:hover:not(:disabled){background:rgba(255,255,255,.13)}
+  .quiz-opts button.right{border-color:var(--ccw);background:rgba(110,231,183,.18)}
+  .quiz-opts button.wrong{border-color:var(--cw);background:rgba(255,158,196,.15)}
+  .quiz-opts button:disabled{cursor:default}
+  .quiz-opts.long{grid-template-columns:1fr}
+  .quiz-opts.long button{text-align:left;font-size:16px}
+  .quiz-fb{margin-top:12px;min-height:1.7em}
+  .quiz-fb .ok{color:var(--ccw);font-weight:800}
+  .quiz-fb .no{color:var(--cw);font-weight:800}
+  .quiz-end{text-align:center;padding:10px 0}
+  .quiz-end .big{font-size:44px}
+  footer{text-align:center;color:var(--muted);font-size:14px;margin-top:30px}
+
+  /* ---------- 第二站：地球帶著月亮繞太陽跑（原 02_earth-moon-orbit.html，Antigravity 開發） ---------- */
+  .chapter{text-align:center;margin:44px 0 16px;padding-top:28px;border-top:1px dashed rgba(160,180,255,.3);scroll-margin-top:8px}
+  .chapter .emoji-row{font-size:28px;letter-spacing:6px;margin-bottom:4px}
+  .chapter h2{font-size:clamp(24px,4.2vw,36px);margin:0 0 8px;line-height:1.3}
+  .chapter h2 .e{color:var(--earth)}
+  .chapter h2 .m{color:var(--moon)}
+  .chapter h2 .s{color:var(--sun)}
+  .chapter p{color:var(--muted);max-width:760px;margin:0 auto;font-size:17px}
+  .rule.blue{background:linear-gradient(90deg,rgba(92,184,255,.18),rgba(255,217,119,.08));border-color:rgba(124,200,255,.45);font-size:17px}
+  .rule.blue em{color:var(--sun)}
+  #orbit .stage{grid-template-columns:3fr 2fr}
+  #orbit .panel{min-width:0}
+  #orbit canvas{border-radius:14px}
+  #orbitCanvas{touch-action:none;cursor:grab}
+  #orbitCanvas:active{cursor:grabbing}
+  #orbit .legend span{display:inline-flex;align-items:center}
+  #orbit .legend i.line{height:3px;border-radius:2px}
+  .tilt-box{margin-top:10px;background:var(--panel2);border-radius:14px;padding:10px 14px}
+  .tilt-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:15px}
+  .tilt-head label{font-weight:700}
+  .tilt-box input[type=range]{width:100%;margin:6px 0 2px}
+  #tiltText{color:var(--sun);font-weight:700}
+  #dayText{font-weight:800;color:var(--sun);font-size:18px}
+  .season-bar{height:8px;border-radius:999px;margin:8px 8px 0;
+    background:linear-gradient(90deg,#f4a261 0%,#e76f51 25%,#a8dadc 50%,#457b9d 75%,#f4a261 100%)}
+  .sub-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .preset-bar{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+  .preset-btn{
+    background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--ink);
+    border-radius:10px;padding:6px 10px;font:inherit;font-size:13.5px;cursor:pointer;text-align:left;transition:background .15s,border-color .15s
+  }
+  .preset-btn:hover{background:rgba(255,255,255,.14);border-color:var(--sun)}
+  .status-banner{
+    margin-top:10px;padding:10px 14px;border-radius:14px;font-weight:700;font-size:16px;
+    background:rgba(255,255,255,.06);border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap
+  }
+  .status-banner.eclipse{background:linear-gradient(90deg,rgba(255,158,196,.24),rgba(255,209,102,.18));border-color:var(--cw);color:#fff0f6}
+  #orbit .facts{margin-top:8px}
+  #orbit .facts dd{font-size:15px}
+  #orbit .seg{flex-wrap:wrap}
+  #orbit .seg button{padding:6px 13px;font-size:14px}
+  #orbit .seg button.active{background:var(--sun)}
+  #orbit .check{display:inline-flex;align-items:center;gap:6px}
+  .stage + .rule{margin-top:0}
+  .stage .status-banner{margin-top:8px;padding:6px 12px;font-size:15px}
+  .stage .tilt-box{margin-top:6px;padding:6px 12px}
+  .stage .tilt-box input[type=range]{margin:2px 0 0}
+  .stage .preset-bar{margin-bottom:6px}
+  #orbit .stage .tilt-labels{display:none}
+  #orbit .stage .facts dd{font-size:14px}
+  #orbit .stage .facts dt{font-size:12px}
+  #orbit .tilt-labels span{white-space:normal}
+  #orbit .tilt-labels span:last-child{text-align:right}
+  #orbit .timebar-ticks .mo{font-weight:inherit}
+  @media (max-width:480px){#orbit .timebar-ticks .mo{display:none}}
+  .story-cap{margin-top:10px;background:var(--panel2);border-radius:14px;padding:12px 16px;min-height:10.5em}
+  .story-top{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+  .story-dots{display:flex;gap:6px}
+  .story-dots button{width:18px;height:18px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.12);cursor:pointer;padding:0}
+  .story-dots button.on{background:var(--sun);border-color:transparent}
+  #storyTitle{margin:6px 0 4px;font-size:20px;color:var(--sun);line-height:1.4}
+  #storyText{margin:0;color:#dfe4ff}
+  .story-ctrl{margin-top:10px}
+  .hoop-note{margin:10px 2px 0;color:#dfe4ff}
+  h3.step{margin:0;font-size:18px;color:var(--sun);line-height:1.4}
+  .step-head{align-items:center;margin:10px 0 8px}
+  #story{margin-top:22px;padding-top:14px;border-top:1px dashed rgba(160,180,255,.3)}
+  .hoop-note b{color:var(--sun)}
+  #hoop .panel-head{align-items:center;margin-bottom:8px}
+  #hoop + section{margin-top:18px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <nav class="top">
+    <a href="../index.html" title="回首頁" aria-label="回首頁">🏠</a>
+    <a href="01_moon-phases.html">🌙 月亮變變變</a>
+    <a href="02_earth-moon-orbit.html" aria-current="page">🌍 地球帶著月亮跑</a>
+    <a href="03_eclipses.html">📅 未來20年日食月食</a>
+    <a href="04_planets.html">🪐 八大行星</a>
+  </nav>
+  <div class="top-right">
+    <a class="quiz-link" href="05_quiz.html">⭐ 小測驗 →</a>
+    <div class="top-ctrl" id="ctrlOrbit">
+      <button class="btn primary" id="playBtn">▶ 播放</button>
+      <button class="btn" id="prevDayBtn">◀ 前一天</button>
+      <button class="btn" id="nextDayBtn">後一天 ▶</button>
+      <span class="ctrl-label">速度</span>
+      <input type="range" id="speedSlider" min="0.2" max="4" step="0.1" value="1">
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <!-- ==================== 第二站：地球帶著月亮繞太陽跑（原 02_earth-moon-orbit.html，Antigravity 開發） ==================== -->
+  <div id="orbit">
+  <section class="stage">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>① 太陽系大舞台：地球帶著月亮繞太陽</h2>
+        <span class="hint">👆 拖曳地球或下方時間軸，看看一整年的變化</span>
+      </div>
+      <div class="canvas-box fill">
+        <canvas id="orbitCanvas" aria-label="地球帶著月球繞太陽公轉的動畫，包含月亮波浪軌跡、地球自轉軸傾角與食季交點線"></canvas>
+      </div>
+      <div class="legend">
+        <span><i class="line" style="background:#5cb8ff"></i>地球公轉軌道（黃道面 0°）</span>
+        <span><i class="line" style="background:#5ce1ff"></i>月道面上半圈（🔼 高於黃道面 +5°）</span>
+        <span><i class="dash" style="border-color:#ff9ec4"></i>月道面下半圈（🔽 低於黃道面 -5°）</span>
+        <span><i style="background:#ff5c77;border:1.5px solid #ffffff"></i>交點（🔴 高度 0° 穿過黃道面處）</span>
+        <span><i style="background:rgba(255,158,196,.35);border:1px solid #ff9ec4"></i>食季區域（🔴 交點轉到對準太陽）</span>
+      </div>
+      <div class="tilt-box">
+        <div class="tilt-head">
+          <label for="camTilt">🎥 觀看角度：從正上方俯視，或拉到側面看立體傾斜</label>
+          <span id="tiltText">斜視 38°</span>
+        </div>
+        <input type="range" id="camTilt" min="8" max="90" value="38">
+        <div class="tilt-labels">
+          <span>📐 接近側面（看清楚自轉軸 23.4° 與月道面高低）</span>
+          <span>🦅 正上方俯視（看清楚 12 圈波浪軌跡）</span>
+        </div>
+      </div>
+      <div class="timebar">
+        <div class="timebar-head">
+          <label for="daySlider">🗓️ 一年時間軸：拉拉看地球走到哪裡</label>
+          <span id="dayText">第 1 天</span>
+        </div>
+        <div class="season-bar" aria-hidden="true"></div>
+        <input type="range" id="daySlider" min="0" max="365.24" step="0.1" value="0">
+        <div class="timebar-ticks" aria-hidden="true">
+          <span style="left:0">🌸<br><b class="mo">3月 </b>春分</span>
+          <span style="left:25%">☀️<br><b class="mo">6月 </b>夏至</span>
+          <span style="left:50%">🍁<br><b class="mo">9月 </b>秋分</span>
+          <span style="left:75%">❄️<br><b class="mo">12月 </b>冬至</span>
+          <span style="left:100%">🌸<br><b class="mo">隔年</b>春分</span>
+        </div>
+      </div>
+      <div class="panel-ctrls">
+        <div class="ctrl">
+          <button class="btn" id="nextNewMoonBtn">🌑 下個新月</button>
+          <button class="btn" id="eclipseSeasonBtn">⚡ 食季日食</button>
+          <button class="btn" id="lunarEclipseBtn">🌕 食季月食</button>
+        </div>
+        <div class="ctrl">
+          <span class="ctrl-label">波浪軌跡</span>
+          <div class="seg" id="scaleSeg">
+            <button data-mode="exag" class="active">🔍 教學放大</button>
+            <button data-mode="true">📏 接近真實</button>
+          </div>
+        </div>
+        <label class="ctrl check"><input type="checkbox" id="showTrail" checked> 軌跡</label>
+        <label class="ctrl check"><input type="checkbox" id="showNodes" checked> 交點線與食季</label>
+        <label class="ctrl check"><input type="checkbox" id="showAxis" checked> 自轉軸（23.4°）</label>
+        <span class="hint" id="scaleNote" hidden>📏 真實的月亮離地球很近（只有地球到太陽的 1/390），會被地球蓋住，所以月亮和藍色的圈有往外畫大一點；黃色軌跡才是照比例的。</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="sub-head">
+        <h2>② 日食月食光影剖面圖</h2>
+        <span class="hint">一鍵切換日食／月食成因對比</span>
+      </div>
+      <div class="preset-bar" role="group" aria-label="日食與月食成因快速示範">
+        <button class="preset-btn" id="btnPresetSolar">🌑 示範「日食成因」</button>
+        <button class="preset-btn" id="btnPresetLunar">🌕 示範「月食成因」</button>
+        <button class="preset-btn" id="btnPresetNormalNew">🌤️ 平常初一（無日食）</button>
+        <button class="preset-btn" id="btnPresetNormalFull">🌝 平常十五（無月食）</button>
+      </div>
+      <div class="canvas-box fill">
+        <canvas id="followCanvas" aria-label="側面光影剖面圖，呈現太陽平行光、月球本影與半影（日食成因）、地球本影與大氣折射紅光（月食成因）"></canvas>
+      </div>
+      <div id="eclipseBanner" class="status-banner">
+        <span id="eclipseTitle">🔭 食季雷達：目前不在食季</span>
+        <small id="eclipseSub" style="color:var(--muted);font-weight:500"></small>
+      </div>
+      <dl class="facts">
+        <div class="hl"><dt>目前月相（地球上看）</dt><dd id="fPhase">滿月</dd></div>
+        <div class="hl"><dt>地球節氣與北半球季節</dt><dd id="fSeason">3月 春分（春季）</dd></div>
+        <div><dt>對遠方星星轉了（恆星月）</dt><dd id="fSidereal">0.0 圈（27.3 天/圈）</dd></div>
+        <div><dt>月相循環了（朔望月）</dt><dd id="fSynodic">0.0 圈（29.5 天/圈）</dd></div>
+        <div class="w2"><dt>為什麼新月到新月要多花 2.2 天？</dt><dd id="fChase">地球一邊繞太陽公轉，陽光照射角度每天轉約 1°，月亮必須多追約 27° 才能再次對準太陽！</dd></div>
+        <div class="wide"><dt>現在新月／滿月會發生日食或月食嗎？</dt><dd id="fNodeInfo"></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 重點整理（第二站） -->
+  <div class="rule blue">
+    🔑 <b>三大太空祕密：</b>
+    ① 地球一年繞太陽一圈，同時帶著月亮轉了<em>約 12 圈半的月相（對著星星則是 13.4 圈）</em>！
+    ② 地球自轉軸<em>永遠斜向同一個方向（23.4°）</em>，所以繞太陽到不同位置就會產生四季。
+    ③ 月道面斜了 <em>5°</em>，只有當「交點線」剛好轉到指著太陽（<em>食季</em>）時，新月和滿月才會發生日食與月食！
+  </div>
+
+  <section class="panel" id="hoop">
+    <h2>③ 動畫說故事：月道面斜 5°，為什麼一年只有兩次食季？</h2>
+    <div class="panel-head step-head">
+      <h3 class="step">第 1 步　月亮繞地球一圈：一下在黃道面上面、一下在下面</h3>
+      <div class="ctrl">
+        <button class="btn primary" id="hoopPlay">⏸ 暫停</button>
+        <span class="ctrl-label">速度</span>
+        <input type="range" id="hoopSpeed" min="0.2" max="2" step="0.1" value="1">
+        <button class="btn" id="hoopPrec">⏩ 快轉 18.6 年</button>
+      </div>
+    </div>
+    <div class="canvas-box"><canvas id="hoopCanvas" aria-label="動畫：月亮沿著斜斜的軌道繞地球，有半圈在黃道面上方、半圈在下方，只有經過兩個交點時剛好在黃道面上"></canvas></div>
+    <p class="hoop-note">🔑 黃道面像一張<b>桌面</b>，月亮的軌道像一個<b>斜放的呼拉圈</b>：一半翹在桌面上面、一半沉在桌面下面。月亮繞一圈（大約 27 天）只會<b>穿過桌面兩次</b>，穿過的那兩個點就是<b>交點</b>。太陽和地球都在桌面上，所以只有月亮剛好在交點附近、又剛好是新月或滿月時，三個才排得成一直線，才會有日食、月食。按「⏩ 快轉 18.6 年」可以看到：呼拉圈斜的角度不變，但<b>斜的方向會很慢地順時針轉</b>，最高點 🚩 繞一整圈要 18.6 年，兩個交點也跟著在桌面上移動，所以每年的食季會提早大約 19 天。<span class="hint">（真實只斜 5°，這裡把斜度放大畫，才看得出高低。）</span></p>
+    <div id="story">
+    <div class="panel-head step-head">
+      <h3 class="step">第 2 步　地球帶著這個呼拉圈繞太陽一年：新月、滿月什麼時候剛好在交點？</h3>
+      <span class="hint">會自動播放，也可以一幕一幕看</span>
+    </div>
+    <div class="canvas-box"><canvas id="storyCanvas" aria-label="動畫：地球帶著斜 5 度的月道面繞太陽，紅旗一直指同一個方向，對著太陽的那一點有時高、有時低、有時剛好在交點線上"></canvas></div>
+    <div class="story-cap" aria-live="polite">
+      <div class="story-top"><span id="storyStep"></span><div class="story-dots" id="storyDots"></div></div>
+      <h3 id="storyTitle"></h3>
+      <p id="storyText"></p>
+    </div>
+    <div class="ctrl story-ctrl">
+      <button class="btn" id="storyPrev">◀ 上一幕</button>
+      <button class="btn primary" id="storyPlay">⏸ 暫停</button>
+      <button class="btn" id="storyNext">下一幕 ▶</button>
+    </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="cards">
+      <div class="card">
+        <div class="ico">🌑</div>
+        <h3>日食是怎麼發生的？（太陽 → 月亮 → 地球）</h3>
+        <p>當農曆初一<em>新月</em>剛好走在「食季」的交點線上時，<em>月亮會跑到太陽和地球正中間</em>，把太陽光擋住！</p>
+        <p>月亮身後會拖著錐形的影子：走進深色<em>本影錐</em>的地區會看到太陽完全被遮住的「<em>日全食</em>」（還能看見美麗的日冕）；走進外圍淺色<em>半影區</em>的地區則會看到「<em>日偏食</em>」。</p>
+      </div>
+      <div class="card">
+        <div class="ico">🌕</div>
+        <h3>月食與「紅月亮」是怎麼發生的？（太陽 → 地球 → 月亮）</h3>
+        <p>當農曆十五<em>滿月</em>走在「食季」的交點線上時，<em>地球會擋在太陽和月亮正中間</em>，滿月走進地球巨大的影子裡，就發生月食了！</p>
+        <p>有趣的是，月全食時月亮不會完全消失，反而變成神祕的「<em>紅月亮（血月）</em>」——因為陽光穿過地球大氣層時，藍光被散射掉，只有<em>紅橙色光被折射彎進地球本影裡</em>，照紅了月亮！</p>
+      </div>
+      <div class="card">
+        <div class="ico">📐</div>
+        <h3>為什麼日食、月食不會每個月發生？</h3>
+        <p>因為月亮繞地球的「月道面」和地球繞太陽的「黃道面」斜了約 <em>5.1 度</em>！兩個平面的交叉線叫「<em>交點線</em>」。</p>
+        <p>地球帶著月道面繞太陽跑時，大部分月份交點線沒有指向太陽，新月的影子或滿月本身會從目標的<em>上面、下面溜過去</em>（按上方「🌤️ 平常初一」或「🌝 平常十五」看剖面圖）。只有每年兩次走到<em>食季</em>時才會發生日食與月食！</p>
+      </div>
+      <div class="card">
+        <div class="ico">🎢</div>
+        <h3>月亮一年繞太陽畫出幾個波浪？</h3>
+        <p>地球花 <em>365.24 天</em>繞太陽一圈，同時帶著月亮一起跑。如果算「新月到新月（朔望月，29.53 天）」，一年大約有 <em>12.37 個月相週期</em>；若以遠方星星為準（恆星月，27.32 天），則繞了 <em>13.37 圈</em>！</p>
+        <p>而且因為地球繞太陽每秒跑 <em>30 公里</em>、月亮繞地球每秒只跑 <em>1 公里</em>，月亮的真實軌跡是<em>平滑不打結的十二邊形波浪</em>喔！</p>
+      </div>
+      <div class="card">
+        <div class="ico">🏃</div>
+        <h3>27.3 天 vs. 29.5 天：月亮為什麼要「多追 2.2 天」？</h3>
+        <p>當月亮繞地球轉滿一圈（360°，花了 <em>27.32 天</em>）回到原本方向時，地球已經帶著月亮繞太陽往前跑了約 <em>27 度</em>！</p>
+        <p>所以陽光照射的方向斜掉了，月亮必須<em>再多跑 2.21 天</em>（共 <em>29.53 天</em>），才能再次追上太陽與地球的連線，變回新月！</p>
+      </div>
+      <div class="card">
+        <div class="ico">🌐</div>
+        <h3>地球自轉軸斜 23.4° 與食季提早 19 天</h3>
+        <p>地球自轉軸永遠指向<em>北極星（畫面左上方）</em>：<em>6 月夏至</em>北極朝向太陽（北半球夏天），<em>12 月冬至</em>北極背對太陽（北半球冬天）。</p>
+        <p>同時，月道面的「交點線」受太陽引力影響，會以 <em>18.6 年一圈</em>慢慢順時針退行，所以地球每隔約 <em>173.3 天</em>就會遇上一次食季，每年食季都會比前一年<em>提早約 19 天</em>！想看交點線 18.6 年轉一圈的樣子，可以到「<a href="03_eclipses.html" style="color:var(--sun)">📅 未來20年日食月食</a>」按「播放 18.6 年轉一圈」。</p>
+      </div>
+    </div>
+  </section>
+  </div>
+  <!-- ==================== 第二站結束 ==================== -->
+
+  <footer>☀️ 太陽 · 🌍 地球 · 🌙 月亮　｜　圖中的大小和距離都有放大縮小，方便觀察喔！</footer>
+</div>
+
+<script>
+// ==================== 第二站：地球帶著月亮繞太陽跑（原 02_earth-moon-orbit.html，Antigravity 開發） ====================
+(() => {
+  const DEG = Math.PI / 180;
+  const TAU = Math.PI * 2;
+  const YEAR = 365.2422;
+  const SIDEREAL = 27.32166;
+  const SYNODIC = 29.53059;
+  const OBLIQUITY = 23.44 * DEG;
+  const INCLINATION = 5.14 * DEG;
+  const FONT = '"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif';
+  const $ = s => document.querySelector(s);
+  const norm = a => ((a % TAU) + TAU) % TAU;
+  const sinDeg = d => Math.sin(d * DEG);
+
+  const PHASES = ['新月', '眉月', '上弦月', '盈凸月', '滿月', '虧凸月', '下弦月', '殘月'];
+
+  // 狀態：day = 0 為 3月春分（地球在畫面下方 θ = -90° 處，逆時針公轉：
+  // day=0 春分(下, -90°) -> day=91.3 夏至(右, 0°) -> day=182.6 秋分(上, +90°) -> day=273.9 冬至(左, 180°)）
+  // 自轉軸北極在太空中固定朝向 -x（左方）：
+  // 所以當地球在右邊（0°，夏至）時，太陽在地球的 -x 方向，北極剛好朝向太陽！
+  // 當地球在左邊（180°，冬至）時，太陽在地球的 +x 方向，北極剛好背對太陽！
+  const state = {
+    day: 52,          // 預設在 5 月中旬，已有漂亮的一段波浪軌跡
+    playing: false,   // 預設暫停，按右上角「播放」才開始
+    speed: 1,
+    camTilt: 38,      // 觀看仰角（度）：90° 為正上方俯視，8° 為接近側面
+    scaleMode: 'exag', // 'exag' 教學放大波浪 | 'true' 接近真實平滑無打結
+    showTrail: true,
+    showNodes: true,
+    showAxis: true,
+    dragging: false,
+  };
+
+  // 交點線在太空中的基準角（設在 θ = 59.8°，使第 5 個朔望月新月與第 10.5 個朔望月滿月恰好對準交點線發生全食，並隨 18.6 年週期退行）
+  const NODE_BASE = 59.8 * DEG;
+  const NODE_PRECESSION = -TAU / (18.61 * YEAR); // 每天退行角度
+
+  function earthAngle(day) {
+    return -Math.PI / 2 + (day / YEAR) * TAU;
+  }
+  function nodeAngle(day) {
+    return NODE_BASE + day * NODE_PRECESSION;
+  }
+  // 選擇讓 day=0 時剛好為新月對齊，使各個朔望月的新月(k*SYNODIC)與滿月((k+0.5)*SYNODIC)精確重現
+  function moonSiderealAngle(day) {
+    const thetaE = earthAngle(day);
+    const sunDirFromEarth = thetaE + Math.PI;
+    const synodicAngle = (day / SYNODIC) * TAU;
+    return sunDirFromEarth + synodicAngle;
+  }
+
+  function angleDiffDeg(a, b) {
+    let d = Math.abs(norm(a - b)) / DEG;
+    if (d > 180) d = 360 - d;
+    return d;
+  }
+
+  function getEclipseStatus(day) {
+    const thE = earthAngle(day);
+    const sunDir = thE + Math.PI;
+    const nodA = nodeAngle(day);
+    const lamM = moonSiderealAngle(day);
+    const synA = norm(lamM - sunDir);
+    const zLat = 5.14 * Math.sin(lamM - nodA);
+    const nodeDiff = Math.min(angleDiffDeg(sunDir, nodA), angleDiffDeg(sunDir, nodA + Math.PI));
+    const inEclipseSeason = nodeDiff <= 16.5;
+    const isNewMoon = angleDiffDeg(synA, 0) < 12;
+    const isFullMoon = angleDiffDeg(synA, Math.PI) < 12;
+    const isSolarEclipse = inEclipseSeason && isNewMoon && Math.abs(zLat) < 1.5;
+    const isLunarEclipse = inEclipseSeason && isFullMoon && Math.abs(zLat) < 1.5;
+    return { thE, sunDir, nodA, lamM, synA, zLat, nodeDiff, inEclipseSeason, isNewMoon, isFullMoon, isSolarEclipse, isLunarEclipse };
+  }
+
+  function setupCanvas(el, ratio) {
+    const o = { el, ctx: el.getContext('2d'), w: 0, h: 0 };
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      // .fill 的盒子：畫布填滿面板剩下的空間（寬螢幕一個畫面放得下）；其他照寬高比
+      const box = el.parentElement, fill = box.classList.contains('fill');
+      const w = box.clientWidth;
+      const h = fill ? box.clientHeight : Math.round(w * ratio);
+      if (!w || !h || (w === o.w && h === o.h)) return;
+      if (!fill) el.style.height = h + 'px';
+      el.width = Math.round(w * dpr);
+      el.height = Math.round(h * dpr);
+      o.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      o.w = w; o.h = h;
+    };
+    new ResizeObserver(resize).observe(el.parentElement);
+    resize();
+    return o;
+  }
+
+  const C1 = setupCanvas($('#orbitCanvas'), 0.82);
+  const C2 = setupCanvas($('#followCanvas'), 0.98);
+
+  function makeStars(n) {
+    const out = [];
+    for (let i = 0; i < n; i++) out.push([Math.random(), Math.random(), Math.random() * 1.2 + 0.3, Math.random() * 0.55 + 0.2]);
+    return out;
+  }
+  const stars1 = makeStars(110), stars2 = makeStars(70);
+  function drawStars(ctx, w, h, stars) {
+    for (const [x, y, r, a] of stars) {
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.beginPath(); ctx.arc(x * w, y * h, r, 0, TAU); ctx.fill();
+    }
+  }
+
+  function arrowHead(ctx, x1, y1, x2, y2, size, color) {
+    const a = Math.atan2(y2 - y1, x2 - x1);
+    ctx.save(); ctx.translate(x2, y2); ctx.rotate(a);
+    ctx.beginPath();
+    ctx.moveTo(size * 0.45, 0);
+    ctx.lineTo(-size, -size * 0.65);
+    ctx.lineTo(-size, size * 0.65);
+    ctx.closePath();
+    ctx.fillStyle = color; ctx.fill();
+    ctx.restore();
+  }
+
+  // 畫小月相圓盤（從地球北半球看月亮的相位）
+  function drawPhaseDisc(ctx, cx, cy, r, synodicA) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU);
+    ctx.fillStyle = '#181e38'; ctx.fill();
+
+    const cosT = Math.cos(synodicA); // synodicA=0(新月)時 cosT=1 全暗；synodicA=PI(滿月)時 cosT=-1 全亮
+    const side = Math.sin(synodicA) >= 0 ? 1 : -1; // 盈月右亮(+1)，虧月左亮(-1)
+    const N = 40;
+    ctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      const u = -1 + 2 * i / N, w = Math.sqrt(1 - u * u);
+      i ? ctx.lineTo(side * r * w, u * r) : ctx.moveTo(side * r * w, u * r);
+    }
+    for (let i = N; i >= 0; i--) {
+      const u = -1 + 2 * i / N, w = Math.sqrt(1 - u * u);
+      ctx.lineTo(side * r * cosT * w, u * r);
+    }
+    ctx.closePath();
+    ctx.fillStyle = '#ffe999'; ctx.fill();
+
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU);
+    ctx.strokeStyle = 'rgba(255,217,119,0.55)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+  }
+
+  function pillTag(ctx, x, y, text, sub, fg, bg) {
+    ctx.save();
+    ctx.font = `700 12px ${FONT}`;
+    const w1 = ctx.measureText(text).width;
+    ctx.font = `500 11px ${FONT}`;
+    const w2 = sub ? ctx.measureText(sub).width : 0;
+    const bw = Math.max(w1, w2) + 14;
+    const bh = sub ? 34 : 20;
+    const bx = x - bw / 2, by = y - bh / 2;
+    ctx.fillStyle = bg || 'rgba(8,13,34,0.82)';
+    ctx.strokeStyle = 'rgba(160,180,255,0.28)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, 8);
+    else ctx.rect(bx, by, bw, bh);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = fg || '#eef2ff';
+    ctx.textAlign = 'center';
+    ctx.font = `700 12px ${FONT}`;
+    ctx.fillText(text, x, sub ? by + 14 : by + 14);
+    if (sub) {
+      ctx.fillStyle = '#aab3dc';
+      ctx.font = `500 10.5px ${FONT}`;
+      ctx.fillText(sub, x, by + 28);
+    }
+    ctx.restore();
+  }
+
+  // ---------- ① 太陽系大舞台 ----------
+  function renderOrbit() {
+    const { ctx, w, h } = C1;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#060a1c'; ctx.fillRect(0, 0, w, h);
+    drawStars(ctx, w, h, stars1);
+
+    const cx = w * 0.5, cy = h * 0.52;
+    const tiltRad = state.camTilt * DEG;
+    const sinT = Math.sin(tiltRad), cosT = Math.cos(tiltRad);
+    // 軌道半徑：盡量畫大。寬度留給左右的節氣標籤；高度依觀看角度算
+    // （斜著看時軌道在畫面上是扁的，可以放大；正上方俯視時才受高度限制）
+    const Re = Math.min(w * 0.33, (h / 2 - 55) / (1.16 * sinT + 0.1));
+    const fs = Math.max(11, Math.min(14, w / 46));
+
+    // 3D -> 2D 投影：世界座標 (x, y, z)，黃道面 z = 0，+y 在畫面上方（遠端），-y 在畫面下方（近端）
+    const P = (x, y, z = 0) => ({
+      x: cx + x,
+      y: cy - (y * sinT + z * cosT),
+      d: -y * cosT + z * sinT // 越大代表越靠近鏡頭
+    });
+    C1.geom = { cx, cy, Re, sinT };
+
+    // 月球繞地半徑與高度放大倍率
+    const Rm = state.scaleMode === 'exag' ? Re * 0.16 : Re * 0.042;
+    const Zm = state.scaleMode === 'exag' ? Re * 0.08 : Re * 0.018;
+
+    const thE = earthAngle(state.day);
+    const nodA = nodeAngle(state.day);
+    const lamM = moonSiderealAngle(state.day);
+
+    // 1. 畫黃道面圓盤與食季扇形區
+    ctx.save();
+    ctx.beginPath();
+    for (let i = 0; i <= 120; i++) {
+      const a = (i / 120) * TAU;
+      const p = P(Re * Math.cos(a), Re * Math.sin(a), 0);
+      i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(92,184,255,0.05)'; ctx.fill();
+    ctx.restore();
+
+    // 共用工具：在 3D 軌道圖上畫出「半圈高於黃道面（青藍實線）、半圈低於黃道面（粉紅虛線）」的斜 5° 月道面與兩顆紅交點
+    const drawTiltedMoonRing = (centerEx, centerEy, radius, alphaScale = 1, showNodeDots = true) => {
+      // 淡色底面：上半圈青色、下半圈粉紅
+      ctx.beginPath();
+      for (let i = 0; i <= 36; i++) {
+        const a = nodA + (i / 36) * Math.PI;
+        const p = P(centerEx + radius * Math.cos(a), centerEy + radius * Math.sin(a), Zm * Math.sin(a - nodA));
+        i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = `rgba(92,225,255,${0.14 * alphaScale})`;
+      ctx.fill();
+
+      ctx.beginPath();
+      for (let i = 0; i <= 36; i++) {
+        const a = nodA + Math.PI + (i / 36) * Math.PI;
+        const p = P(centerEx + radius * Math.cos(a), centerEy + radius * Math.sin(a), Zm * Math.sin(a - nodA));
+        i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = `rgba(255,158,196,${0.14 * alphaScale})`;
+      ctx.fill();
+
+      // 下半圈（z < 0，低於黃道面）：粉紅虛線
+      ctx.beginPath();
+      for (let i = 0; i <= 36; i++) {
+        const a = nodA + Math.PI + (i / 36) * Math.PI;
+        const p = P(centerEx + radius * Math.cos(a), centerEy + radius * Math.sin(a), Zm * Math.sin(a - nodA));
+        i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+      }
+      ctx.strokeStyle = `rgba(255,158,196,${0.88 * alphaScale})`;
+      ctx.lineWidth = 1.8;
+      ctx.setLineDash([4, 3]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 上半圈（z > 0，高於黃道面）：青藍實線
+      ctx.beginPath();
+      for (let i = 0; i <= 36; i++) {
+        const a = nodA + (i / 36) * Math.PI;
+        const p = P(centerEx + radius * Math.cos(a), centerEy + radius * Math.sin(a), Zm * Math.sin(a - nodA));
+        i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+      }
+      ctx.strokeStyle = `rgba(92,225,255,${0.95 * alphaScale})`;
+      ctx.lineWidth = 2.1;
+      ctx.stroke();
+
+      // 交點線與兩顆紅點（穿過黃道面 0° 的位置）
+      if (state.showNodes && showNodeDots) {
+        const n1 = P(centerEx + radius * 1.15 * Math.cos(nodA), centerEy + radius * 1.15 * Math.sin(nodA), 0);
+        const n2 = P(centerEx - radius * 1.15 * Math.cos(nodA), centerEy - radius * 1.15 * Math.sin(nodA), 0);
+        ctx.beginPath();
+        ctx.moveTo(n1.x, n1.y);
+        ctx.lineTo(n2.x, n2.y);
+        ctx.strokeStyle = `rgba(255,255,255,${0.82 * alphaScale})`;
+        ctx.setLineDash([3, 3]);
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        for (const aNode of [nodA, nodA + Math.PI]) {
+          const np = P(centerEx + radius * Math.cos(aNode), centerEy + radius * Math.sin(aNode), 0);
+          ctx.beginPath();
+          ctx.arc(np.x, np.y, 3.3 * Math.max(0.75, alphaScale), 0, TAU);
+          ctx.fillStyle = `rgba(255,92,119,${0.95 * alphaScale})`;
+          ctx.fill();
+          ctx.strokeStyle = `rgba(255,255,255,${0.9 * alphaScale})`;
+          ctx.lineWidth = 1.1;
+          ctx.stroke();
+        }
+      }
+    };
+
+    // 在月道面的圈上標出「新月」「滿月」的位置：新月在朝太陽那一邊、滿月在背對太陽那一邊。
+    // 小棒子連到黃道面，表示那一點比黃道面高或低；剛好在交點（高度約 0）時用綠色圈起來
+    const markNewFull = (centerEx, centerEy, radius, earthAng, alphaScale = 1) => {
+      const f3 = Math.max(10, fs - 3);
+      for (const [a, isNew] of [[earthAng + Math.PI, true], [earthAng, false]]) {
+        const zr = Math.sin(a - nodA);                 // +1 最高、-1 最低、0 在交點
+        const px = centerEx + radius * Math.cos(a), py = centerEy + radius * Math.sin(a);
+        const top = P(px, py, Zm * zr), foot = P(px, py, 0);
+        const onNode = Math.abs(zr) < 0.28;            // 離交點約 16° 以內（食季）
+        const col = onNode ? '110,231,183' : zr > 0 ? '92,225,255' : '255,158,196';
+        ctx.beginPath(); ctx.moveTo(foot.x, foot.y); ctx.lineTo(top.x, top.y);
+        ctx.strokeStyle = `rgba(${col},${0.95 * alphaScale})`; ctx.lineWidth = 1.6; ctx.stroke();
+        const r0 = 4.2 * Math.max(0.85, alphaScale);
+        ctx.beginPath(); ctx.arc(top.x, top.y, r0, 0, TAU);
+        ctx.fillStyle = isNew ? `rgba(26,32,64,${Math.min(1, alphaScale + 0.35)})` : `rgba(255,243,196,${Math.min(1, alphaScale + 0.35)})`;
+        ctx.fill();
+        ctx.strokeStyle = `rgba(${onNode ? col : '255,217,119'},${Math.min(1, alphaScale + 0.3)})`;
+        ctx.lineWidth = onNode ? 2 : 1.2; ctx.stroke();
+        // 字放在圈的外側
+        const c0 = P(centerEx, centerEy, 0);
+        const dx = top.x - c0.x, dy = top.y - c0.y, dl = Math.hypot(dx, dy) || 1;
+        ctx.fillStyle = `rgba(${isNew ? '255,233,153' : '255,243,196'},${Math.min(1, alphaScale + 0.4)})`;
+        ctx.font = `700 ${f3}px ${FONT}`; ctx.textAlign = 'center';
+        ctx.fillText(isNew ? '新月' : '滿月', top.x + dx / dl * (r0 + f3), top.y + dy / dl * (r0 + f3 * 0.8) + f3 * 0.35);
+      }
+    };
+
+    // 食季扇形帶（當地球走在 nodA 或 nodA + PI 附近 ±16° 時，交點線對準太陽）
+    if (state.showNodes) {
+      for (const base of [nodA, nodA + Math.PI]) {
+        const span = 16 * DEG;
+        ctx.beginPath();
+        const p0 = P(0, 0, 0);
+        ctx.moveTo(p0.x, p0.y);
+        for (let i = -12; i <= 12; i++) {
+          const a = base + (i / 12) * span;
+          const p = P((Re + Rm * 1.1) * Math.cos(a), (Re + Rm * 1.1) * Math.sin(a), 0);
+          ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(255,158,196,0.12)';
+        ctx.fill();
+
+        const lp = P((Re + Rm * 1.48) * Math.cos(base), (Re + Rm * 1.48) * Math.sin(base), 0);
+        ctx.fillStyle = 'rgba(255,185,215,0.94)';
+        ctx.font = `700 ${fs - 1}px ${FONT}`;
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡食季區', lp.x, lp.y + 4);
+      }
+
+      // 在食季區與非食季區畫出半透明的「月道面平移對照圈」，一眼看懂月道面方向固定、為何只有食季區交點才對準太陽
+      const refR = Math.max(Rm * 0.92, Re * 0.13);
+      for (const aRef of [nodA, nodA + Math.PI / 2, nodA + Math.PI, nodA + 1.5 * Math.PI]) {
+        if (angleDiffDeg(thE, aRef) > 22) {
+          drawTiltedMoonRing(Re * Math.cos(aRef), Re * Math.sin(aRef), refR, 0.42, true);
+          markNewFull(Re * Math.cos(aRef), Re * Math.sin(aRef), refR, aRef, 0.55);
+        }
+      }
+    }
+
+    // 2. 地球公轉軌道線與方向箭頭
+    ctx.beginPath();
+    for (let i = 0; i <= 120; i++) {
+      const a = (i / 120) * TAU;
+      const p = P(Re * Math.cos(a), Re * Math.sin(a), 0);
+      i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+    }
+    ctx.strokeStyle = 'rgba(92,184,255,0.45)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    for (const a0 of [-45 * DEG, 45 * DEG, 135 * DEG, 225 * DEG]) {
+      const p1 = P(Re * Math.cos(a0), Re * Math.sin(a0), 0);
+      const p2 = P(Re * Math.cos(a0 + 0.08), Re * Math.sin(a0 + 0.08), 0);
+      arrowHead(ctx, p1.x, p1.y, p2.x, p2.y, 7, 'rgba(92,184,255,0.75)');
+    }
+
+    // 3. 畫月亮走過的波浪軌跡（從第 0 天畫到目前天數，外加淡色預覽整圈）
+    if (state.showTrail) {
+      // 整年淡色波浪底線
+      ctx.beginPath();
+      const stepsFull = 720;
+      for (let i = 0; i <= stepsFull; i++) {
+        const d = (i / stepsFull) * YEAR;
+        const te = earthAngle(d), lm = moonSiderealAngle(d), na = nodeAngle(d);
+        const ex = Re * Math.cos(te), ey = Re * Math.sin(te);
+        const mx = ex + Rm * Math.cos(lm), my = ey + Rm * Math.sin(lm);
+        const mz = Zm * Math.sin(lm - na);
+        const p = P(mx, my, mz);
+        i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+      }
+      ctx.strokeStyle = 'rgba(255,217,119,0.22)';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+
+      // 已走過的亮色波浪軌跡
+      const spanDays = Math.max(1, state.day);
+      const steps = Math.max(30, Math.round(spanDays * 3));
+      ctx.beginPath();
+      for (let i = 0; i <= steps; i++) {
+        const d = (i / steps) * spanDays;
+        const te = earthAngle(d), lm = moonSiderealAngle(d), na = nodeAngle(d);
+        const ex = Re * Math.cos(te), ey = Re * Math.sin(te);
+        const mx = ex + Rm * Math.cos(lm), my = ey + Rm * Math.sin(lm);
+        const mz = Zm * Math.sin(lm - na);
+        const p = P(mx, my, mz);
+        i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+      }
+      ctx.strokeStyle = '#ffd977';
+      ctx.lineWidth = 2.4;
+      ctx.stroke();
+    }
+
+    // 4. 畫四個節氣標記（放在波浪軌跡外側，並加半透明底框避免與軌跡線干擾）
+    const outR = Re + Rm + 26;
+    const SEASONS = [
+      { a: -Math.PI / 2, label: '🌸 3月 春分', sub: '晝夜平分', ox: 0, oy: 12 },
+      { a: 0,            label: '☀️ 6月 夏至', sub: '北極朝向太陽', ox: 18, oy: 0 },
+      { a: Math.PI / 2,  label: '🍁 9月 秋分', sub: '晝夜平分', ox: 0, oy: -12 },
+      { a: Math.PI,      label: '❄️ 12月 冬至', sub: '北極背對太陽', ox: -18, oy: 0 },
+    ];
+    for (const s of SEASONS) {
+      const pDot = P(Re * Math.cos(s.a), Re * Math.sin(s.a), 0);
+      ctx.beginPath(); ctx.arc(pDot.x, pDot.y, 4, 0, TAU);
+      ctx.fillStyle = '#80d8ff'; ctx.fill();
+
+      const pLbl = P((Re + Rm) * Math.cos(s.a), (Re + Rm) * Math.sin(s.a), 0);
+      const lx = Math.max(58, Math.min(w - 58, pLbl.x + s.ox * (w > 540 ? 2.2 : 1.2)));
+      const ly = Math.max(24, Math.min(h - 24, pLbl.y + s.oy * 1.8));
+      pillTag(ctx, lx, ly, s.label, w > 520 ? s.sub : '');
+    }
+
+    // 5. 計算太陽、地球、月球當前位置
+    const ex = Re * Math.cos(thE), ey = Re * Math.sin(thE);
+    const ep = P(ex, ey, 0);
+    const mx = ex + Rm * Math.cos(lamM), my = ey + Rm * Math.sin(lamM);
+    const mz = Zm * Math.sin(lamM - nodA);
+    const mp = P(mx, my, mz);
+
+    // 畫中心太陽
+    const drawSun = () => {
+      const sr = Math.max(20, Re * 0.14);
+      const gGlow = ctx.createRadialGradient(cx, cy, sr * 0.3, cx, cy, sr * 2.6);
+      gGlow.addColorStop(0, 'rgba(255,210,100,0.5)');
+      gGlow.addColorStop(1, 'rgba(255,210,100,0)');
+      ctx.fillStyle = gGlow;
+      ctx.beginPath(); ctx.arc(cx, cy, sr * 2.6, 0, TAU); ctx.fill();
+
+      const gBody = ctx.createRadialGradient(cx - sr * 0.25, cy - sr * 0.25, sr * 0.1, cx, cy, sr);
+      gBody.addColorStop(0, '#fff9db');
+      gBody.addColorStop(0.55, '#ffd166');
+      gBody.addColorStop(1, '#ff922b');
+      ctx.beginPath(); ctx.arc(cx, cy, sr, 0, TAU);
+      ctx.fillStyle = gBody; ctx.fill();
+
+      ctx.fillStyle = '#5c2d00';
+      ctx.font = `800 ${fs}px ${FONT}`;
+      ctx.textAlign = 'center';
+      ctx.fillText('太陽', cx, cy + 5);
+    };
+
+    // 畫地球與隨身攜帶的月道面、交點線、自轉軸
+    const drawEarthSystem = () => {
+      const er = Math.max(11, Re * 0.068);
+      const mr = Math.max(5, er * 0.45);
+      const localR = Math.max(Rm, er * 2.1);
+
+      // 陽光連到地球的輔助線
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(ep.x, ep.y);
+      ctx.strokeStyle = 'rgba(255,215,110,0.22)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // 地球背光方向的本影錐（地球影子）
+      const shLen = localR * 1.25;
+      const shP = P(ex + shLen * Math.cos(thE), ey + shLen * Math.sin(thE), 0);
+      ctx.beginPath();
+      ctx.moveTo(ep.x, ep.y);
+      ctx.lineTo(shP.x, shP.y);
+      ctx.strokeStyle = 'rgba(0,0,0,0.65)';
+      ctx.lineWidth = er * 1.4;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      ctx.lineCap = 'butt';
+
+      // 月球繞地球的隨身軌道圈（月道面，斜 5°：上半圈青藍實線、下半圈粉紅虛線、交點紅點）
+      drawTiltedMoonRing(ex, ey, localR, 1, true);
+      if (state.showNodes) markNewFull(ex, ey, localR, thE, 1);
+
+      // 地球與自轉軸（自轉軸方向固定為 [-sin(23.44°), 0, cos(23.44°)]，即北極偏左）
+      const ax = -Math.sin(OBLIQUITY), ay = 0, az = Math.cos(OBLIQUITY);
+      const axisLen = er * 2.15;
+      const northP = P(ex + ax * axisLen, ey + ay * axisLen, az * axisLen);
+      const southP = P(ex - ax * axisLen, ey - ay * axisLen, -az * axisLen);
+
+      const drawSouthAxis = () => {
+        if (!state.showAxis) return;
+        ctx.beginPath();
+        ctx.moveTo(ep.x, ep.y);
+        ctx.lineTo(southP.x, southP.y);
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      };
+      const drawNorthAxis = () => {
+        if (!state.showAxis) return;
+        // 垂直黃道面的基準虛線（從球心引出）
+        if (state.camTilt < 78) {
+          const normP = P(ex, ey, axisLen * 0.95);
+          ctx.beginPath();
+          ctx.moveTo(ep.x, ep.y);
+          ctx.lineTo(normP.x, normP.y);
+          ctx.strokeStyle = 'rgba(255,209,102,0.75)';
+          ctx.setLineDash([3, 3]);
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        ctx.beginPath();
+        ctx.moveTo(ep.x, ep.y);
+        ctx.lineTo(northP.x, northP.y);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.4;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(northP.x, northP.y, 2.5, 0, TAU);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `700 ${fs - 2}px ${FONT}`;
+        // 手機窄螢幕且地球在太陽右側時，標籤改置於北極點正上方，避免往左擠到中心「太陽」文字
+        if (w < 460 && ep.x > cx) {
+          ctx.textAlign = 'center';
+          ctx.fillText('北極(23.4°)', northP.x, northP.y - 6);
+        } else {
+          ctx.textAlign = 'right';
+          ctx.fillText('北極(23.4°)', northP.x - 5, northP.y - 2);
+        }
+      };
+
+      const drawEarthDisc = () => {
+        ctx.save();
+        ctx.beginPath(); ctx.arc(ep.x, ep.y, er, 0, TAU); ctx.clip();
+        const gE = ctx.createRadialGradient(ep.x - er * 0.3, ep.y - er * 0.3, er * 0.1, ep.x, ep.y, er);
+        gE.addColorStop(0, '#80d8ff');
+        gE.addColorStop(1, '#1b5eb8');
+        ctx.fillStyle = gE;
+        ctx.fillRect(ep.x - er, ep.y - er, er * 2, er * 2);
+
+        // 綠洲斑塊
+        ctx.fillStyle = '#52c471';
+        ctx.beginPath(); ctx.arc(ep.x - er * 0.25, ep.y - er * 0.15, er * 0.35, 0, TAU); ctx.fill();
+        ctx.beginPath(); ctx.arc(ep.x + er * 0.3, ep.y + er * 0.25, er * 0.28, 0, TAU); ctx.fill();
+
+        // 地球背對太陽那一半畫上黑夜陰影
+        const sunAngleScreen = Math.atan2(cy - ep.y, cx - ep.x);
+        ctx.translate(ep.x, ep.y);
+        ctx.rotate(sunAngleScreen);
+        ctx.fillStyle = 'rgba(4,8,26,0.72)';
+        ctx.fillRect(-er, -er, er, er * 2);
+        ctx.restore();
+
+        ctx.beginPath(); ctx.arc(ep.x, ep.y, er, 0, TAU);
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 1; ctx.stroke();
+      };
+
+      const drawMoonDisc = () => {
+        const mPos = state.scaleMode === 'exag' ? mp : P(ex + localR * Math.cos(lamM), ey + localR * Math.sin(lamM), Zm * Math.sin(lamM - nodA));
+        ctx.save();
+        ctx.beginPath(); ctx.arc(mPos.x, mPos.y, mr, 0, TAU); ctx.clip();
+        ctx.fillStyle = '#fff3c4';
+        ctx.fillRect(mPos.x - mr, mPos.y - mr, mr * 2, mr * 2);
+        const sunAngleScreen = Math.atan2(cy - mPos.y, cx - mPos.x);
+        ctx.translate(mPos.x, mPos.y);
+        ctx.rotate(sunAngleScreen);
+        ctx.fillStyle = 'rgba(8,12,34,0.78)';
+        ctx.fillRect(-mr, -mr, mr, mr * 2);
+        ctx.restore();
+
+        ctx.beginPath(); ctx.arc(mPos.x, mPos.y, mr, 0, TAU);
+        ctx.strokeStyle = '#ffd977'; ctx.lineWidth = 1.2; ctx.stroke();
+      };
+
+      drawSouthAxis();
+      if (mp.d < ep.d) {
+        drawMoonDisc();
+        drawEarthDisc();
+        drawNorthAxis();
+      } else {
+        drawEarthDisc();
+        drawNorthAxis();
+        drawMoonDisc();
+      }
+
+      // 地球標籤放在外側，避免與自轉軸重疊
+      const ec = getEclipseStatus(state.day);
+      const outP = P((Re + localR + 18) * Math.cos(thE), (Re + localR + 18) * Math.sin(thE), 0);
+      ctx.fillStyle = '#80d8ff';
+      ctx.font = `700 ${fs}px ${FONT}`;
+      ctx.textAlign = 'center';
+      ctx.fillText('地球＋月亮', outP.x, outP.y + 4);
+
+      if (ec.isSolarEclipse) {
+        pillTag(ctx, 114, 28, '🌑 發生日食！', '太陽 → 月亮 → 地球成一直線', '#ffd166', 'rgba(42,26,8,0.92)');
+      } else if (ec.isLunarEclipse) {
+        pillTag(ctx, 122, 28, '🌕 發生月食（紅月亮）！', '太陽 → 地球 → 月亮成一直線', '#ff9ec4', 'rgba(44,14,28,0.92)');
+      }
+    };
+
+    if (ep.d < 0) {
+      drawEarthSystem();
+      drawSun();
+    } else {
+      drawSun();
+      drawEarthSystem();
+    }
+  }
+
+  // ---------- ② 日食月食側面光影剖面圖（上半部的俯視跟拍圖已移除） ----------
+  function renderFollow() {
+    const { ctx, w, h } = C2;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#060a1c'; ctx.fillRect(0, 0, w, h);
+    drawStars(ctx, w, h, stars2);
+
+    const fs = Math.max(11, Math.min(13.5, w / 38));
+    const ec = getEclipseStatus(state.day);
+    const { thE, sunDir, nodA, lamM, synA, zLat, nodeDiff, inEclipseSeason, isNewMoon, isFullMoon, isSolarEclipse, isLunarEclipse } = ec;
+    const antiSun = thE; // 地球與月球背光影子方向角
+
+    // =========================================================
+    // 【下半部】📐 側面光影剖面圖：日食與月食成因放大鏡
+    // =========================================================
+    // 上半部的俯視跟拍圖（含「地球看」小圓窗）已依使用者要求移除，剖面圖放大到整個畫布
+    const boxX = 8, boxY = 8, boxW = w - 16, boxH = h - 16;
+    ctx.fillStyle = 'rgba(9,14,38,0.94)';
+    ctx.strokeStyle = isSolarEclipse ? 'rgba(255,209,102,0.75)' : isLunarEclipse ? 'rgba(255,158,196,0.75)' : 'rgba(140,175,255,0.32)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxW, boxH, 14);
+    else ctx.rect(boxX, boxY, boxW, boxH);
+    ctx.fill(); ctx.stroke();
+
+    // 剖面圖標題列
+    ctx.fillStyle = '#eef2ff';
+    ctx.font = `800 ${fs - 0.5}px ${FONT}`;
+    ctx.textAlign = 'left';
+    ctx.fillText(boxW < 470 ? '📐 側面光影剖面圖' : '📐 側面光影剖面圖（日食・月食成因放大鏡）', boxX + 14, boxY + 21);
+
+    ctx.fillStyle = '#aab3dc';
+    ctx.font = `600 ${fs - 2.5}px ${FONT}`;
+    ctx.textAlign = 'right';
+    ctx.fillText(boxW < 470 ? '☀️ 陽光從左邊射入 ➔' : '☀️ 陽光從左方平行射入 ➔', boxX + boxW - 14, boxY + 21);
+
+    // 剖面圖幾何座標系：太陽在左方，地球在中央偏右，新月在地球左方（向陽側），滿月在地球右方（背光影子側）
+    const midY = boxY + boxH * 0.52;
+    const earthX = boxX + boxW * 0.52;
+    const sEr = Math.max(14, Math.min(20, boxH * 0.11)); // 地球半徑
+    const sMr = Math.max(6, sEr * 0.30);                  // 月球半徑（縮小一點，地球本影才包得住滿月）
+    const orbitSpanX = boxW * 0.30;                       // 月球在剖面圖左右擺幅
+    const maxZOffset = Math.max(24, Math.min(boxH * 0.25, boxH * 0.46 - 28 - sMr - 15)); // 5.14° 垂直偏移（較扁畫布下自動縮放避免標籤貼邊）
+
+    // 1. 左側太陽平行光束與背景光暈
+    const gSideSun = ctx.createLinearGradient(boxX, midY, boxX + boxW * 0.45, midY);
+    gSideSun.addColorStop(0, 'rgba(255,210,90,0.22)');
+    gSideSun.addColorStop(1, 'rgba(255,210,90,0)');
+    ctx.fillStyle = gSideSun;
+    ctx.fillRect(boxX + 2, boxY + 30, boxW * 0.45, boxH - 62);
+
+    // 左緣太陽圓弧與平行光箭頭
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(boxX + 2, boxY + 28, boxW - 4, boxH - 56);
+    ctx.clip();
+
+    const sunArcR = boxH * 0.36;
+    const gSunEdge = ctx.createRadialGradient(boxX - sunArcR * 0.65, midY, sunArcR * 0.2, boxX - sunArcR * 0.65, midY, sunArcR);
+    gSunEdge.addColorStop(0, '#fff9db');
+    gSunEdge.addColorStop(0.7, '#ffd166');
+    gSunEdge.addColorStop(1, 'rgba(255,146,43,0)');
+    ctx.fillStyle = gSunEdge;
+    ctx.beginPath(); ctx.arc(boxX - sunArcR * 0.65, midY, sunArcR, -Math.PI / 2, Math.PI / 2); ctx.fill();
+
+    for (const dyRay of [-maxZOffset * 0.9, -sEr, sEr, maxZOffset * 0.9]) {
+      const ry = midY + dyRay;
+      ctx.beginPath();
+      ctx.moveTo(boxX + 22, ry);
+      ctx.lineTo(boxX + 68, ry);
+      ctx.strokeStyle = 'rgba(255,214,102,0.55)';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+      arrowHead(ctx, boxX + 22, ry, boxX + 68, ry, 5, 'rgba(255,214,102,0.75)');
+    }
+
+    // 2. 黃道面水平基準線（0°）與月道面 ±5.1° 傾角上下限參考線（證明月道面永遠斜 5.1°，從不變平！）
+    for (const [zSign, zColor, zLbl] of [[1, 'rgba(92,225,255,0.28)', '+5.1° 軌道最高'], [-1, 'rgba(255,158,196,0.28)', '-5.1° 軌道最低']]) {
+      const yLim = midY - zSign * maxZOffset;
+      ctx.beginPath();
+      ctx.moveTo(boxX + 18, yLim);
+      ctx.lineTo(boxX + boxW - 16, yLim);
+      ctx.strokeStyle = zColor;
+      ctx.setLineDash([2, 4]);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = zSign > 0 ? 'rgba(92,225,255,0.75)' : 'rgba(255,158,196,0.75)';
+      ctx.font = `600 ${fs - 3.5}px ${FONT}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(boxW < 420 ? (zSign > 0 ? '+5.1°' : '-5.1°') : zLbl, boxX + 24, yLim + (zSign > 0 ? -3 : 10));
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(boxX + 18, midY);
+    ctx.lineTo(boxX + boxW - 16, midY);
+    ctx.strokeStyle = 'rgba(255,209,102,0.48)';
+    ctx.setLineDash([5, 5]);
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = 'rgba(255,209,102,0.92)';
+    ctx.font = `600 ${fs - 3}px ${FONT}`;
+    ctx.textAlign = 'left';
+    ctx.fillText('黃道面 0°', boxX + 24, midY - 4);
+
+    // 3. 地球在右方投射出的「地球半影區」、「地球本影錐」與「大氣層折射紅光」
+    const shadowEndX = boxX + boxW - 14;
+    // 地球半影（外張扇形）
+    ctx.beginPath();
+    ctx.moveTo(earthX, midY - sEr);
+    ctx.lineTo(shadowEndX, midY - sEr * 2.15);
+    ctx.lineTo(shadowEndX, midY + sEr * 2.15);
+    ctx.lineTo(earthX, midY + sEr);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0,0,0,0.34)';
+    ctx.fill();
+
+    // 地球本影錐（向內收束的深色錐體，包住滿月軌道區）
+    const umbraTipX = earthX + orbitSpanX * 3.2; // 真實的地球本影長度約是地月距離的 3.6 倍，超出畫布的部分會被裁掉
+    ctx.beginPath();
+    ctx.moveTo(earthX, midY - sEr);
+    ctx.lineTo(umbraTipX, midY);
+    ctx.lineTo(earthX, midY + sEr);
+    ctx.closePath();
+    const gEarthUmbra = ctx.createLinearGradient(earthX, midY, umbraTipX, midY);
+    gEarthUmbra.addColorStop(0, 'rgba(3,5,18,0.92)');
+    gEarthUmbra.addColorStop(0.65, 'rgba(25,8,14,0.85)');
+    gEarthUmbra.addColorStop(1, 'rgba(40,10,16,0.55)');
+    ctx.fillStyle = gEarthUmbra;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,140,140,0.32)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // 地球大氣層折射紅光（從地球上下邊緣折射進入本影錐，解釋為何月全食是紅月亮！）
+    ctx.beginPath();
+    ctx.moveTo(earthX, midY - sEr);
+    ctx.lineTo(earthX + orbitSpanX, midY - sMr * 0.4);
+    ctx.moveTo(earthX, midY + sEr);
+    ctx.lineTo(earthX + orbitSpanX, midY + sMr * 0.4);
+    ctx.strokeStyle = isLunarEclipse ? 'rgba(255,110,80,0.75)' : 'rgba(255,110,80,0.32)';
+    ctx.setLineDash([3, 3]);
+    ctx.lineWidth = isLunarEclipse ? 1.8 : 1.1;
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 標註地球本影與半影（起點避開地球圓盤半徑 sEr，手機窄螢幕也不重疊）
+    const umbraLblX = earthX + sEr + (orbitSpanX - sEr) * 0.54;
+    ctx.fillStyle = 'rgba(255,190,205,0.88)';
+    ctx.font = `600 ${fs - 3}px ${FONT}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(boxW < 420 ? '地球本影' : '地球本影錐 (月食區)', umbraLblX, midY + 4);
+    ctx.fillStyle = 'rgba(175,190,230,0.68)';
+    ctx.fillText('地球半影', earthX + orbitSpanX * 0.68, midY - sEr * 1.28);
+
+    // 4. 畫出當月「完整一圈 360° 月道面」在側面剖面圖上的立體投影軌跡（上半圈青藍 +5.1°、下半圈粉紅 -5.1°、兩顆 0° 紅交點）
+    // 讓使用者一眼看懂：月道面每個月都維持 ±5.1° 傾斜（從未變平）！食季是因為「0° 紅交點」剛好轉到初一（左端）與十五（右端）！
+    const phiAsc = nodA - sunDir; // 升交點對應的朔望角 phi
+    // 下半圈（z <= 0，低於黃道面，最低 -5.14°）：粉紅虛線
+    ctx.beginPath();
+    for (let i = 0; i <= 48; i++) {
+      const phi = phiAsc + Math.PI + (i / 48) * Math.PI;
+      const ox = earthX - Math.cos(phi) * orbitSpanX;
+      const oy = midY - Math.sin(phi - phiAsc) * maxZOffset;
+      i ? ctx.lineTo(ox, oy) : ctx.moveTo(ox, oy);
+    }
+    ctx.strokeStyle = 'rgba(255,158,196,0.78)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 上半圈（z >= 0，高於黃道面，最高 +5.14°）：青藍實線
+    ctx.beginPath();
+    for (let i = 0; i <= 48; i++) {
+      const phi = phiAsc + (i / 48) * Math.PI;
+      const ox = earthX - Math.cos(phi) * orbitSpanX;
+      const oy = midY - Math.sin(phi - phiAsc) * maxZOffset;
+      i ? ctx.lineTo(ox, oy) : ctx.moveTo(ox, oy);
+    }
+    ctx.strokeStyle = 'rgba(92,225,255,0.88)';
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+
+    // 新月處 (synA = 0 => lam = sunDir) 的高度：zNew = 5.14 * sin(sunDir - nodA)
+    // 滿月處 (synA = PI => lam = sunDir + PI) 的高度：zFull = -zNew
+    const zNewLat = 5.14 * Math.sin(sunDir - nodA);
+    const zFullLat = -zNewLat;
+    const newX = earthX - orbitSpanX;
+    const newY = midY - (zNewLat / 5.14) * maxZOffset;
+    const fullX = earthX + orbitSpanX;
+    const fullY = midY - (zFullLat / 5.14) * maxZOffset;
+
+    // 畫出兩顆「🔴 交點(0°)」在側面剖面圖上的位置（永遠落在 midY 黃道面 0° 線上！）
+    if (state.showNodes) {
+      for (const phiNode of [phiAsc, phiAsc + Math.PI]) {
+        const nx = earthX - Math.cos(phiNode) * orbitSpanX;
+        ctx.beginPath();
+        ctx.arc(nx, midY, 4.2, 0, TAU);
+        ctx.fillStyle = '#ff5c77';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+      }
+    }
+
+    // 在新月端與滿月端畫淡色虛線參考圈，讓小朋友隨時看懂這個月新月/滿月在軌道的哪個高度（若月亮正位於該端則不重複畫文字避免重疊）
+    for (const [rx, ry, lbl, hideLbl] of [[newX, newY, '初一新月處', isNewMoon], [fullX, fullY, '十五滿月處', isFullMoon]]) {
+      ctx.beginPath(); ctx.arc(rx, ry, sMr, 0, TAU);
+      ctx.strokeStyle = 'rgba(160,210,255,0.42)';
+      ctx.setLineDash([2, 3]);
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      if (!hideLbl) {
+        ctx.fillStyle = 'rgba(170,195,240,0.78)';
+        ctx.font = `500 ${fs - 3.5}px ${FONT}`;
+        ctx.textAlign = 'center';
+        ctx.fillText(lbl, rx, ry + (ry < midY ? -sMr - 5 : sMr + 12));
+      }
+    }
+
+    // 5. 計算當前月球在側面剖面圖上的 (curMoonX, curMoonY)
+    // cos(synA) = +1 為新月（地球左方 -orbitSpanX），cos(synA) = -1 為滿月（地球右方 +orbitSpanX）
+    const curMoonX = earthX - Math.cos(synA) * orbitSpanX;
+    const curMoonY = midY - (zLat / 5.14) * maxZOffset;
+
+    // 畫月球投射出的「月球半影」與「月球本影錐」（向右延伸）
+    const drawMoonAndShadow = () => {
+      const mShadowLen = orbitSpanX * 1.05;
+      // 月球半影（外張扇形）
+      ctx.beginPath();
+      ctx.moveTo(curMoonX, curMoonY - sMr);
+      ctx.lineTo(curMoonX + mShadowLen, curMoonY - sMr * 2.3);
+      ctx.lineTo(curMoonX + mShadowLen, curMoonY + sMr * 2.3);
+      ctx.lineTo(curMoonX, curMoonY + sMr);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0,0,0,0.28)';
+      ctx.fill();
+
+      // 月球本影錐（尖端剛好可觸及地球表面，形成日全食帶！）
+      ctx.beginPath();
+      ctx.moveTo(curMoonX, curMoonY - sMr);
+      ctx.lineTo(curMoonX + mShadowLen, curMoonY);
+      ctx.lineTo(curMoonX, curMoonY + sMr);
+      ctx.closePath();
+      ctx.fillStyle = isSolarEclipse ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.65)';
+      ctx.fill();
+      if (isNewMoon) {
+        ctx.strokeStyle = isSolarEclipse ? 'rgba(255,209,102,0.7)' : 'rgba(160,180,255,0.3)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // 畫月球本體（左半向陽亮、右半背光暗；若月食中則整顆呈現折射紅月亮！）
+      ctx.save();
+      ctx.beginPath(); ctx.arc(curMoonX, curMoonY, sMr, 0, TAU); ctx.clip();
+      if (isLunarEclipse) {
+        const gBM = ctx.createRadialGradient(curMoonX - sMr * 0.2, curMoonY - sMr * 0.2, 1, curMoonX, curMoonY, sMr);
+        gBM.addColorStop(0, '#ff8e6e');
+        gBM.addColorStop(0.65, '#d63626');
+        gBM.addColorStop(1, '#611111');
+        ctx.fillStyle = gBM;
+        ctx.fillRect(curMoonX - sMr, curMoonY - sMr, sMr * 2, sMr * 2);
+      } else {
+        ctx.fillStyle = '#fff3c4';
+        ctx.fillRect(curMoonX - sMr, curMoonY - sMr, sMr, sMr * 2);
+        ctx.fillStyle = '#182042';
+        ctx.fillRect(curMoonX, curMoonY - sMr, sMr, sMr * 2);
+      }
+      ctx.restore();
+      ctx.beginPath(); ctx.arc(curMoonX, curMoonY, sMr, 0, TAU);
+      ctx.strokeStyle = isLunarEclipse ? '#ff7b7b' : '#ffd977';
+      ctx.lineWidth = 1.5; ctx.stroke();
+
+      // 月球高度標籤
+      ctx.fillStyle = '#ffd977';
+      ctx.font = `700 ${fs - 2.5}px ${FONT}`;
+      ctx.textAlign = 'center';
+      const mTagY = curMoonY <= midY ? curMoonY - sMr - 6 : curMoonY + sMr + 13;
+      ctx.fillText(`🌙 月亮 (${zLat >= 0 ? '+' : ''}${zLat.toFixed(1)}°)`, Math.max(boxX + 58, Math.min(boxX + boxW - 58, curMoonX)), mTagY);
+    };
+
+    // 畫地球本體（左半向陽白天、右半背光黑夜）
+    const drawSideEarth = () => {
+      ctx.save();
+      ctx.beginPath(); ctx.arc(earthX, midY, sEr, 0, TAU); ctx.clip();
+      const gSE = ctx.createRadialGradient(earthX - sEr * 0.35, midY - sEr * 0.25, 2, earthX, midY, sEr);
+      gSE.addColorStop(0, '#80d8ff');
+      gSE.addColorStop(1, '#1b5eb8');
+      ctx.fillStyle = gSE;
+      ctx.fillRect(earthX - sEr, midY - sEr, sEr * 2, sEr * 2);
+      // 右半黑夜
+      ctx.fillStyle = 'rgba(4,8,26,0.76)';
+      ctx.fillRect(earthX, midY - sEr, sEr, sEr * 2);
+      ctx.restore();
+
+      // 大氣層微光圈
+      ctx.beginPath(); ctx.arc(earthX, midY, sEr + 1.5, 0, TAU);
+      ctx.strokeStyle = isLunarEclipse ? 'rgba(255,120,90,0.85)' : 'rgba(128,216,255,0.55)';
+      ctx.lineWidth = 1.6; ctx.stroke();
+
+      // 若發生日食，在地球左側向陽表面標出月球本影落點！
+      if (isSolarEclipse) {
+        ctx.beginPath();
+        { // 黑點貼在地球向陽那一側的圓周上，不會浮到地球外面
+          const dyS = Math.max(-sEr * 0.9, Math.min(sEr * 0.9, curMoonY - midY));
+          ctx.arc(earthX - Math.sqrt(sEr * sEr - dyS * dyS) * 0.9, midY + dyS, 4.5, 0, TAU);
+        }
+        ctx.fillStyle = '#000000'; ctx.fill();
+        ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 1.5; ctx.stroke();
+      }
+
+      ctx.fillStyle = '#80d8ff';
+      ctx.font = `700 ${fs - 2}px ${FONT}`;
+      ctx.textAlign = 'center';
+      ctx.fillText('🌍 地球', earthX, midY + sEr + 15);
+    };
+
+    // 依照月球在地球前景或背景決定繪製順序
+    if (Math.sin(synA) < 0) {
+      drawMoonAndShadow();
+      drawSideEarth();
+    } else {
+      drawSideEarth();
+      drawMoonAndShadow();
+    }
+    ctx.restore();
+
+    // 6. 剖面圖底部動態成因解說膠囊（直接點出現在為什麼有食／無食）
+    let explainText = '';
+    let explainColor = '#eef2ff';
+    let explainBg = 'rgba(18,27,68,0.92)';
+
+    if (isSolarEclipse) {
+      explainText = '🎯 日食：月道面仍斜 5°（上下弦在 ±5°），但初一剛好踩在 🔴0°交點 上，擋住太陽！';
+      explainColor = '#ffd166';
+      explainBg = 'rgba(48,32,8,0.94)';
+    } else if (isLunarEclipse) {
+      explainText = '🎯 月食：月道面仍斜 5°（上下弦在 ±5°），但十五剛好踩在 🔴0°交點 上，進地球本影！';
+      explainColor = '#ff9ec4';
+      explainBg = 'rgba(48,14,30,0.94)';
+    } else if (isNewMoon) {
+      const dirStr = zLat > 0 ? '上方' : '下方';
+      explainText = `❌ 平常初一無日食：🔴0°交點在中間（弦月處），初一偏到${dirStr} ${Math.abs(zLat).toFixed(1)}° 避開地球`;
+      explainColor = '#a8d8ff';
+    } else if (isFullMoon) {
+      const dirStr = zLat > 0 ? '上方' : '下方';
+      explainText = `❌ 平常十五無月食：🔴0°交點在中間（弦月處），十五偏到${dirStr} ${Math.abs(zLat).toFixed(1)}° 避開本影`;
+      explainColor = '#a8d8ff';
+    } else if (inEclipseSeason) {
+      explainText = `⚡ 食季：月道面仍斜 ±5°，但兩顆 🔴0°交點 剛好位於左右兩端（初一與十五處）！`;
+      explainColor = '#ffd166';
+    } else {
+      explainText = `💡 非食季：月道面斜 ±5°，🔴0°交點 不在左右兩端，初一與十五都會偏高或偏低而無食`;
+      explainColor = '#cbd5f7';
+    }
+
+    ctx.fillStyle = explainBg;
+    ctx.strokeStyle = 'rgba(160,185,255,0.28)';
+    ctx.lineWidth = 1;
+    const footH = 24;
+    const footY = boxY + boxH - footH - 5;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(boxX + 8, footY, boxW - 16, footH, 8);
+    else ctx.rect(boxX + 8, footY, boxW - 16, footH);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = explainColor;
+    ctx.font = `700 ${Math.max(10.5, fs - 2)}px ${FONT}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(explainText, boxX + boxW / 2, footY + 16, boxW - 28);
+  }
+
+  // ---------- 更新文字與資訊卡 ----------
+  function updateInfo() {
+    const d = state.day;
+    const ec = getEclipseStatus(d);
+    const { synA, zLat, nodeDiff, inEclipseSeason, isNewMoon, isFullMoon, isSolarEclipse, isLunarEclipse } = ec;
+
+    const pIdx = Math.round((synA / TAU) * 8) % 8;
+    const pct = Math.round((1 - Math.cos(synA)) / 2 * 100);
+    $('#fPhase').textContent = isSolarEclipse
+      ? '🌑 新月（正發生日食！）'
+      : isLunarEclipse
+      ? '🌕 滿月（正發生月食・紅月亮！）'
+      : `${PHASES[pIdx]}（亮面 ${pct}%）`;
+
+    // 季節與日期估算（day=0 為 3月21日春分）
+    const totalDays = Math.floor(d);
+    const dateObj = new Date(2026, 2, 21 + totalDays);
+    const month = dateObj.getMonth() + 1;
+    const date = dateObj.getDate();
+    let sName = '🌸 春季（陽光漸往北移）';
+    if (d >= 91.31 && d < 182.62) sName = '☀️ 夏季（北極朝向太陽）';
+    else if (d >= 182.62 && d < 273.93) sName = '🍁 秋季（陽光漸往南移）';
+    else if (d >= 273.93) sName = '❄️ 冬季（北極背對太陽）';
+
+    $('#dayText').textContent = `${month} 月 ${date} 日（第 ${d.toFixed(0)} 天）`;
+    $('#fSeason').textContent = `${month}月${date}日 · ${sName}`;
+    $('#fSidereal').textContent = `${(d / SIDEREAL).toFixed(2)} 圈（每圈 27.3 天）`;
+    $('#fSynodic').textContent = `${(d / SYNODIC).toFixed(2)} 圈（每圈 29.5 天）`;
+
+    const banner = $('#eclipseBanner');
+    const bTitle = $('#eclipseTitle');
+    const bSub = $('#eclipseSub');
+
+    if (isSolarEclipse) {
+      banner.className = 'status-banner eclipse';
+      bTitle.textContent = '🌑 叮咚！發生「日食」了！（太陽 → 月亮 → 地球）';
+      bSub.textContent = `交點線對準太陽（偏差僅 ${nodeDiff.toFixed(1)}°），月球本影錐落到地球表面，把太陽擋住了！`;
+    } else if (isLunarEclipse) {
+      banner.className = 'status-banner eclipse';
+      bTitle.textContent = '🌕 叮咚！發生「月食（紅月亮）」了！（太陽 → 地球 → 月亮）';
+      bSub.textContent = `交點線對準太陽（偏差僅 ${nodeDiff.toFixed(1)}°），滿月走進地球本影錐，被地球大氣折射紅光染成紅月亮！`;
+    } else if (inEclipseSeason) {
+      banner.className = 'status-banner eclipse';
+      bTitle.textContent = `⚡ 目前進入「食季」！（交點線偏離太陽僅 ${nodeDiff.toFixed(1)}°）`;
+      bSub.textContent = '這段期間遇到初一新月就會日食、遇到十五滿月就會月食喔！';
+    } else {
+      banner.className = 'status-banner';
+      bTitle.textContent = `🔭 目前不在食季（交點線偏離太陽 ${nodeDiff.toFixed(0)}°）`;
+      bSub.textContent = '新月的影子與滿月會從地球或地球影子的上方／下方溜過去（看上方剖面圖）';
+    }
+
+    if (isSolarEclipse) {
+      $('#fNodeInfo').textContent = `✅ 正在發生日食！新月高度僅偏離黃道面 ${Math.abs(zLat).toFixed(1)}°，月球本影直接投射到地球上！`;
+    } else if (isLunarEclipse) {
+      $('#fNodeInfo').textContent = `✅ 正在發生月食！滿月高度僅偏離黃道面 ${Math.abs(zLat).toFixed(1)}°，整顆月亮走進地球本影裡變成紅月亮！`;
+    } else if (inEclipseSeason) {
+      $('#fNodeInfo').textContent = `✅ 交點線正指著太陽附近（相差 ${nodeDiff.toFixed(1)}°），這個月的新月與滿月幾乎壓在黃道面上，會發生日食與月食！`;
+    } else {
+      $('#fNodeInfo').textContent = `❌ 不會！目前交點線和陽光差了 ${nodeDiff.toFixed(0)}°，月亮走到新月／滿月時會偏高或偏低約 ${Math.abs(5.14 * Math.sin(ec.sunDir - ec.nodA)).toFixed(1)}°，影子照不到彼此。`;
+    }
+  }
+
+  // ---------- 控制項事件 ----------
+  const playBtn = $('#playBtn');
+  function setPlaying(p) {
+    state.playing = p;
+    playBtn.textContent = p ? '⏸ 暫停' : '▶ 播放';
+  }
+  function jumpToDay(d) {
+    setPlaying(false);
+    state.day = ((d % YEAR) + YEAR) % YEAR;
+    $('#daySlider').value = state.day;
+  }
+
+  playBtn.addEventListener('click', () => setPlaying(!state.playing));
+  $('#prevDayBtn').addEventListener('click', () => jumpToDay(state.day - 1));
+  $('#nextDayBtn').addEventListener('click', () => jumpToDay(state.day + 1));
+  $('#nextNewMoonBtn').addEventListener('click', () => {
+    const nextK = Math.floor(state.day / SYNODIC + 0.05) + 1;
+    jumpToDay(nextK * SYNODIC);
+  });
+
+  // 4 個一鍵示範成因按鈕 + 下方快捷鍵
+  // k = 5 (day ≈ 147.65): 食季新月 → 日全食 (zLat ≈ -0.3°)
+  // k = 10.5 (day ≈ 310.07): 食季滿月 → 月全食・紅月亮 (zLat ≈ +0.7°)
+  // k = 2 (day ≈ 59.06): 平常初一新月 → 無日食 (zLat ≈ +5.1°，月球本影從地球上方掃過)
+  // k = 2.5 (day ≈ 73.83): 平常十五滿月 → 無月食 (zLat ≈ -4.9°，滿月從地球本影下方溜過)
+  $('#btnPresetSolar').addEventListener('click', () => jumpToDay(5 * SYNODIC));
+  $('#eclipseSeasonBtn').addEventListener('click', () => jumpToDay(5 * SYNODIC));
+  $('#btnPresetLunar').addEventListener('click', () => jumpToDay(10.5 * SYNODIC));
+  $('#lunarEclipseBtn').addEventListener('click', () => jumpToDay(10.5 * SYNODIC));
+  $('#btnPresetNormalNew').addEventListener('click', () => jumpToDay(2 * SYNODIC));
+  $('#btnPresetNormalFull').addEventListener('click', () => jumpToDay(2.5 * SYNODIC));
+
+  $('#daySlider').addEventListener('input', e => {
+    setPlaying(false);
+    state.day = +e.target.value;
+  });
+  $('#camTilt').addEventListener('input', e => {
+    state.camTilt = +e.target.value;
+    $('#tiltText').textContent = state.camTilt >= 85 ? '正上方俯視 90°' : `斜視 ${state.camTilt}°`;
+  });
+  $('#speedSlider').addEventListener('input', e => {
+    state.speed = +e.target.value;
+  });
+
+  document.querySelectorAll('#scaleSeg button').forEach(b => {
+    b.addEventListener('click', () => {
+      state.scaleMode = b.dataset.mode;
+      $('#scaleNote').hidden = b.dataset.mode !== 'true';
+      document.querySelectorAll('#scaleSeg button').forEach(x => x.classList.toggle('active', x === b));
+    });
+  });
+
+  $('#showTrail').addEventListener('change', e => { state.showTrail = e.target.checked; });
+  $('#showNodes').addEventListener('change', e => { state.showNodes = e.target.checked; });
+  $('#showAxis').addEventListener('change', e => { state.showAxis = e.target.checked; });
+
+  // 在主畫布上直接拖曳地球改變日期
+  function dragEarth(e) {
+    const rect = C1.el.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    const { cx, cy, sinT } = C1.geom;
+    const dx = px - cx;
+    const dy = -(py - cy) / Math.max(0.15, sinT);
+    const ang = Math.atan2(dy, dx);
+    const frac = norm(ang - (-Math.PI / 2)) / TAU;
+    state.day = frac * YEAR;
+    $('#daySlider').value = state.day;
+  }
+  C1.el.addEventListener('pointerdown', e => {
+    state.dragging = true;
+    setPlaying(false);
+    C1.el.setPointerCapture(e.pointerId);
+    dragEarth(e);
+  });
+  C1.el.addEventListener('pointermove', e => {
+    if (state.dragging) dragEarth(e);
+  });
+  ['pointerup', 'pointercancel'].forEach(ev => C1.el.addEventListener(ev, () => { state.dragging = false; }));
+
+  // 支援網址 hash 直接跳轉示範狀態（例如 #solar, #lunar, #normalNew, #normalFull）
+  const applyHashPreset = () => {
+    const h = location.hash.replace('#', '');
+    if (h === 'solar') jumpToDay(5 * SYNODIC);
+    else if (h === 'lunar') jumpToDay(10.5 * SYNODIC);
+    else if (h === 'normalNew') jumpToDay(2 * SYNODIC);
+    else if (h === 'normalFull') jumpToDay(2.5 * SYNODIC);
+    else return;
+    if ($('#orbit').getBoundingClientRect().top > window.innerHeight * 0.5) {
+      $('#orbit').scrollIntoView(); // 合併進月相頁後，示範網址要捲到第二站
+    }
+  };
+  $('#daySlider').value = state.day; // 預設暫停時，滑桿也要先對到目前的日期
+  applyHashPreset();
+  window.addEventListener('hashchange', applyHashPreset);
+
+  // 第二站不在畫面上時先暫停（不偷跑日期、也不浪費電）
+  let orbitVisible = true;
+  new IntersectionObserver(es => { orbitVisible = es[es.length - 1].isIntersecting; })
+    .observe($('#orbit .stage'));
+
+  // ---------- 動畫主迴圈 ----------
+  let last = performance.now();
+  function frame(t) {
+    const dt = Math.min(0.05, (t - last) / 1000);
+    last = t;
+    if (!orbitVisible) { requestAnimationFrame(frame); return; }
+    if (state.playing && !state.dragging) {
+      state.day = (state.day + dt * 12 * state.speed) % YEAR;
+      $('#daySlider').value = state.day;
+    }
+    renderOrbit();
+    renderFollow();
+    updateInfo();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+// ==================== ⑥ 動畫說故事：月道面永遠斜 5°，為什麼一年只有兩次食季？ ====================
+(() => {
+  const DEG = Math.PI / 180, TAU = Math.PI * 2;
+  const INC = 5.1 * DEG;          // 月道面和黃道面的夾角（真實值，呼拉圈本身照真實角度畫）
+  const NODE = 240 * DEG;         // 交點線在太空中的方向（固定不動；18.6 年的退行不畫）
+  const FONT = '"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif';
+  const $ = s => document.querySelector(s);
+  const nh = [Math.cos(NODE), Math.sin(NODE), 0];            // 交點線方向
+  const hh = [-Math.sin(NODE), Math.cos(NODE), 0];           // 呼拉圈「最高點」的水平方向（🚩 指的方向）
+
+  // 每一幕：地球公轉到的角度 th（度），停留秒數，標題，說明
+  const SCENES = [
+    { th: 110, hold: 6, title: '🍽️ 月道面就像一個斜 5° 的呼拉圈',
+      text: '月亮繞地球走的路（月道面）像一個呼拉圈，比黃道面斜了 5°。我們在呼拉圈最高的地方插一支紅旗 🚩。地球帶著呼拉圈繞太陽時，呼拉圈不會跟著轉，🚩 永遠指著同一個方向（就像地球自轉軸一直指著北極星）。' },
+    { th: 150, hold: 6, title: '⬆️ 對著太陽的那一點，剛好是最高的地方',
+      text: '看黃色的陽光線：新月一定在地球和太陽中間（🌑）。現在這一點剛好在 🚩 那裡，比黃道面高 5°，月亮的影子從地球上面掃過去，所以沒有日食。對面的滿月（🌕）在最低的地方，從地球影子下面溜過去，也沒有月食。' },
+    { th: 240, hold: 6, title: '⚡ 食季：交點線對準太陽',
+      text: '地球走了大約 3 個月。🚩 還是指著同一邊，可是對著太陽的那一點，變成呼拉圈和黃道面交叉的地方（交點線）。新月、滿月都剛好在黃道面上，太陽、月亮、地球排成一直線，所以這段時間會發生日食和月食！' },
+    { th: 330, hold: 6, title: '⬇️ 對著太陽的那一點，變成最低的地方',
+      text: '再走 3 個月，對著太陽的那一點跑到呼拉圈最低的地方。新月從太陽下面經過，滿月從地球影子上面經過，又沒有日食、月食了。' },
+    { th: 420, hold: 5, title: '⚡ 第二次食季',
+      text: '再走 3 個月，交點線的另一頭對準太陽，新月、滿月又剛好在黃道面上，第二次食季來了！從上一次食季到這一次，大約隔了半年。' },
+    { th: 420, hold: 8, title: '✅ 呼拉圈沒變，是地球換了位置',
+      text: '呼拉圈永遠斜 5°，🚩 也永遠指著同一邊。會變的是「對著太陽的那一點」在呼拉圈上是高、是低，還是剛好在交點線上。地球繞太陽一圈，交點線會對準太陽兩次，所以一年大約有兩次食季。（真實的交點線還會很慢很慢地轉，18.6 年轉一圈，所以每年的食季會提早大約 19 天，這裡沒有畫出來。）' },
+  ];
+  const MOVING = { title: '🌍 地球帶著呼拉圈往前走……',
+    text: '注意看：🚩 一直指著同一個方向，可是對著太陽的那一點（🌑），在呼拉圈上慢慢換位置。' };
+  const SPEED = 22; // 移動時每秒公轉幾度
+
+  const st = { th: SCENES[0].th, idx: 0, mode: 'hold', t: 0, playing: true, mu: 0.6 }; // mu：月亮在呼拉圈上走到哪裡（一直繞）
+
+  // ---------- 畫布 ----------
+  const cv = $('#storyCanvas'), ctx = cv.getContext('2d');
+  let W = 0, H = 0, wide = true;
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = cv.parentElement.clientWidth;
+    const isWide = w >= 640;
+    const h = isWide ? Math.round(w * 0.47) : Math.round(w * 0.9) + 10 + Math.round(w * 0.74);
+    if (w === W && h === H) return;
+    W = w; H = h; wide = isWide;
+    cv.style.height = h + 'px';
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  new ResizeObserver(resize).observe(cv.parentElement);
+  resize();
+
+  const stars = Array.from({ length: 90 }, () => [Math.random(), Math.random(), Math.random() * 1.1 + 0.3, Math.random() * 0.5 + 0.2]);
+
+  const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
+  const fmt = b => Math.abs(b) < 0.05 ? '0°' : `${b > 0 ? '+' : '−'}${Math.abs(b).toFixed(1)}°`;
+
+  // 地球在 th 度時：地球位置、太陽方向、對著太陽那一點在呼拉圈上的角度 r、那一點的高度 beta（度）
+  function geo(thd) {
+    const t = thd * DEG;
+    const E = [Math.cos(t), Math.sin(t), 0];
+    const s = [-E[0], -E[1], 0];
+    const r = Math.atan2(s[0] * hh[0] + s[1] * hh[1], s[0] * nh[0] + s[1] * nh[1]);
+    const beta = Math.asin(Math.sin(r) * Math.sin(INC)) / DEG;
+    return { E, s, r, beta };
+  }
+
+  function roundBox(x, y, w, h, r) {
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+  }
+  function label(text, x, y, color, size, weight = 700, align = 'center') {
+    ctx.font = `${weight} ${size}px ${FONT}`;
+    ctx.textAlign = align;
+    ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(6,10,28,.85)'; ctx.lineJoin = 'round';
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = color; ctx.fillText(text, x, y);
+  }
+  // 文字不要超出 [x0, x1]
+  function clampX(text, x, x0, x1, size, weight = 700) {
+    ctx.font = `${weight} ${size}px ${FONT}`;
+    const hw = ctx.measureText(text).width / 2 + 4;
+    return Math.max(x0 + hw, Math.min(x1 - hw, x));
+  }
+
+  // ---------- 左邊：從斜上方看太空 ----------
+  function drawSpace(x0, y0, w, h, fs) {
+    const g = geo(st.th);
+    ctx.save();
+    roundBox(x0, y0, w, h, 14); ctx.fillStyle = '#060a1c'; ctx.fill(); ctx.clip();
+    for (const [sx, sy, sr, sa] of stars) {
+      ctx.fillStyle = `rgba(255,255,255,${sa})`;
+      ctx.beginPath(); ctx.arc(x0 + sx * w, y0 + sy * h, sr, 0, TAU); ctx.fill();
+    }
+    const cx = x0 + w / 2, cy = y0 + h * 0.55;
+    const Ro = Math.min(w * (wide ? 0.31 : 0.33), h * 0.58);
+    const rho = Ro * 0.42, K = Ro * 0.17;
+    const sE = Math.sin(36 * DEG), cE = Math.cos(36 * DEG);
+    const P = v => ({ x: cx + v[0], y: cy - (v[1] * sE + v[2] * cE), d: -v[1] * cE + v[2] * sE });
+    const scaleV = (v, k) => [v[0] * k, v[1] * k, v[2] * k];
+
+    // 黃道面與地球公轉軌道
+    ctx.beginPath();
+    for (let i = 0; i <= 96; i++) { const a = i / 96 * TAU, p = P([Ro * 1.42 * Math.cos(a), Ro * 1.42 * Math.sin(a), 0]); i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); }
+    ctx.fillStyle = 'rgba(255,209,102,0.06)'; ctx.fill();
+    ctx.beginPath();
+    for (let i = 0; i <= 96; i++) { const a = i / 96 * TAU, p = P([Ro * Math.cos(a), Ro * Math.sin(a), 0]); i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); }
+    ctx.strokeStyle = 'rgba(92,184,255,0.45)'; ctx.lineWidth = 1.6; ctx.setLineDash([5, 5]); ctx.stroke(); ctx.setLineDash([]);
+    for (const a0 of [20, 200]) { // 公轉方向（逆時針）小箭頭
+      const a = a0 * DEG, p1 = P([Ro * Math.cos(a), Ro * Math.sin(a), 0]), p2 = P([Ro * Math.cos(a + 0.09), Ro * Math.sin(a + 0.09), 0]);
+      const ang = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+      ctx.save(); ctx.translate(p2.x, p2.y); ctx.rotate(ang);
+      ctx.beginPath(); ctx.moveTo(4, 0); ctx.lineTo(-7, -5); ctx.lineTo(-7, 5); ctx.closePath();
+      ctx.fillStyle = 'rgba(92,184,255,0.8)'; ctx.fill(); ctx.restore();
+    }
+    const lp = P([0, -Ro * 1.5, 0]);
+    label('黃道面', lp.x, lp.y, 'rgba(255,209,102,0.8)', fs - 1, 600);
+
+    // 呼拉圈的斜度放大畫（和第 1 步一樣），才有高低的空間感；文字裡的度數仍然用真實的 5.1° 算
+    const DI = 22 * DEG;
+    const UPC = '#5ce1ff', DNC = '#ff9ec4';
+    const platePt = (Ec, rr, u) => add(add(Ec, nh, rr * Math.cos(u)), [hh[0] * Math.cos(DI), hh[1] * Math.cos(DI), Math.sin(DI)], rr * Math.sin(u));
+    const foot = (Ec, rr, u) => { const q = platePt(Ec, rr, u); return [q[0], q[1], 0]; };
+    const rim = (Ec, rr, u0, u1) => {
+      ctx.beginPath();
+      for (let i = 0; i <= 36; i++) { const p = P(platePt(Ec, rr, u0 + (u1 - u0) * i / 36)); i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); }
+    };
+    // 繞著呼拉圈走的月亮（moonU：從升交點算起的角度；不畫月亮就傳 null）
+    const drawGoingMoon = (Ec, rr, moonU) => {
+      const top = P(platePt(Ec, rr, moonU)), ft = P(foot(Ec, rr, moonU)), up = Math.sin(moonU) >= 0;
+      ctx.beginPath(); ctx.moveTo(ft.x, ft.y); ctx.lineTo(top.x, top.y);
+      ctx.strokeStyle = up ? UPC : DNC; ctx.lineWidth = 2; ctx.setLineDash(up ? [] : [3, 3]); ctx.stroke(); ctx.setLineDash([]);
+      const r0 = Math.max(5, rr * 0.085);
+      ctx.beginPath(); ctx.arc(top.x, top.y, r0, 0, TAU); ctx.fillStyle = '#f3e9bd'; ctx.fill();
+      ctx.strokeStyle = up ? UPC : DNC; ctx.lineWidth = 1.8; ctx.stroke();
+      return top;
+    };
+    // 下半部：先畫沉在黃道面下面的半圈（之後被半透明的桌面蓋住，看起來比較暗）、桌面、交點線
+    function drawPlateLower(Ec, rr, faint, moonU) {
+      ctx.save();
+      ctx.globalAlpha = faint ? 0.4 : 1;
+      rim(Ec, rr, Math.PI, TAU); ctx.strokeStyle = DNC; ctx.lineWidth = faint ? 1.2 : 2.2; ctx.setLineDash([5, 4]); ctx.stroke(); ctx.setLineDash([]);
+      if (moonU != null && Math.sin(moonU) < 0) drawGoingMoon(Ec, rr, moonU);
+      // 地球旁邊的一小塊桌面（黃道面）
+      ctx.beginPath();
+      for (let i = 0; i <= 48; i++) { const a = i / 48 * TAU, p = P([Ec[0] + rr * 1.2 * Math.cos(a), Ec[1] + rr * 1.2 * Math.sin(a), 0]); i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); }
+      ctx.closePath(); ctx.fillStyle = 'rgba(255,209,102,0.16)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,209,102,0.45)'; ctx.lineWidth = 1; ctx.stroke();
+      // 交點線和兩個交點
+      const n1 = P(add(Ec, nh, rr * 1.22)), n2 = P(add(Ec, nh, -rr * 1.22));
+      ctx.beginPath(); ctx.moveTo(n1.x, n1.y); ctx.lineTo(n2.x, n2.y);
+      ctx.strokeStyle = 'rgba(255,255,255,0.75)'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.3; ctx.stroke(); ctx.setLineDash([]);
+      ctx.restore();
+      return { n1, n2 };
+    }
+    // 上半部：翹在黃道面上面的半圈、交點紅點、最高點的 🚩
+    function drawPlateUpper(Ec, rr, faint, moonU) {
+      ctx.save();
+      ctx.globalAlpha = faint ? 0.4 : 1;
+      rim(Ec, rr, 0, Math.PI); ctx.strokeStyle = UPC; ctx.lineWidth = faint ? 1.4 : 2.6; ctx.stroke();
+      for (const u of [0, Math.PI]) {
+        const q = P(platePt(Ec, rr, u));
+        ctx.beginPath(); ctx.arc(q.x, q.y, faint ? 3 : 4.5, 0, TAU); ctx.fillStyle = '#ff5c77'; ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.1; ctx.stroke();
+      }
+      const hp = platePt(Ec, rr, Math.PI / 2);
+      const fb = P(hp), ft = P(add(hp, [0, 0, K * (faint ? 0.45 : 0.6)]));
+      ctx.beginPath(); ctx.moveTo(fb.x, fb.y); ctx.lineTo(ft.x, ft.y); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = faint ? 1.2 : 2; ctx.stroke();
+      const fl = faint ? 7 : 11;
+      ctx.beginPath(); ctx.moveTo(ft.x, ft.y); ctx.lineTo(ft.x + fl, ft.y + fl * 0.35); ctx.lineTo(ft.x, ft.y + fl * 0.7); ctx.closePath();
+      ctx.fillStyle = '#ff5a5a'; ctx.fill();
+      let moonTop = null;
+      if (moonU != null && Math.sin(moonU) >= 0) moonTop = drawGoingMoon(Ec, rr, moonU);
+      ctx.restore();
+      return { ft, moonTop };
+    }
+
+    // 淡淡的四個關鍵位置：呼拉圈和 🚩 都指同一邊
+    for (const gth of [150, 240, 330, 60]) {
+      const dd = ((st.th - gth) % 360 + 540) % 360 - 180;
+      if (Math.abs(dd) < 14) continue;
+      const Eg = scaleV(geo(gth).E, Ro);
+      drawPlateLower(Eg, rho * 0.72, true, null);
+      const pg = P(Eg);
+      ctx.beginPath(); ctx.arc(pg.x, pg.y, 3, 0, TAU); ctx.fillStyle = 'rgba(128,216,255,0.5)'; ctx.fill();
+      drawPlateUpper(Eg, rho * 0.72, true, null);
+    }
+
+    const Ec = scaleV(g.E, Ro);
+    const pe = P(Ec), ps = P([0, 0, 0]);
+    const aligned = Math.abs(g.beta) < 0.8;
+
+    const drawSun = () => {
+      const sr = Math.max(14, Ro * 0.12);
+      const gl = ctx.createRadialGradient(ps.x, ps.y, sr * 0.3, ps.x, ps.y, sr * 2.6);
+      gl.addColorStop(0, 'rgba(255,210,100,0.5)'); gl.addColorStop(1, 'rgba(255,210,100,0)');
+      ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(ps.x, ps.y, sr * 2.6, 0, TAU); ctx.fill();
+      const gb = ctx.createRadialGradient(ps.x - sr * 0.25, ps.y - sr * 0.25, sr * 0.1, ps.x, ps.y, sr);
+      gb.addColorStop(0, '#fff9db'); gb.addColorStop(0.55, '#ffd166'); gb.addColorStop(1, '#ff922b');
+      ctx.fillStyle = gb; ctx.beginPath(); ctx.arc(ps.x, ps.y, sr, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#5c2d00'; ctx.font = `800 ${fs}px ${FONT}`; ctx.textAlign = 'center'; ctx.fillText('太陽', ps.x, ps.y + fs * 0.35);
+    };
+
+    const drawSystem = () => {
+      // 陽光線：太陽 → 地球 → 滿月那一邊
+      const far = P(add(Ec, g.s, -rho * 1.4));
+      ctx.beginPath(); ctx.moveTo(ps.x, ps.y); ctx.lineTo(far.x, far.y);
+      ctx.strokeStyle = aligned ? 'rgba(255,209,102,0.85)' : 'rgba(255,209,102,0.45)'; ctx.lineWidth = aligned ? 3 : 2; ctx.stroke();
+
+      drawPlateLower(Ec, rho, false, st.mu);
+
+      // 地球
+      const er = Math.max(6, Ro * 0.055);
+      ctx.save(); ctx.beginPath(); ctx.arc(pe.x, pe.y, er, 0, TAU); ctx.clip();
+      const ge = ctx.createRadialGradient(pe.x - er * 0.3, pe.y - er * 0.3, 1, pe.x, pe.y, er);
+      ge.addColorStop(0, '#80d8ff'); ge.addColorStop(1, '#1b5eb8');
+      ctx.fillStyle = ge; ctx.fillRect(pe.x - er, pe.y - er, er * 2, er * 2);
+      ctx.translate(pe.x, pe.y); ctx.rotate(Math.atan2(ps.y - pe.y, ps.x - pe.x));
+      ctx.fillStyle = 'rgba(4,8,26,0.7)'; ctx.fillRect(-er, -er, er, er * 2);
+      ctx.restore();
+
+      const m = drawPlateUpper(Ec, rho, false, st.mu);
+      if (m.moonTop) label("月亮", m.moonTop.x, m.moonTop.y - Math.max(5, rho * 0.085) - 5, "#ffe9a8", fs - 2);
+
+      // 新月、滿月的位置：就在呼拉圈上，小棒子連到黃道面表示高低
+      const mr = Math.max(5, er * 0.75);
+      const spot = (u, isNew) => {
+        const f = foot(Ec, rho, u), top = platePt(Ec, rho, u);
+        const pf = P(f), pt = P(top);
+        const hgt = Math.asin(Math.sin(u) * Math.sin(INC)) / DEG;
+        const ok = Math.abs(hgt) < 0.8;
+        ctx.beginPath(); ctx.moveTo(pf.x, pf.y); ctx.lineTo(pt.x, pt.y);
+        ctx.strokeStyle = ok ? '#6ee7b7' : '#ff9ec4'; ctx.lineWidth = 2.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(pf.x, pf.y, 2.2, 0, TAU); ctx.fillStyle = ok ? '#6ee7b7' : '#ff9ec4'; ctx.fill();
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, mr, 0, TAU);
+        ctx.fillStyle = isNew ? '#1a2040' : (ok ? '#c93b2b' : '#fff3c4'); ctx.fill();
+        ctx.strokeStyle = '#ffd977'; ctx.lineWidth = 1.4; ctx.stroke();
+        return { pt, hgt, isNew };
+      };
+      const spots = [spot(g.r, true), spot(g.r + Math.PI, false)];
+
+      // 文字：月亮的字放在離地球比較遠的那一側；交點線的字放在離兩個月亮比較遠的那一頭
+      const lf = fs - 1;
+      for (const s of spots) {
+        const extra = !wide ? '' : s.hgt > 4.6 ? '（🚩 最高）' : s.hgt < -4.6 ? '（最低）' : '';
+        const txt = `${s.isNew ? '🌑 新月' : '🌕 滿月'} ${fmt(s.hgt)}${extra}`;
+        ctx.font = `700 ${lf}px ${FONT}`;
+        const tw = ctx.measureText(txt).width;
+        const side = s.pt.x >= pe.x ? 1 : -1;
+        const cxl = s.pt.x + side * (mr + 6 + tw / 2);
+        const cxc = clampX(txt, cxl, x0, x0 + w, lf);
+        const col = s.isNew ? '#ffe999' : '#fff3c4';
+        if (Math.abs(cxc - cxl) < 3) label(txt, cxc, s.pt.y + lf * 0.35, col, lf);
+        else { // 旁邊放不下：改放在月亮下面（高的放上面）
+          const ly = s.hgt >= 0 ? s.pt.y - mr - 7 : s.pt.y + mr + lf + 3;
+          label(txt, clampX(txt, s.pt.x, x0, x0 + w, lf), ly, col, lf);
+        }
+      }
+      const ends = [1, -1].map(k => P(add(Ec, nh, k * rho * 1.4)));
+      const far2 = p => Math.min(...spots.map(s => Math.hypot(p.x - s.pt.x, p.y - s.pt.y)));
+      const ne = far2(ends[0]) >= far2(ends[1]) ? ends[0] : ends[1];
+      label('交點線', clampX('交點線', ne.x, x0, x0 + w, fs - 2, 600), ne.y + 4, 'rgba(255,255,255,0.85)', fs - 2, 600);
+      if (!spots.some(s => s.hgt > 4.6)) label('🚩 最高', m.ft.x + 14, m.ft.y + 4, '#ffb3b3', fs - 1, 700, 'left');
+
+      if (aligned) label('⚡ 交點線對準太陽：食季！', x0 + 12, y0 + 22 + fs + 10, '#ffd166', fs, 800, 'left');
+    };
+
+    if (pe.d < 0) { drawSystem(); drawSun(); } else { drawSun(); drawSystem(); }
+
+    label('🛰️ 從斜上方看：地球帶著呼拉圈繞太陽', x0 + 12, y0 + 22, '#eef2ff', fs, 800, 'left');
+    label('呼拉圈的斜度放大畫，才看得出高低（真實只斜 5°）', x0 + 12, y0 + h - 12, '#aab3dc', fs - 2, 500, 'left');
+    ctx.restore();
+    return g;
+  }
+
+  // ---------- 右邊：從旁邊看「太陽—地球」這條線 ----------
+  function drawSide(x0, y0, w, h, fs, g) {
+    ctx.save();
+    roundBox(x0, y0, w, h, 14);
+    ctx.fillStyle = 'rgba(9,14,38,0.96)'; ctx.fill();
+    ctx.strokeStyle = Math.abs(g.beta) < 0.8 ? 'rgba(255,209,102,0.75)' : 'rgba(140,175,255,0.32)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.clip();
+
+    const midY = y0 + h * 0.57, earthX = x0 + w * 0.6, L = w * 0.27, V = h * 0.24;
+    const er = Math.max(9, Math.min(16, h * 0.07)), mr = er * 0.55;
+    // 太陽（左邊）與平行光
+    const sR = h * 0.32;
+    const gs = ctx.createRadialGradient(x0 - sR * 0.6, midY, sR * 0.2, x0 - sR * 0.6, midY, sR);
+    gs.addColorStop(0, '#fff9db'); gs.addColorStop(0.7, '#ffd166'); gs.addColorStop(1, 'rgba(255,146,43,0)');
+    ctx.fillStyle = gs; ctx.beginPath(); ctx.arc(x0 - sR * 0.6, midY, sR, 0, TAU); ctx.fill();
+    for (const dy of [-V * 0.95, -V * 0.4, V * 0.4, V * 0.95]) {
+      const y = midY + dy, xa = x0 + 14, xb = x0 + Math.min(46, w * 0.12);
+      ctx.beginPath(); ctx.moveTo(xa, y); ctx.lineTo(xb, y); ctx.strokeStyle = 'rgba(255,214,102,0.6)'; ctx.lineWidth = 1.3; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xb + 4, y); ctx.lineTo(xb - 4, y - 3.5); ctx.lineTo(xb - 4, y + 3.5); ctx.closePath(); ctx.fillStyle = 'rgba(255,214,102,0.8)'; ctx.fill();
+    }
+    // 黃道面
+    ctx.beginPath(); ctx.moveTo(x0 + 10, midY); ctx.lineTo(x0 + w - 10, midY);
+    ctx.strokeStyle = 'rgba(255,209,102,0.5)'; ctx.setLineDash([5, 5]); ctx.lineWidth = 1.3; ctx.stroke(); ctx.setLineDash([]);
+    label('黃道面', x0 + w * 0.15, midY + fs + 2, 'rgba(255,209,102,0.85)', fs - 2, 600, 'left');
+    // 地球的影子
+    ctx.beginPath(); ctx.moveTo(earthX, midY - er); ctx.lineTo(earthX + L * 3.5, midY); ctx.lineTo(earthX, midY + er); ctx.closePath();
+    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fill();
+
+    const off = g.beta / 5.1 * V;            // 新月那一點的高度（上下拉長畫）
+    const nx = earthX - L, ny = midY - off;   // 新月在地球和太陽中間
+    const fx = earthX + L, fy = midY + off;   // 滿月在地球背後（剛好相反）
+    // 月食的判定對齊畫出來的地球影子：滿月那裡影子的半寬是 er * (1 - 1/3.5)
+    const hitNew = Math.abs(off) < er * 0.85, hitFull = Math.abs(off) < er * (1 - 1 / 3.5);
+    // 月道面（從旁邊看的斜度）
+    const slope = (fy - ny) / (fx - nx);
+    ctx.beginPath(); ctx.moveTo(nx - 18, ny - slope * 18); ctx.lineTo(fx + 18, fy + slope * 18);
+    ctx.strokeStyle = 'rgba(128,216,255,0.75)'; ctx.lineWidth = 1.8; ctx.stroke();
+    // 月亮的影子（新月時往地球那邊）
+    ctx.beginPath(); ctx.moveTo(nx, ny - mr); ctx.lineTo(earthX - er * 0.2, ny); ctx.lineTo(nx, ny + mr); ctx.closePath();
+    ctx.fillStyle = hitNew ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.55)'; ctx.fill();
+    // 地球
+    ctx.save(); ctx.beginPath(); ctx.arc(earthX, midY, er, 0, TAU); ctx.clip();
+    const ge = ctx.createRadialGradient(earthX - er * 0.35, midY - er * 0.25, 2, earthX, midY, er);
+    ge.addColorStop(0, '#80d8ff'); ge.addColorStop(1, '#1b5eb8');
+    ctx.fillStyle = ge; ctx.fillRect(earthX - er, midY - er, er * 2, er * 2);
+    ctx.fillStyle = 'rgba(4,8,26,0.75)'; ctx.fillRect(earthX, midY - er, er, er * 2);
+    ctx.restore();
+    if (hitNew) { ctx.beginPath(); ctx.arc(earthX - er * 0.8, ny, 4, 0, TAU); ctx.fillStyle = '#000'; ctx.fill(); ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 1.3; ctx.stroke(); }
+    label('地球', earthX, midY + er + fs + 2, '#80d8ff', fs - 2);
+    // 新月（左半邊被照亮）
+    ctx.save(); ctx.beginPath(); ctx.arc(nx, ny, mr, 0, TAU); ctx.clip();
+    ctx.fillStyle = '#fff3c4'; ctx.fillRect(nx - mr, ny - mr, mr, mr * 2);
+    ctx.fillStyle = '#182042'; ctx.fillRect(nx, ny - mr, mr, mr * 2);
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(nx, ny, mr, 0, TAU); ctx.strokeStyle = '#ffd977'; ctx.lineWidth = 1.3; ctx.stroke();
+    // 滿月
+    ctx.beginPath(); ctx.arc(fx, fy, mr, 0, TAU);
+    ctx.fillStyle = hitFull ? '#c93b2b' : '#fff3c4'; ctx.fill(); ctx.strokeStyle = hitFull ? '#ff7b7b' : '#ffd977'; ctx.stroke();
+
+    const fsl = Math.max(10, fs - 1.5);
+    const tNew = hitNew ? '🌑 影子打到地球 → 日食！' : `🌑 影子從地球${off > 0 ? '上' : '下'}面掃過`;
+    const tFull = hitFull ? '🌕 走進地球影子 → 月食！' : `🌕 從地球影子${off < 0 ? '上' : '下'}面溜過`;
+    const nly = off >= 0 ? ny - mr - 8 : ny + mr + fsl + 4;
+    const fly = hitFull ? midY + er + fs * 2 + 8 : (off <= 0 ? fy - mr - 8 : fy + mr + fsl + 4); // 月食時放在「地球」下面，避免和日食的字擠在一起
+    label(tNew, clampX(tNew, nx, x0, x0 + w, fsl), nly, hitNew ? '#ffd166' : '#cfe0ff', fsl);
+    label(tFull, clampX(tFull, fx, x0, x0 + w, fsl), fly, hitFull ? '#ff9ec4' : '#cfe0ff', fsl);
+
+    label('👀 從旁邊看「太陽—地球」這條線', x0 + 12, y0 + 22, '#eef2ff', fs, 800, 'left');
+    label(`對著太陽的那一點：${fmt(g.beta)}`, x0 + 12, y0 + 22 + fs + 8, Math.abs(g.beta) < 0.8 ? '#6ee7b7' : '#ffb3d1', fs - 1, 700, 'left');
+    label('（上下拉長畫；呼拉圈本身永遠斜 5°）', x0 + 12, y0 + 22 + fs * 2 + 14, '#aab3dc', fs - 2, 500, 'left');
+    ctx.restore();
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    const fs = Math.max(11, Math.min(14, W / (wide ? 72 : 30)));
+    const w3 = wide ? Math.round(W * 0.58) : W;
+    const h3 = wide ? H : Math.round(W * 0.9);
+    const g = drawSpace(0, 0, w3, h3, fs);
+    if (wide) drawSide(w3 + 10, 0, W - w3 - 10, H, fs, g);
+    else drawSide(0, h3 + 10, W, H - h3 - 10, fs, g);
+  }
+
+  // ---------- 字幕與控制 ----------
+  const dots = $('#storyDots');
+  SCENES.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', `第 ${i + 1} 幕`);
+    b.addEventListener('click', () => goto(i));
+    dots.appendChild(b);
+  });
+  function caption() {
+    const moving = st.mode === 'move';
+    const s = moving ? MOVING : SCENES[st.idx];
+    $('#storyStep').textContent = moving ? `往第 ${st.idx + 1} 幕前進中…` : `第 ${st.idx + 1} / ${SCENES.length} 幕`;
+    $('#storyTitle').textContent = s.title;
+    $('#storyText').textContent = s.text;
+    dots.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i === st.idx));
+  }
+  function goto(i) {
+    st.idx = (i + SCENES.length) % SCENES.length;
+    st.th = SCENES[st.idx].th; st.mode = 'hold'; st.t = 0;
+    caption();
+  }
+  function advance() {
+    st.idx++;
+    if (st.idx >= SCENES.length) { st.idx = 0; st.th -= 360; }
+    st.t = 0;
+    st.mode = SCENES[st.idx].th > st.th + 0.01 ? 'move' : 'hold';
+    caption();
+  }
+  function setPlay(p) { st.playing = p; $('#storyPlay').textContent = p ? '⏸ 暫停' : '▶ 播放'; }
+  $('#storyPlay').addEventListener('click', () => setPlay(!st.playing));
+  $('#storyPrev').addEventListener('click', () => goto(st.idx - 1));
+  $('#storyNext').addEventListener('click', () => goto(st.mode === 'move' ? st.idx : st.idx + 1));
+  caption();
+
+  let visible = true;
+  new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; }).observe($('#story'));
+
+  let last = performance.now();
+  function frame(t) {
+    const dt = Math.min(0.05, (t - last) / 1000);
+    last = t;
+    if (visible) {
+      if (st.playing) {
+        st.mu = (st.mu + dt * TAU / 6) % TAU; // 月亮約 6 秒繞一圈，停在每一幕時也繼續繞
+        if (st.mode === 'hold') {
+          st.t += dt;
+          if (st.t >= SCENES[st.idx].hold) advance();
+        } else {
+          st.th = Math.min(SCENES[st.idx].th, st.th + SPEED * dt);
+          if (st.th >= SCENES[st.idx].th) { st.mode = 'hold'; st.t = 0; caption(); }
+        }
+      }
+      render();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+// ==================== ③ 動畫：月亮繞一圈，一下在黃道面上面、一下在下面 ====================
+(() => {
+  const DEG = Math.PI / 180, TAU = Math.PI * 2;
+  const FONT = '"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif';
+  const $ = s => document.querySelector(s);
+  const REAL = 5.1;            // 真實傾角（度），文字用這個
+  const SHOW = 24 * DEG;       // 畫面上放大的傾角，才看得出高低
+  const ELEV = 20 * DEG;       // 鏡頭從多高往下看（低一點，高低差比較明顯）
+  const NODE = 25 * DEG;       // 交點線在桌面上的方向（起點）
+  const YEARS = 18.6;          // 交點線轉一圈要幾年
+  const PREC_SECS = 18;        // 快轉時，18.6 年用幾秒播完
+  const LAP = 12;              // 速度 1 時繞一圈幾秒
+
+  // u：月亮從升交點算起走了多少角度；prec：正在快轉 18.6 年；py：已經過了幾年
+  const st = { u: 40 * DEG, playing: true, speed: 1, prec: false, py: 0 };
+
+  const cv = $('#hoopCanvas'), ctx = cv.getContext('2d');
+  let W = 0, H = 0;
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = cv.parentElement.clientWidth, h = Math.round(Math.max(300, Math.min(460, w * 0.34)));
+    if (!w || (w === W && h === H)) return;
+    W = w; H = h;
+    cv.style.height = h + 'px';
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  new ResizeObserver(resize).observe(cv.parentElement);
+  resize();
+
+  const stars = Array.from({ length: 70 }, () => [Math.random(), Math.random(), Math.random() * 1.1 + 0.3, Math.random() * 0.5 + 0.2]);
+  // 交點線方向會慢慢順時針轉（從上面看），所以 n、hd 每一幀重算
+  const n = [0, 0], hd = [0, 0];
+  const setNode = a => { n[0] = Math.cos(a); n[1] = Math.sin(a); hd[0] = -Math.sin(a); hd[1] = Math.cos(a); };
+  setNode(NODE);
+  // 月亮在軌道上角度 u 的位置（桌面座標 x、y，高度 z）；z > 0 在桌面上面
+  const orbit = (u, r) => ({
+    x: r * (Math.cos(u) * n[0] + Math.sin(u) * Math.cos(SHOW) * hd[0]),
+    y: r * (Math.cos(u) * n[1] + Math.sin(u) * Math.cos(SHOW) * hd[1]),
+    z: r * Math.sin(u) * Math.sin(SHOW),
+  });
+  const realHeight = u => Math.asin(Math.sin(u) * Math.sin(REAL * DEG)) / DEG;
+  const fmt = b => `${b >= 0 ? '+' : '−'}${Math.abs(b).toFixed(1)}°`;
+
+  function text(t, x, y, color, size, weight = 700, align = 'center') {
+    ctx.font = `${weight} ${size}px ${FONT}`; ctx.textAlign = align;
+    ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(6,10,28,0.85)';
+    ctx.strokeText(t, x, y);
+    ctx.fillStyle = color; ctx.fillText(t, x, y);
+  }
+  function box(x, y, w, h) {
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, w, h, 14); else ctx.rect(x, y, w, h);
+  }
+
+  const UP = '#5ce1ff', DOWN = '#ff9ec4', NODEC = '#ff5c77';
+
+  // ---------- 左：斜著看桌面和呼拉圈 ----------
+  function drawScene(x0, y0, w, h, fs) {
+    ctx.save();
+    box(x0, y0, w, h); ctx.fillStyle = '#060a1c'; ctx.fill(); ctx.clip();
+    for (const [sx, sy, sr, a] of stars) { ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.beginPath(); ctx.arc(x0 + sx * w, y0 + sy * h, sr, 0, TAU); ctx.fill(); }
+
+    const cx = x0 + w * 0.5, cy = y0 + h * 0.56;
+    const sE = Math.sin(ELEV), cE = Math.cos(ELEV);
+    const Rt = Math.min(w * 0.4, (h * 0.36) / (sE + 0.02));   // 桌面半徑
+    const Rh = Rt * 0.8;                                        // 呼拉圈半徑
+    const P = p => ({ x: cx + p.x, y: cy - (p.y * sE + (p.z || 0) * cE) });
+    const arc = (u0, u1) => { ctx.beginPath(); for (let i = 0; i <= 48; i++) { const q = P(orbit(u0 + (u1 - u0) * i / 48, Rh)); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); } };
+    const m = orbit(st.u, Rh), mp = P(m), foot = P({ x: m.x, y: m.y, z: 0 });
+    const above = m.z >= 0;
+    const mr = Math.max(8, Rt * 0.045);
+    const moonDisc = () => {
+      // 高度棒：月亮到桌面的距離
+      ctx.beginPath(); ctx.moveTo(foot.x, foot.y); ctx.lineTo(mp.x, mp.y);
+      ctx.strokeStyle = above ? UP : DOWN; ctx.lineWidth = 2.5; ctx.setLineDash(above ? [] : [4, 3]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(mp.x, mp.y, mr, 0, TAU);
+      const g = ctx.createRadialGradient(mp.x - mr * 0.3, mp.y - mr * 0.3, 1, mp.x, mp.y, mr);
+      g.addColorStop(0, '#fffbea'); g.addColorStop(1, '#d9cc9c');
+      ctx.fillStyle = g; ctx.fill();
+      ctx.strokeStyle = above ? UP : DOWN; ctx.lineWidth = 2; ctx.stroke();
+    };
+
+    // 1. 桌面下面的半圈（先畫，之後被半透明的桌面蓋住，看起來比較暗）
+    arc(Math.PI, TAU); ctx.strokeStyle = DOWN; ctx.lineWidth = 2.5; ctx.setLineDash([6, 5]); ctx.stroke(); ctx.setLineDash([]);
+    if (!above) moonDisc();
+
+    // 2. 桌面（黃道面）
+    ctx.beginPath(); ctx.ellipse(cx, cy, Rt, Rt * sE, 0, 0, TAU);
+    ctx.fillStyle = 'rgba(255,209,102,0.16)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,209,102,0.65)'; ctx.lineWidth = 1.5; ctx.stroke();
+    text('黃道面（桌面）', cx - Rt * 0.62, cy + Rt * sE * 0.72, 'rgba(255,215,120,0.95)', fs - 1, 700);
+
+    // 交點線
+    const a = P(orbit(0, Rh * 1.22)), b = P(orbit(Math.PI, Rh * 1.22));
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.setLineDash([5, 5]); ctx.lineWidth = 1.3; ctx.stroke(); ctx.setLineDash([]);
+
+    // 月亮在桌面上的影子點（正下方或正上方的位置）
+    ctx.beginPath(); ctx.ellipse(foot.x, foot.y, mr * 0.7, mr * 0.7 * sE, 0, 0, TAU);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fill();
+
+    // 地球
+    const er = Math.max(11, Rt * 0.07);
+    const ge = ctx.createRadialGradient(cx - er * 0.3, cy - er * 0.3, 2, cx, cy, er);
+    ge.addColorStop(0, '#80d8ff'); ge.addColorStop(1, '#1b5eb8');
+    ctx.beginPath(); ctx.arc(cx, cy, er, 0, TAU); ctx.fillStyle = ge; ctx.fill();
+    text('地球', cx, cy + er + fs + 2, '#80d8ff', fs - 1);
+
+    // 3. 桌面上面的半圈
+    arc(0, Math.PI); ctx.strokeStyle = UP; ctx.lineWidth = 3; ctx.stroke();
+    if (above) moonDisc();
+
+    // 交點（紅點）和最高、最低
+    const near = Math.abs(Math.sin(st.u)) < 0.13;
+    for (const u of [0, Math.PI]) {
+      const q = P(orbit(u, Rh));
+      const hot = near && Math.cos(st.u - u) > 0;
+      ctx.beginPath(); ctx.arc(q.x, q.y, hot ? 9 : 6, 0, TAU); ctx.fillStyle = NODEC; ctx.fill();
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = hot ? 2.5 : 1.5; ctx.stroke();
+      text('交點', q.x + (q.x > cx ? 26 : -26), q.y + 5, '#ffb3c0', fs - 1);
+    }
+    const top = P(orbit(Math.PI / 2, Rh)), bot = P(orbit(-Math.PI / 2, Rh));
+    text(`最高（+${REAL}°）`, top.x, top.y - 10, UP, fs - 1);
+    text(`最低（−${REAL}°）`, bot.x, bot.y + fs + 8, DOWN, fs - 1);
+
+    // ---------- 18.6 年：呼拉圈斜的方向慢慢順時針轉一圈 ----------
+    // 最高點的位置只跟交點線方向 a 有關：畫出它 18.6 年走的一整圈、已經走過的那一段、和起點
+    const highAt = a => P({ x: -Math.sin(a) * Rh * Math.cos(SHOW), y: Math.cos(a) * Rh * Math.cos(SHOW), z: Rh * Math.sin(SHOW) });
+    const flag = (p, col, size) => {
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y - size * 1.6); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.8; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(p.x, p.y - size * 1.6); ctx.lineTo(p.x + size, p.y - size * 1.25); ctx.lineTo(p.x, p.y - size * 0.9); ctx.closePath();
+      ctx.fillStyle = col; ctx.fill();
+    };
+    if (st.py > 0 || st.prec) {
+      ctx.beginPath();
+      for (let i = 0; i <= 72; i++) { const q = highAt(i / 72 * TAU); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }
+      ctx.strokeStyle = 'rgba(255,255,255,0.28)'; ctx.setLineDash([3, 5]); ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+      const turned = st.py / YEARS * TAU;
+      ctx.beginPath();
+      for (let i = 0; i <= 60; i++) { const q = highAt(NODE - turned * i / 60); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.4; ctx.stroke();
+      const s0 = highAt(NODE);
+      flag(s0, 'rgba(255,90,90,0.4)', 9);
+      text('起點', s0.x - 14, s0.y - 18, 'rgba(255,255,255,0.7)', fs - 2, 600);
+    }
+    flag(top, '#ff5a5a', 11);
+    if (st.py > 0 || st.prec) {
+      const done = st.py >= YEARS - 0.001;
+      const msg2 = done ? `✅ 第 18.6 年：🚩 轉完一整圈，回到原位！`
+        : `⏩ 第 ${st.py.toFixed(1)} 年：🚩 已經順時針轉了 ${(st.py / YEARS * 360).toFixed(0)}°（斜度一直是 5°）`;
+      text(msg2, x0 + 14, y0 + 26 + fs + 12, '#ffd166', fs + 1, 800, 'left');
+    }
+    text('月亮', mp.x, mp.y - mr - 6, '#ffe9a8', fs - 1);
+
+    // 大字：現在在哪裡
+    const hgt = realHeight(st.u);
+    const msg = near ? '⚡ 月亮正在穿過黃道面：這裡就是交點！'
+      : above ? `▲ 月亮在黃道面上面（${fmt(hgt)}）` : `▼ 月亮在黃道面下面（${fmt(hgt)}）`;
+    text(msg, x0 + 14, y0 + 26, near ? '#ffd166' : above ? UP : DOWN, fs + 3, 800, 'left');
+    ctx.restore();
+  }
+
+  // ---------- 右：高度圖 ----------
+  function drawChart(x0, y0, w, h, fs) {
+    ctx.save();
+    box(x0, y0, w, h); ctx.fillStyle = 'rgba(9,14,38,0.96)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(140,175,255,0.32)'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.clip();
+    text('📈 繞一圈，月亮離黃道面多高？', x0 + 14, y0 + 24, '#eef2ff', fs, 800, 'left');
+
+    const gx = x0 + 54, gw = w - 54 - 22, midY = y0 + h * 0.56, amp = h * 0.27;
+    const X = u => gx + (u / TAU) * gw, Y = u => midY - Math.sin(u) * amp;
+    // 上、下兩塊淡淡的底色
+    ctx.fillStyle = 'rgba(92,225,255,0.07)'; ctx.fillRect(gx, midY - amp - 8, gw, amp + 8);
+    ctx.fillStyle = 'rgba(255,158,196,0.07)'; ctx.fillRect(gx, midY, gw, amp + 8);
+    // 黃道面（高度 0）
+    ctx.beginPath(); ctx.moveTo(gx, midY); ctx.lineTo(gx + gw, midY);
+    ctx.strokeStyle = 'rgba(255,209,102,0.8)'; ctx.lineWidth = 1.6; ctx.stroke();
+    text('黃道面 0°', gx - 6, midY + 4, 'rgba(255,215,120,0.95)', fs - 2, 700, 'right');
+    text(`+${REAL}°`, gx - 6, midY - amp + 4, UP, fs - 2, 700, 'right');
+    text(`−${REAL}°`, gx - 6, midY + amp + 4, DOWN, fs - 2, 700, 'right');
+    text('上面', gx + gw * 0.25, midY - amp - 14, UP, fs - 1);
+    text('下面', gx + gw * 0.75, midY + amp + fs + 12, DOWN, fs - 1);
+    // 曲線：上半段實線、下半段虛線
+    const seg = (u0, u1, col, dash) => {
+      ctx.beginPath();
+      for (let i = 0; i <= 40; i++) { const u = u0 + (u1 - u0) * i / 40; i ? ctx.lineTo(X(u), Y(u)) : ctx.moveTo(X(u), Y(u)); }
+      ctx.strokeStyle = col; ctx.setLineDash(dash); ctx.lineWidth = 2.5; ctx.stroke(); ctx.setLineDash([]);
+    };
+    seg(0, Math.PI, UP, []); seg(Math.PI, TAU, DOWN, [6, 5]);
+    // 交點
+    for (const u of [0, Math.PI, TAU]) {
+      ctx.beginPath(); ctx.arc(X(u), midY, 5.5, 0, TAU); ctx.fillStyle = NODEC; ctx.fill();
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.4; ctx.stroke();
+    }
+    text('交點', X(Math.PI), midY + fs + 8, '#ffb3c0', fs - 1);
+    // 現在的月亮
+    const u = ((st.u % TAU) + TAU) % TAU, mx = X(u), my = Y(u), above = Math.sin(u) >= 0;
+    ctx.beginPath(); ctx.moveTo(mx, midY); ctx.lineTo(mx, my);
+    ctx.strokeStyle = above ? UP : DOWN; ctx.lineWidth = 2.5; ctx.setLineDash(above ? [] : [4, 3]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(mx, my, 8, 0, TAU); ctx.fillStyle = '#fff3c4'; ctx.fill();
+    ctx.strokeStyle = above ? UP : DOWN; ctx.lineWidth = 2; ctx.stroke();
+    text(fmt(realHeight(u)), mx, above ? my - 14 : my + fs + 12, '#ffe9a8', fs);
+    text('← 繞地球一圈（大約 27 天）→', gx + gw / 2, y0 + h - 12, '#aab3dc', fs - 2, 500);
+    ctx.restore();
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    const fs = Math.max(12, Math.min(15, W / 80));
+    const wl = Math.round(W * 0.58);
+    drawScene(0, 0, wl, H, fs);
+    drawChart(wl + 10, 0, W - wl - 10, H, fs);
+  }
+
+  $('#hoopPlay').addEventListener('click', () => {
+    st.playing = !st.playing;
+    $('#hoopPlay').textContent = st.playing ? '⏸ 暫停' : '▶ 播放';
+  });
+  $('#hoopSpeed').addEventListener('input', e => { st.speed = +e.target.value; });
+  // 快轉 18.6 年：按一次開始（從頭），播放中再按一次是停下來並回到原本的方向
+  const precBtn = $('#hoopPrec');
+  precBtn.addEventListener('click', () => {
+    if (st.prec) { st.prec = false; st.py = 0; setNode(NODE); precBtn.textContent = '⏩ 快轉 18.6 年'; return; }
+    st.prec = true; st.py = 0; st.playing = true;
+    $('#hoopPlay').textContent = '⏸ 暫停';
+    precBtn.textContent = '⏹ 停止快轉';
+  });
+
+  let visible = true;
+  new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; }).observe($('#hoop'));
+  let last = performance.now();
+  function frame(t) {
+    const dt = Math.min(0.05, (t - last) / 1000);
+    last = t;
+    if (visible) {
+      if (st.playing) {
+        // 經過交點附近時放慢，看清楚「穿過桌面」那一下
+        const slow = Math.abs(Math.sin(st.u)) < 0.13 ? 0.35 : 1;
+        st.u = (st.u + dt * st.speed * slow * TAU / LAP) % TAU;
+        if (st.prec) {
+          st.py = Math.min(YEARS, st.py + dt * st.speed * YEARS / PREC_SECS);
+          setNode(NODE - st.py / YEARS * TAU); // 從上面看是順時針，所以角度變小
+          if (st.py >= YEARS) { st.prec = false; precBtn.textContent = '↺ 再快轉一次'; } // 停在轉完一圈的畫面
+        }
+      }
+      render();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

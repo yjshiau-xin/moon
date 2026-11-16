@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小測驗：月亮與地球</title>
+<style>
+  :root{
+    --bg:#0a0f24;--panel:rgba(22,31,70,.78);--panel2:rgba(255,255,255,.05);--line:rgba(160,180,255,.18);
+    --ink:#f2f4ff;--muted:#aab3dc;--moon:#ffd977;--ccw:#6ee7b7;--cw:#ff9ec4;--sun:#ffd166;--radius:20px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;color:var(--ink);font-size:17px;line-height:1.7;
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #26336f 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 25%, #1a2355 0%, transparent 55%),
+      var(--bg);
+  }
+  .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:8px 20px;background:rgba(10,15,36,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav.top{display:flex;gap:8px;flex-wrap:wrap}
+  nav.top a{color:var(--muted);text-decoration:none;padding:4px 14px;border-radius:999px;border:1px solid var(--line);font-size:15px}
+  .quiz-link{color:#1d1a0b;background:var(--sun);text-decoration:none;font-weight:800;padding:6px 16px;border-radius:999px;font-size:15px}
+  .wrap{max-width:860px;margin:0 auto;padding:28px 20px 72px}
+  h1{font-size:30px;margin:0 0 6px;text-align:center}
+  h1 span{color:var(--moon)}
+  .sub{text-align:center;color:var(--muted);margin:0 0 20px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;backdrop-filter:blur(6px)}
+  .btn{background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:7px 14px;font:inherit;font-size:15px;cursor:pointer}
+  .btn.primary{background:var(--moon);color:#1d1a0b;border-color:transparent;font-weight:700}
+  .quiz-top{display:flex;justify-content:space-between;color:var(--muted);font-size:15px}
+  .quiz-q{font-size:22px;font-weight:700;margin:8px 0 12px}
+  .quiz-moon{display:block;width:140px;height:140px;margin:0 auto 12px}
+  .quiz-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+  .quiz-opts button{font:inherit;font-size:18px;padding:14px;border-radius:14px;cursor:pointer;background:rgba(255,255,255,.07);border:2px solid var(--line);color:var(--ink)}
+  .quiz-opts button:hover:not(:disabled){background:rgba(255,255,255,.13)}
+  .quiz-opts button.right{border-color:var(--ccw);background:rgba(110,231,183,.18)}
+  .quiz-opts button.wrong{border-color:var(--cw);background:rgba(255,158,196,.15)}
+  .quiz-opts button:disabled{cursor:default}
+  .quiz-opts.long{grid-template-columns:1fr}
+  .quiz-opts.long button{text-align:left;font-size:17px}
+  .quiz-fb{margin-top:14px;min-height:1.7em}
+  .quiz-fb .ok{color:var(--ccw);font-weight:800}
+  .quiz-fb .no{color:var(--cw);font-weight:800}
+  .quiz-end{text-align:center;padding:10px 0}
+  .quiz-end .big{font-size:48px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <nav class="top">
+    <a href="../index.html" title="回首頁" aria-label="回首頁">🏠</a>
+    <a href="01_moon-phases.html">🌙 月亮變變變</a>
+    <a href="02_earth-moon-orbit.html">🌍 地球帶著月亮跑</a>
+    <a href="03_eclipses.html">📅 未來20年日食月食</a>
+    <a href="04_planets.html">🪐 八大行星</a>
+  </nav>
+  <a class="quiz-link" href="01_moon-phases.html">← 回去看動畫</a>
+</header>
+<div class="wrap">
+  <h1>⭐ 小測驗：<span>月亮</span>與<span>地球</span></h1>
+  <p class="sub">「月亮變變變」7 題＋「地球帶著月亮跑」5 題，答錯了可以回去看動畫再來挑戰！</p>
+  <section class="panel"><div id="quiz"></div></section>
+</div>
+<script>
+(() => {
+  const DEG = Math.PI / 180, TAU = Math.PI * 2;
+  const $ = s => document.querySelector(s);
+  const norm = a => ((a % TAU) + TAU) % TAU;
+  const phiFromAge = (A, dir) => norm(dir === 1 ? Math.PI + A : Math.PI - A);
+  // 月亮在正南方時（北半球）的樣子（和 01_moon-phases.html 相同）
+  function moonLook(phi) {
+    return { cosT: -Math.cos(phi), side: Math.sin(phi) < 0 ? 1 : -1 };
+  }
+  const CRATERS = [[-0.35,-0.3,0.16],[0.25,-0.45,0.1],[0.4,0.15,0.18],[-0.1,0.38,0.13],[-0.52,0.22,0.08],[0.05,-0.05,0.09],[0.6,-0.18,0.07],[-0.2,-0.62,0.07]];
+
+  function drawCraters(ctx, r, color) {
+    ctx.fillStyle = color;
+    for (const [x, y, s] of CRATERS) {
+      ctx.beginPath(); ctx.arc(x * r, y * r, s * r, 0, TAU); ctx.fill();
+    }
+  }
+
+  // 畫出從地球看到的月亮；opt.rot 讓亮面（side=+1 時的右邊）轉向指定方向
+  function drawMoon(ctx, cx, cy, r, cosT, side, opt = {}) {
+    const da = opt.darkAlpha ?? 1;
+    ctx.save();
+    ctx.translate(cx, cy);
+    if (opt.flip) ctx.rotate(Math.PI);
+    if (opt.rot) ctx.rotate(opt.rot);
+
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU);
+    ctx.fillStyle = `rgba(39,45,75,${da})`; ctx.fill();
+    if (opt.craters && da > 0.3) drawCraters(ctx, r, `rgba(0,0,0,${0.2 * da})`);
+
+    const N = 60;
+    ctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      const u = -1 + 2 * i / N, w = Math.sqrt(1 - u * u);
+      i ? ctx.lineTo(side * r * w, u * r) : ctx.moveTo(side * r * w, u * r);
+    }
+    for (let i = N; i >= 0; i--) {
+      const u = -1 + 2 * i / N, w = Math.sqrt(1 - u * u);
+      ctx.lineTo(side * r * cosT * w, u * r);
+    }
+    ctx.closePath();
+
+    if (opt.glow) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(255,225,140,0.6)';
+      ctx.shadowBlur = r * 0.35;
+      ctx.fillStyle = '#fff6da'; ctx.fill();
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.clip();
+    const g = ctx.createRadialGradient(-r * 0.2, -r * 0.25, r * 0.1, 0, 0, r);
+    g.addColorStop(0, '#fffbea'); g.addColorStop(1, '#eadb9f');
+    ctx.fillStyle = g; ctx.fillRect(-r, -r, 2 * r, 2 * r);
+    if (opt.craters) drawCraters(ctx, r, 'rgba(160,140,90,0.28)');
+    ctx.restore();
+
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU);
+    ctx.strokeStyle = `rgba(255,255,255,${0.14 * da})`; ctx.lineWidth = Math.max(1, r * 0.03); ctx.stroke();
+    ctx.restore();
+  }
+
+  // 太空視角的月亮：太陽光從左邊來，所以永遠是左半邊亮
+  function drawNight(ctx, x, y, r) {
+    const s = ctx.createLinearGradient(x - r * 0.15, 0, x + r * 0.15, 0);
+    s.addColorStop(0, 'rgba(4,7,22,0)'); s.addColorStop(1, 'rgba(4,7,22,0.8)');
+    ctx.fillStyle = s; ctx.fillRect(x - r * 0.15, y - r, r * 1.15, 2 * r);
+  }
+  function iconCanvas(c, cssSize, cosT, side, flip) {
+    const dpr = window.devicePixelRatio || 1;
+    const d = Math.round(cssSize * dpr);
+    c.width = c.height = d;
+    const x = c.getContext('2d');
+    x.clearRect(0, 0, d, d);
+    drawMoon(x, d / 2, d / 2, d * 0.42, cosT, side, { flip, craters: true });
+  }
+
+  // ---------- 小測驗（月亮變變變 7 題＋地球帶著月亮跑 5 題） ----------
+  const QUIZ = [
+    { q: '傍晚太陽在西邊（你的右手邊）下山，這時候看到的月亮，哪一邊會亮？',
+      opts: ['右邊', '左邊'], a: 0,
+      why: '亮面永遠朝著太陽！太陽在右手邊，月亮就是右邊亮。' },
+    { q: '在台灣看到這個月亮，它叫什麼名字？', age: 90,
+      opts: ['上弦月', '下弦月', '滿月'], a: 0,
+      why: '右半邊亮的半月，出現在農曆上半月，是上弦月！口訣：上弦月亮面朝西（右邊）。' },
+    { q: '這個細細的月牙，要什麼時候才看得到？', age: 320,
+      opts: ['傍晚的西邊天空', '清晨的東邊天空'], a: 1,
+      why: '左邊亮的月牙是殘月，快變成新月了。它在太陽的西邊，要早起在清晨東方天空才看得到。' },
+    { q: '為什麼太陽和月亮都是東升西落？',
+      opts: ['因為地球在自轉', '因為月亮在繞地球轉', '因為太陽在繞地球轉'], a: 0,
+      why: '地球一天自轉一圈（從北極上方看是逆時針），所以天上的太陽、月亮看起來都是東升西落。' },
+    { q: '下弦月大約出現在農曆哪幾天？',
+      opts: ['初一', '初七、初八', '十五', '廿二、廿三'], a: 3,
+      why: '下弦月在農曆下半月，大約廿二、廿三。上弦月才是初七、初八喔。' },
+    { q: '為什麼不是每個月都有日食和月食？',
+      opts: ['月道面和黃道面斜了約 5 度', '月亮有時候不會發光', '地球轉太快了'], a: 0,
+      why: '月道面斜斜的，新月、滿月時月亮通常從太陽或地球影子的上面、下面經過。' },
+    { q: '想像實驗：如果月亮改成「順時針」繞地球，新月之後先看到的月牙，哪一邊亮？',
+      opts: ['右邊', '左邊'], a: 1,
+      why: '順序整個倒過來了！新月後月亮先跑到太陽西邊，所以先看到左邊亮的月牙。' },
+    // ↓ 地球帶著月亮繞太陽跑（02_earth-moon-orbit.html，Antigravity 出題）
+    { q: '地球帶著月亮繞太陽公轉一整年（365 天），從新月到新月大約循環了幾次（幾個農曆月）？',
+      opts: ['約 12.4 次', '只有 1 次', '剛好 365 次'], a: 0,
+      why: '一個朔望月約 29.53 天，365.24 ÷ 29.53 ≈ 12.37 次！所以農曆一年有 12 個月（有時閏月變 13 個月）。' },
+    { q: '為什麼月亮繞地球一圈只要 27.3 天，但從「新月到下一次新月」卻要 29.5 天？',
+      opts: ['因為地球同時繞太陽往前跑，月亮要多跑 2.2 天才追得上陽光角度', '因為月亮走累了會休息 2 天', '因為太陽會繞著月亮跑'], a: 0,
+      why: '地球一邊繞太陽公轉，27.3 天裡地球已經繞太陽走了約 27 度，所以月亮必須再多追 2.2 天才能再次跑到太陽和地球正中間！' },
+    { q: '真實太空中，地球帶著月亮繞太陽跑出來的軌跡是什麼形狀？',
+      opts: ['永遠往前、沒有打結的平滑波浪形', '像電話線一樣往後倒退、打好多結', '完全筆直的一條直線'], a: 0,
+      why: '地球繞太陽每秒跑約 30 公里，月亮繞地球每秒只跑約 1 公里，所以月亮永遠都在往前衝，軌跡完全沒有打結喔！' },
+    { q: '地球繞太陽公轉時，為什麼會有春、夏、秋、冬四季變化？',
+      opts: ['地球自轉軸斜了 23.4° 且指向固定方向，走到不同位置時陽光直射北半球或南半球', '因為地球自轉軸每個月會倒過來轉', '因為夏天月亮離我們比較近'], a: 0,
+      why: '地球自轉軸斜 23.4° 並一直指向北極星！6 月夏至北極朝向太陽（北半球夏天），12 月冬至北極背對太陽（北半球冬天）。' },
+    { q: '發生「月全食」的時候，為什麼月亮不會完全黑掉，反而變成神祕的「紅月亮」？',
+      opts: ['因為地球在太陽和月亮中間，地球大氣層把陽光中的紅光折射彎進地球本影裡照亮月亮', '因為月亮自己會點火發紅光', '因為月亮跑到太陽前面把太陽染紅了'], a: 0,
+      why: '月食是「太陽 → 地球 → 月亮」排成一直線，滿月走進地球本影裡；陽光穿過地球大氣層時藍光被散射，紅光被折射彎進影子裡照在月球上，就變成紅月亮了！' },
+  ];
+  let qi = 0, score = 0;
+  const quizBox = $('#quiz');
+  function renderQuiz() {
+    if (qi >= QUIZ.length) {
+      const stars = '⭐'.repeat(score) + '☆'.repeat(QUIZ.length - score);
+      const msg = score === QUIZ.length ? '太厲害了！你是月亮小博士！' : score >= Math.ceil(QUIZ.length * 0.7) ? '很棒喔！再多玩玩上面的月亮和地球吧！' : '沒關係，拖拖看上面的月亮和地球，再挑戰一次！';
+      quizBox.innerHTML = `<div class="quiz-end"><div class="big">🌕</div><p class="quiz-q">答對 ${score} / ${QUIZ.length} 題</p><p>${stars}</p><p>${msg}</p><button class="btn primary" id="again">再玩一次</button></div>`;
+      $('#again').addEventListener('click', () => { qi = 0; score = 0; renderQuiz(); });
+      return;
+    }
+    const q = QUIZ[qi];
+    quizBox.innerHTML = `
+      <div class="quiz-top"><span>第 ${qi + 1} / ${QUIZ.length} 題</span><span>⭐ ${score}</span></div>
+      <p class="quiz-q">${q.q}</p>
+      ${q.age != null ? '<canvas class="quiz-moon"></canvas>' : ''}
+      <div class="quiz-opts${q.opts.some(o => o.length > 14) ? ' long' : ''}">${q.opts.map((o, i) => `<button data-i="${i}">${o}</button>`).join('')}</div>
+      <div class="quiz-fb" aria-live="polite"></div>`;
+    if (q.age != null) {
+      const look = moonLook(phiFromAge(q.age * DEG, 1));
+      iconCanvas(quizBox.querySelector("canvas"), 140, look.cosT, look.side, false);
+    }
+    const btns = quizBox.querySelectorAll('.quiz-opts button');
+    btns.forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.i, ok = i === q.a;
+      if (ok) score++;
+      btns.forEach(x => { x.disabled = true; if (+x.dataset.i === q.a) x.classList.add('right'); });
+      if (!ok) b.classList.add('wrong');
+      const fb = quizBox.querySelector('.quiz-fb');
+      fb.innerHTML = `<span class="${ok ? 'ok' : 'no'}">${ok ? '🎉 答對了！' : '🤔 再想想～'}</span> ${q.why}
+        <div style="margin-top:10px"><button class="btn primary" id="nextQ">${qi === QUIZ.length - 1 ? '看成績' : '下一題 →'}</button></div>`;
+      $('#nextQ').addEventListener('click', () => { qi++; renderQuiz(); });
+    }));
+  }
+
+  renderQuiz();
+})();
+</script>
+</body>
+</html>

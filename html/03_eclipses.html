@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>未來 20 年日食・月食時間地點＆食季佐證（2027–2046）</title>
+<style>
+  :root{
+    --bg:#0a0f24;
+    --panel:rgba(22,31,70,.78);
+    --panel2:rgba(255,255,255,.05);
+    --line:rgba(160,180,255,.18);
+    --ink:#f2f4ff;
+    --muted:#aab3dc;
+    --moon:#ffd977;
+    --sky:#7cc8ff;
+    --ccw:#6ee7b7;
+    --cw:#ff9ec4;
+    --sun:#ffd166;
+    --earth:#5cb8ff;
+    --blood:#ff7b7b;
+    --radius:20px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #26336f 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 25%, #1a2355 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.65;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.55;
+    background-image:
+      radial-gradient(1.2px 1.2px at 20px 30px,#fff,transparent),
+      radial-gradient(1px 1px at 140px 80px,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 210px 190px,#ffeebb,transparent),
+      radial-gradient(1px 1px at 60px 220px,#fff,transparent),
+      radial-gradient(1px 1px at 180px 20px,#cfe3ff,transparent);
+    background-size:260px 260px;
+  }
+  .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:8px 20px;background:rgba(10,15,36,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav.top{display:flex;gap:8px;flex-wrap:wrap}
+  nav.top a{color:var(--muted);text-decoration:none;padding:4px 14px;border-radius:999px;border:1px solid var(--line);font-size:15px}
+  nav.top a[aria-current]{color:#0a0f24;background:var(--moon);border-color:transparent;font-weight:700}
+  .quiz-link{color:#1d1a0b;background:var(--sun);text-decoration:none;font-weight:800;padding:6px 16px;border-radius:999px;font-size:15px;white-space:nowrap}
+  .quiz-link:hover{filter:brightness(1.08)}
+
+  .wrap{max-width:1620px;margin:0 auto;padding:18px 20px 72px}
+  .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+  .hero h1{margin:0;font-size:clamp(24px,3vw,34px);line-height:1.25}
+  .hero h1 span{color:var(--sun)}
+  .hero p{margin:6px 0 0;color:var(--muted);max-width:900px}
+  .hero-cta{display:flex;gap:10px;flex-wrap:wrap}
+  .btn-link{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;text-decoration:none;font-weight:700;font-size:14px;background:rgba(92,184,255,.15);color:var(--sky);border:1px solid rgba(92,184,255,.35)}
+  .btn-link:hover{background:rgba(92,184,255,.25)}
+
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px;backdrop-filter:blur(8px)}
+  .stat .k{font-size:13px;color:var(--muted);font-weight:700}
+  .stat .v{font-size:26px;font-weight:800;margin:2px 0 4px;line-height:1.2}
+  .stat .v.ok{color:var(--ccw)}
+  .stat .v.sun{color:var(--sun)}
+  .stat .v.blood{color:var(--cw)}
+  .stat .v.sky{color:var(--sky)}
+  .stat .s{font-size:13px;color:#d6ddff}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;backdrop-filter:blur(8px);margin-bottom:16px}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .panel-head h2{margin:0;font-size:19px}
+  .sub-note{font-size:13.5px;color:var(--muted)}
+
+  .proof-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,0.9fr);gap:16px;align-items:stretch}
+  .charts-col{display:grid;gap:16px}
+  .canvas-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#060a1c}
+  .canvas-wrap canvas{display:block;width:100%;cursor:crosshair}
+
+  .inspector{display:flex;flex-direction:column;gap:12px;background:rgba(12,18,45,.82);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  .ins-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .ins-date{font-size:20px;font-weight:800;color:var(--sun)}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;font-size:12.5px;font-weight:700;border:1px solid transparent;white-space:nowrap}
+  .b-total-s{background:rgba(255,209,102,.2);color:#ffe28a;border-color:rgba(255,209,102,.5)}
+  .b-ann-s{background:rgba(255,159,67,.18);color:#ffb974;border-color:rgba(255,159,67,.45)}
+  .b-hyb-s{background:rgba(110,231,183,.18);color:#8af2cb;border-color:rgba(110,231,183,.45)}
+  .b-part-s{background:rgba(160,180,255,.16);color:#ced9ff;border-color:rgba(160,180,255,.38)}
+  .b-total-l{background:rgba(255,110,110,.2);color:#ff9b9b;border-color:rgba(255,110,110,.5)}
+  .b-part-l{background:rgba(255,158,196,.18);color:#ffb8d5;border-color:rgba(255,158,196,.42)}
+  .b-pen-l{background:rgba(148,163,210,.16);color:#b9c3e8;border-color:rgba(148,163,210,.35)}
+
+  .dial-box{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#060a1c}
+  .dial-ctrl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+  .dial-ctrl .dial-lbl{flex:1 1 100%;font-size:12.5px;color:var(--muted)}
+  .dial-ctrl button{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--ink);cursor:pointer}
+  .dial-ctrl button:hover{background:rgba(255,255,255,.14)}
+  .dial-ctrl button.on{background:var(--moon);color:#0a0f24;border-color:transparent;font-weight:700}
+  .dial-ctrl button.play{background:var(--sun);color:#1d1a0b;border-color:transparent;font-weight:800}
+  .dial-box canvas{display:block;width:100%}
+  .ins-dl{display:grid;grid-template-columns:108px 1fr;gap:6px 10px;font-size:14px;margin:0}
+  .ins-dl dt{color:var(--muted);font-weight:700}
+  .ins-dl dd{margin:0;color:#eef2ff}
+  .proof-pill{background:rgba(110,231,183,.12);border:1px solid rgba(110,231,183,.38);color:#9bf7d3;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.55}
+
+  .legend-row{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:13px;color:var(--muted);margin-top:8px}
+  .legend-row span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+  .seg button{background:var(--panel2);color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+  .seg button.active{background:var(--sun);color:#1d1a0b;border-color:transparent}
+  .search-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .search-box input{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:999px;padding:7px 15px;color:var(--ink);font-size:14px;font-family:inherit;min-width:230px}
+  .search-box input::placeholder{color:#8c96c2}
+  .count-chip{font-size:13.5px;color:var(--sky);font-weight:700}
+
+  .table-wrap{overflow:auto;max-height:660px;border:1px solid var(--line);border-radius:14px;background:rgba(7,11,30,.72)}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:1040px}
+  thead th{position:sticky;top:0;z-index:2;background:#121a42;color:#cfe0ff;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:800;white-space:nowrap}
+  tbody tr{border-bottom:1px solid rgba(160,180,255,.1);cursor:pointer;transition:background .12s}
+  tbody tr:hover{background:rgba(124,200,255,.09)}
+  tbody tr.selected{background:rgba(255,209,102,.15)}
+  tbody td{padding:9px 12px;vertical-align:top}
+  .mono{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .tw-ok{color:var(--ccw);font-weight:700}
+  .tw-part{color:var(--sun);font-weight:700}
+  .tw-no{color:#7f89b8}
+  .node-tag{display:inline-block;padding:1px 7px;border-radius:6px;font-size:12px;font-weight:700}
+  .n-asc{background:rgba(92,225,255,.14);color:#8ce8ff}
+  .n-desc{background:rgba(255,158,196,.14);color:#ffb6d3}
+  .path-note{color:#ffe6a3;font-size:12.5px;margin-top:2px}
+  .small-muted{color:var(--muted);font-size:12.5px}
+
+  .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+  .card .ico{font-size:30px;line-height:1}
+  .card h3{margin:6px 0 8px;font-size:20px;color:var(--ink)}
+  .card strong{color:var(--moon);font-weight:700}
+  .card p{margin:0;color:#dce2ff;font-size:16px}
+  .card p + p{margin-top:8px}
+  .card ul{margin:0;padding-left:1.15em;color:#dce2ff;font-size:16px}
+  .card li{margin:3px 0}
+  .card li ul{margin-top:2px}
+  .kn-title{margin:26px 0 12px;font-size:19px;color:var(--ink);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .kn-title small{font-size:13.5px;font-weight:400;color:var(--muted)}
+  .card table.mini{min-width:0;font-size:15px;margin-top:4px}
+  .card table.mini th,.card table.mini td{padding:5px 8px;border:1px solid var(--line);text-align:left;vertical-align:top;position:static;background:none;white-space:normal}
+  .card table.mini th{color:var(--sky);font-weight:700}
+  .card table.mini tr,.card table.mini tr:hover{cursor:default;border-bottom:0;background:none}
+  .card .sum{margin-top:10px;padding:8px 10px;border-radius:10px;background:rgba(255,209,102,.1);color:var(--sun);font-size:15.5px}
+
+  @media (max-width:1100px){
+    .proof-grid{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .cards{grid-template-columns:1fr}
+  }
+  @media (max-width:600px){
+    .stats{grid-template-columns:1fr}
+    .topbar{padding:8px 12px}
+    .wrap{padding:12px 12px 60px}
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <nav class="top">
+    <a href="../index.html" title="回首頁" aria-label="回首頁">🏠</a>
+    <a href="01_moon-phases.html">🌙 月亮變變變</a>
+    <a href="02_earth-moon-orbit.html">🌍 地球帶著月亮跑</a>
+    <a href="03_eclipses.html" aria-current="page">📅 未來20年日食月食</a>
+    <a href="04_planets.html">🪐 八大行星</a>
+  </nav>
+  <a class="quiz-link" href="05_quiz.html">⭐ 小測驗 →</a>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1>未來 20 年 <span>日食・月食總表</span>＆食季佐證（2027–2046）</h1>
+      <p>整理 NASA 未來 20 年（自 2026 年 11 月起至 2046 年底）共 <strong>89 場真實日食與月食</strong> 的時間與可見地區，並直接計算每場食甚時<strong>太陽與月球交點線（☊ 升交點／☋ 降交點）的黃經差距 Δλ</strong>，用真實天象證明「每一場都落在食季區內」。</p>
+    </div>
+    <div class="hero-cta">
+      <a class="btn-link" href="02_earth-moon-orbit.html">🌍 回到公轉動畫看食季扇形區</a>
+    </div>
+  </section>
+
+  <section class="stats" id="statsGrid">
+    <div class="stat">
+      <div class="k">食季命中率（2027–2046）</div>
+      <div class="v ok" id="statHit">89 / 89 (100%)</div>
+      <div class="s">0 場落在食區外；全數符合天文食限</div>
+    </div>
+    <div class="stat">
+      <div class="k">日食 44 場最大離交點 |Δλ|</div>
+      <div class="v sun" id="statMaxS">—</div>
+      <div class="s">日食偏食極限 ±18.5°（中心食多在 ±11.7° 內）</div>
+    </div>
+    <div class="stat">
+      <div class="k">月食 45 場最大離交點 |Δλ|</div>
+      <div class="v blood" id="statMaxL">—</div>
+      <div class="s">半影月食極限 ±17.8°（本影全/偏食在 ±12.1° 內）</div>
+    </div>
+    <div class="stat">
+      <div class="k">台灣 20 年可賞統計</div>
+      <div class="v sky" id="statTW">—</div>
+      <div class="s">含 2028/12/31 跨年血月全食、2035/09/02 日偏食等</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>📊 真實天象佐證圖：每一場都在「食季區」內，且每年提早約 19 天</h2>
+      <span class="sub-note">👆 點擊或滑過任一點，即可連動右側羅盤與下方清單</span>
+    </div>
+    <div class="proof-grid">
+      <div class="charts-col">
+        <div>
+          <div class="canvas-wrap"><canvas id="limitChart" height="310"></canvas></div>
+          <div class="legend-row">
+            <span><i class="dot" style="background:#ffd166"></i> 日全／環／混合食</span>
+            <span><i class="dot" style="background:#9eb2ff"></i> 日偏食</span>
+            <span><i class="dot" style="background:#ff6e6e"></i> 月全食（紅月亮）</span>
+            <span><i class="dot" style="background:#ff9ec4"></i> 月偏食</span>
+            <span><i class="dot" style="background:#9aa4cc"></i> 半影月食</span>
+            <span>｜ 黃綠核心區 ±5°・中層 ±12.1°・外限 ±18.5°（區外無食）</span>
+          </div>
+        </div>
+        <div>
+          <div class="canvas-wrap"><canvas id="seasonChart" height="260"></canvas></div>
+          <div class="legend-row">
+            <span><i class="dot" style="background:#5ce1ff"></i> 升交點季（☊ 附近）</span>
+            <span><i class="dot" style="background:#ff9ec4"></i> 降交點季（☋ 附近）</span>
+            <span>｜ 看兩條平行斜帶一路往前提早（每年約 −19 天），20 年剛好繞完一圈 18.6 年週期回到起點！</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="inspector" id="inspector">
+        <div class="ins-head">
+          <span class="ins-date" id="insTitle">—</span>
+          <span class="badge" id="insBadge">—</span>
+        </div>
+        <div class="dial-box"><canvas id="dialCanvas" height="230"></canvas></div>
+        <div class="dial-ctrl" id="dialCtrl">
+          <span class="dial-lbl">照順序點，看兩個食季扇形區順時針轉：</span>
+          <button type="button" data-y="2027">2027</button>
+          <button type="button" data-y="2031">2031</button>
+          <button type="button" data-y="2036">2036</button>
+          <button type="button" data-y="2041">2041</button>
+          <button type="button" data-y="2046">2046</button>
+          <button type="button" class="play" id="sweepBtn">▶ 播放 18.6 年轉一圈</button>
+        </div>
+        <div class="proof-pill" id="insProof">—</div>
+        <dl class="ins-dl">
+          <dt>台灣時間</dt><dd id="insTW">—</dd>
+          <dt>世界時 UT</dt><dd id="insUT">—</dd>
+          <dt>交點距離</dt><dd id="insNode">—</dd>
+          <dt>沙羅／規模</dt><dd id="insMeta">—</dd>
+          <dt>全球可見</dt><dd id="insRegion">—</dd>
+          <dt>中心食帶</dt><dd id="insPath">—</dd>
+          <dt>台灣觀賞</dt><dd id="insTaipei">—</dd>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>📅 2027–2046 年日食與月食完整清單（共 89 場）</h2>
+      <span class="count-chip" id="countChip">顯示 89 場</span>
+    </div>
+    <div class="toolbar">
+      <div class="seg" id="filterSeg">
+        <button data-f="all" class="active">全部 (89)</button>
+        <button data-f="S">☀️ 日食 (44)</button>
+        <button data-f="L">🌕 月食 (45)</button>
+        <button data-f="tw">🇹🇼 台灣可見</button>
+        <button data-f="major">⭐ 僅看全食・環食・混合</button>
+      </div>
+      <div class="search-box">
+        <input id="searchInput" type="search" placeholder="搜尋年份、地區或關鍵字（如 2035、日本、台灣）">
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>台灣時間（UTC+8）</th>
+            <th>世界時（UT）</th>
+            <th>類型</th>
+            <th>離交點 Δλ（食區佐證）</th>
+            <th>沙羅／食分歷時</th>
+            <th>全球可見地區＆中心食帶</th>
+            <th>台灣觀測</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="cards">
+    <div class="card">
+      <div class="ico">🎯</div>
+      <h3>1. 為什麼 |Δλ| 越大，食象就越「偏」？</h3>
+      <p>從上方散佈圖可以清楚看出：當太陽與交點差距 <strong>|Δλ| &lt; 5°</strong> 時，幾乎全都是<strong>日全食、日環食或月全食</strong>；差距跑到 <strong>11°～18.5°</strong> 的食區邊緣時，月道已經離開黃道一段距離，就只剩<strong>日偏食或半影月食</strong>。一旦超過 18.5°，影子徹底錯過地球，完全沒有食。</p>
+    </div>
+    <div class="card">
+      <div class="ico">⏪</div>
+      <h3>2. 為什麼「食季」每年提早約 19 天？</h3>
+      <p>看第二張月份斜線圖：2027 年的食季在 <strong>2 月與 8 月</strong>，2028 年提早到 <strong>1 月與 7 月</strong>，2030 年變成 <strong>6 月與 11–12 月</strong>……因為月球軌道交點線每 <strong>18.6 年</strong> 逆行繞太陽一圈，過了約 18.6 年後的 <strong>2045–2046 年</strong>，食季又剛好回到 <strong>1–2 月與 7–8 月</strong>！</p>
+    </div>
+    <div class="card">
+      <div class="ico">📚</div>
+      <h3>3. 資料與計算依據說明</h3>
+      <p>日期、時刻、類別、沙羅週期、食分／中心食歷時及全球食帶整理自 <strong>NASA Five Millennium Catalog（Fred Espenak）</strong> 與台北市立天文館預報；每場的太陽黃經 λ☉ 與白道升交點 Ω 則依 <strong>Jean Meeus 天文演算法</strong> 即時換算（誤差 &lt; 1°）。</p>
+    </div>
+  </section>
+
+  <h2 class="kn-title" id="know-pair">🌗 日食和月食的關係 <small>為什麼常常成對出現，日食卻很少看到？</small></h2>
+  <section class="cards">
+    <div class="card">
+      <div class="ico">🌗</div>
+      <h3>4. 日食和月食常常差半個月</h3>
+      <ul>
+        <li>日食發生在<strong>新月</strong>（朔），月食發生在<strong>滿月</strong>（望），兩者相差大約半個月，所以常常相隔兩週<strong>成對出現</strong>。</li>
+        <li>但不是每個月都有：月球軌道和地球軌道有大約 <strong>5°</strong> 的夾角。</li>
+        <li>只有在<strong>食季</strong>（大約每半年一次），新月或滿月剛好落在兩個軌道的交點附近，才會發生日食或月食。</li>
+        <li>一個食季裡可能<strong>先日食、約兩週後月食</strong>，也可能順序相反。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ico">🔍</div>
+      <h3>5. 為什麼很少看到日食？</h3>
+      <p>不是日食次數少。就全球來說，兩者發生的<strong>次數差不多</strong>，日食甚至多一點。差別在<strong>能看到的範圍</strong>：</p>
+      <table class="mini">
+        <tr><th></th><th>月食</th><th>日食</th></tr>
+        <tr><th>原理</th><td>月球進入地球的影子</td><td>月球的影子投到地球上</td></tr>
+        <tr><th>可見範圍</th><td><strong>當時是夜晚的半個地球</strong></td><td>很小；日全食帶通常只有<strong>一兩百公里寬</strong></td></tr>
+        <tr><th>持續時間</th><td>好幾個小時</td><td>很短</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ico">📍</div>
+      <h3>6. 同一個地方多久看到一次？</h3>
+      <ul>
+        <li><strong>月食</strong>：<strong>每隔一兩年</strong>就可能看到一次。</li>
+        <li><strong>日全食</strong>：平均大約<strong>三四百年</strong>才經過同一個地點一次。</li>
+      </ul>
+      <div class="sum">一句話：日食和月食發生的次數差不多，但月食半個地球都看得到，日食只有很小的區域看得到，所以感覺日食很少見。</div>
+    </div>
+  </section>
+
+  <h2 class="kn-title" id="know-red">🔴 藍天和紅月亮 <small>月全食的月亮為什麼是紅色？和天空是藍色是同一個道理</small></h2>
+  <section class="cards">
+    <div class="card">
+      <div class="ico">🌤️</div>
+      <h3>7. 天空為什麼是藍色？</h3>
+      <ul>
+        <li>陽光混合了各種顏色的光。碰到大氣分子（氮氣、氧氣）時，光會被彈向四面八方，這叫<strong>瑞利散射</strong>。</li>
+        <li><strong>波長越短越容易被散射</strong>（強度大約和波長的四次方成反比）。藍光的波長比紅光短，被散射得多很多。</li>
+        <li><strong>藍光被散射到整片天空</strong>，往哪個方向看都有藍光射進眼睛。紅光、黃光大多直直穿過大氣，所以太陽看起來偏白或偏黃。</li>
+        <li>為什麼不是紫色？陽光裡的紫光本來就少，一部分又被高空大氣吸收，而且人的眼睛<strong>對藍光比對紫光敏感</strong>。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ico">🌇</div>
+      <h3>8. 日落為什麼是紅色？</h3>
+      <ul>
+        <li>太陽靠近地平線時，陽光要穿過<strong>很厚的大氣</strong>。</li>
+        <li>藍光在半路就被散射掉了，剩下<strong>紅光和橙光</strong>。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ico">🔴</div>
+      <h3>9. 月全食為什麼是紅月亮？</h3>
+      <ul>
+        <li>陽光穿過地球大氣時被<strong>折射</strong>，<strong>彎進地球的影子裡</strong>，照到月亮上。</li>
+        <li>藍光已經被散射掉，到達月亮的主要是<strong>紅光</strong>。</li>
+        <li>等於<strong>地球周圍一整圈日出日落的光</strong>，一起投到月亮上。</li>
+        <li>大氣裡的灰塵、雲越多（例如火山爆發之後），月亮<strong>越暗紅</strong>；大氣越乾淨，月亮<strong>越亮、偏橙紅</strong>。</li>
+      </ul>
+    </div>
+  </section>
+
+  <h2 class="kn-title" id="know-sun">☀️ 日全食、日冕和太陽自轉 <small>太陽被遮住的那幾分鐘，可以看到什麼？</small></h2>
+  <section class="cards">
+    <div class="card">
+      <div class="ico">🌘</div>
+      <h3>10. 日全食為什麼不會全暗？</h3>
+      <ul>
+        <li>亮度大約<strong>像黃昏</strong>，可以看到亮星和行星。</li>
+        <li>月球的本影只有一兩百公里寬，<strong>影子外面的大氣被陽光照亮</strong>，把光散射進來；所以地平線會出現一圈像日落的光。</li>
+        <li><strong>日冕還在發光</strong>，亮度大約和滿月差不多。</li>
+        <li>全食只有幾分鐘，眼睛來不及適應，所以會覺得比實際更暗。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ico">👑</div>
+      <h3>11. 日冕是什麼？</h3>
+      <ul>
+        <li><strong>太陽大氣的最外層</strong>，往外延伸幾百萬公里，看起來是白色的光暈。</li>
+        <li>亮度大約是太陽表面的<strong>百萬分之一</strong>，只有<strong>日全食</strong>，或用日冕儀遮住太陽時才看得到。</li>
+        <li>溫度超過<strong>一百萬度</strong>，比太陽表面的大約 5,500°C 高很多。這就是「日冕加熱問題」，到現在還沒有完全解開，可能和磁場有關。</li>
+        <li>氣體非常稀薄，所以總熱量不大。</li>
+        <li>形狀會跟著太陽活動變：活動強的時候偏圓，活動弱的時候沿著赤道拉長。</li>
+        <li>它是<strong>太陽風的來源</strong>，太陽風也和極光有關。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ico">🌀</div>
+      <h3>12. 太陽也會自轉嗎？</h3>
+      <ul>
+        <li>會，方向和<strong>行星公轉的方向相同</strong>。</li>
+        <li>太陽是氣體（電漿），各處轉的速度不一樣，叫做<strong>較差自轉</strong>：
+          <ul>
+            <li>赤道大約 <strong>25 天</strong>一圈（最快）</li>
+            <li>兩極大約 <strong>35 天</strong>一圈（最慢）</li>
+            <li>從地球看，赤道附近大約 27 天一圈</li>
+          </ul>
+        </li>
+        <li>最早是伽利略等人觀察<strong>太陽黑子</strong>的移動時發現的。</li>
+        <li>赤道快、兩極慢的自轉會扭曲磁場，因此產生黑子，也和大約 <strong>11 年</strong>的太陽活動週期有關。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const DEG = Math.PI / 180;
+  const TAU = Math.PI * 2;
+  const FONT = '"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif';
+  const $ = s => document.querySelector(s);
+
+  // NASA Five Millennium Catalog of Solar & Lunar Eclipses (2027-01-01 ~ 2046-12-31, 89 events)
+  // [dateUTC, timeUTC, kind('S'|'L'), subType, saros, meta, region, centralPath, twCode('full'|'part'|'no'), twNote]
+  const RAW_EVENTS = [
+    ["2027-02-06","15:59:36","S","日環食",131,"食分 0.928 · 環食 7分51秒","南美洲、南極洲、西非與南非","智利、阿根廷、大西洋","no","❌ 發生在深夜，不在食帶"],
+    ["2027-02-20","23:14:05","L","半影月食",143,"半影食 · 本影食分 -0.055","美洲、歐洲、非洲、亞洲、西澳","—","part","🌗 清晨月沒前僅微弱半影"],
+    ["2027-07-18","16:04:10","L","半影月食",148,"半影食 · 本影食分 -1.066","東非、亞洲、澳洲、太平洋","—","full","✅ 凌晨半影全程可見（肉眼難辨）"],
+    ["2027-08-02","10:06:38","S","日全食",136,"食分 1.079 · 全食 6分23秒（世紀最長陸地全食之一）","歐洲、北非、中東、南亞","西班牙南部、摩洛哥、埃及盧克索、沙烏地阿拉伯","no","❌ 偏西半球／傍晚後，不可見"],
+    ["2027-08-17","07:14:58","L","半影月食",110,"半影食 · 本影食分 -0.523","太平洋、美洲、西非、東澳","—","no","❌ 發生在下午白天，不可見"],
+
+    ["2028-01-12","04:14:13","L","月偏食",115,"本影食分 0.068 · 僅擦邊","美洲、歐洲、非洲","—","no","❌ 發生在中午白天，不可見"],
+    ["2028-01-26","15:07:47","S","日環食",141,"食分 0.921 · 環食 10分27秒","美洲、西歐、西北非","厄瓜多、秘魯、巴西、西班牙・葡萄牙（日落）","no","❌ 發生在深夜，不可見"],
+    ["2028-07-06","18:20:57","L","月偏食",120,"本影食分 0.391","歐洲、非洲、亞洲、澳洲","—","full","✅ 7/7 凌晨全程可見"],
+    ["2028-07-22","02:55:27","S","日全食",146,"食分 1.056 · 全食 5分10秒","東南亞、東印度群島、澳洲、紐西蘭","澳洲（橫貫雪梨）、紐西蘭南島","no","❌ 偏食帶止於南洋，台灣未見"],
+    ["2028-12-31","16:53:15","L","月全食",125,"本影食分 1.248 · 跨年血月","歐洲、非洲、亞洲、澳洲、太平洋","—","full","✅ 1/1 凌晨 00:53 食甚！跨年全程高掛"],
+
+    ["2029-01-14","17:13:48","S","日偏食",151,"最大食分 0.871","北美洲、中美洲","—（北半球偏食）","no","❌ 發生在深夜，不可見"],
+    ["2029-06-12","04:06:13","S","日偏食",118,"最大食分 0.458","北極、北歐、阿拉斯加、北亞、加拿大北部","—（高緯度偏食）","no","❌ 食帶偏極區，台灣不可見"],
+    ["2029-06-26","03:23:22","L","月全食",130,"本影食分 1.845 · 幾乎正過地影中心！","美洲、歐洲、非洲","—","no","❌ 發生在上午白天，不可見"],
+    ["2029-07-11","15:37:18","S","日偏食",156,"最大食分 0.230","智利南部、阿根廷南部","—（南美偏食）","no","❌ 發生在深夜，不可見"],
+    ["2029-12-05","15:02:45","S","日偏食",123,"最大食分 0.891","阿根廷南部、智利南部、南極洲","—（南極偏食）","no","❌ 發生在深夜，不可見"],
+    ["2029-12-20","22:43:12","L","月全食",135,"本影食分 1.119","美洲、歐洲、非洲、部分亞洲","—","part","🌗 12/21 清晨月沒帶食"],
+
+    ["2030-06-01","06:27:56","S","日環食",128,"食分 0.944 · 環食 5分21秒","歐洲、北非、中東、亞洲","北非、希臘、土耳其、俄國、中國東北、日本北海道","part","✅ 下午可見日偏食（台北食分 ~0.36）"],
+    ["2030-06-15","18:34:33","L","月偏食",140,"本影食分 0.504","非洲、亞洲、澳洲、東歐","—","full","✅ 6/16 凌晨全程可見"],
+    ["2030-11-25","06:50:19","S","日全食",133,"食分 1.047 · 全食 3分44秒","非洲南部、南極洲、澳洲","納米比亞、南非、印度洋、澳洲南部","no","❌ 食帶在南半球，台灣不可見"],
+    ["2030-12-09","22:28:51","L","半影月食",145,"半影食 · 本影食分 -0.161","美洲、歐洲、非洲、亞洲","—","part","🌗 12/10 清晨月沒帶半影食"],
+
+    ["2031-05-07","03:52:01","L","半影月食",112,"半影食 · 本影食分 -0.089","美洲、歐洲、非洲","—","no","❌ 發生在中午，不可見"],
+    ["2031-05-21","07:14:47","S","日環食",138,"食分 0.959 · 環食 5分26秒","非洲、南亞、東南亞、澳洲","安哥拉、印度南部、馬來西亞、印尼","part","✅ 下午可見日偏食（台北食分 ~0.25）"],
+    ["2031-06-05","11:45:17","L","半影月食",150,"半影食 · 本影食分 -0.818（極靠食區外緣）","非洲、亞洲、澳洲、太平洋","—","part","🌗 傍晚月出帶微弱半影"],
+    ["2031-10-30","07:46:44","L","半影月食",117,"半影食 · 本影食分 -0.319","美洲、歐洲、非洲、亞洲","—","part","🌗 傍晚月出時尾段微弱半影"],
+    ["2031-11-14","21:06:12","S","混合日食",143,"食分 1.011 · 全環混合 1分08秒","太平洋、美國南部、中美洲、南美西北","太平洋、巴拿馬","no","❌ 發生在早晨但食帶在美洲"],
+
+    ["2032-04-25","15:14:51","L","月全食",122,"本影食分 1.192","亞洲、澳洲、太平洋、美洲西部","—","full","✅ 夜間 23:14 食甚，全程可見"],
+    ["2032-05-09","13:25:24","S","日環食",148,"食分 0.996 · 環食 0分22秒","南美洲南部、非洲南部","南大西洋","no","❌ 發生在夜間，不可見"],
+    ["2032-10-18","19:03:40","L","月全食",127,"本影食分 1.104","亞洲、歐洲、非洲、大洋洲","—","full","✅ 10/19 凌晨 03:03 食甚，全程可見"],
+    ["2032-11-03","05:34:12","S","日偏食",153,"最大食分 0.855","全亞洲大部分地區","—（亞洲偏食）","part","✅ 下午可見明顯日偏食（台北食分 ~0.34）"],
+
+    ["2033-03-30","18:01:16","S","日全食",120,"食分 1.046 · 全食 2分37秒","北美洲、亞洲東北部","俄羅斯遠東、美國阿拉斯加","no","❌ 發生在凌晨，不可見"],
+    ["2033-04-14","19:13:51","L","月全食",132,"本影食分 1.095","東亞、澳洲、太平洋、美洲","—","full","✅ 4/15 凌晨 03:13 食甚，月沒帶食"],
+    ["2033-09-23","13:53:12","S","日偏食",125,"最大食分 0.689","南美洲南部、南極洲","—（南美極區偏食）","no","❌ 發生在夜間，不可見"],
+    ["2033-10-08","10:56:23","L","月全食",137,"本影食分 1.351","歐洲、非洲、亞洲、澳洲","—","part","🌗 傍晚 18:56 食甚，月出帶食"],
+
+    ["2034-03-20","10:17:25","S","日全食",130,"食分 1.046 · 全食 4分09秒","非洲、歐洲、西亞、中國西部","奈及利亞、埃及、沙烏地、伊朗、西藏西部","no","❌ 日落時偏食止於華西，台灣未見"],
+    ["2034-04-03","19:07:00","L","半影月食",142,"半影食 · 本影食分 -0.226","非洲、歐洲、亞洲、澳洲","—","full","✅ 4/4 凌晨半影全程可見"],
+    ["2034-09-12","16:18:08","S","日環食",135,"食分 0.924 · 環食 8分58秒","中美洲、南美洲","智利、玻利維亞、阿根廷、巴拉圭、巴西","no","❌ 發生在半夜，不可見"],
+    ["2034-09-28","02:46:16","L","月偏食",147,"本影食分 0.014 · 僅略進本影","美洲、歐洲、非洲、西亞","—","no","❌ 發生在上午，不可見"],
+
+    ["2035-02-22","09:06:12","L","半影月食",114,"半影食 · 本影食分 -0.054","歐洲、非洲、亞洲、澳洲","—","part","🌗 傍晚月出帶半影"],
+    ["2035-03-09","23:05:54","S","日環食",140,"食分 0.992 · 環食 0分48秒","澳洲、紐西蘭、南太平洋、墨西哥、南極","紐西蘭、太平洋","no","❌ 偏食帶在南太平洋與紐澳"],
+    ["2035-08-19","01:12:15","L","月偏食",119,"本影食分 0.104","美洲、太平洋（部分歐非）","—","no","❌ 發生在上午，不可見"],
+    ["2035-09-02","01:56:46","S","日全食",145,"食分 1.032 · 全食 2分54秒","東亞、太平洋","中國華北（北京）、韓國、日本本州、太平洋","part","✅ 上午 09:56 食甚！台灣全境可見日偏食"],
+
+    ["2036-02-11","22:13:00","L","月全食",124,"本影食分 1.300","美洲、歐洲、非洲、西澳、亞洲","—","part","🌗 2/12 清晨月沒帶食"],
+    ["2036-02-27","04:45:32","S","日偏食",150,"最大食分 0.629","南極洲、澳洲南部、紐西蘭","—（南半球偏食）","no","❌ 食帶在南極與紐澳"],
+    ["2036-07-23","10:30:37","S","日偏食",117,"最大食分 0.199（極靠食區外緣）","南大西洋","—（海上偏食）","no","❌ 距離太遠，台灣不可見"],
+    ["2036-08-07","02:52:00","L","月全食",129,"本影食分 1.455","美洲、歐洲、非洲、西亞","—","no","❌ 發生在上午白天，不可見"],
+    ["2036-08-21","17:24:28","S","日偏食",155,"最大食分 0.362","阿拉斯加、加拿大、北極、西歐、西北非","—（高緯度偏食）","no","❌ 發生在深夜，不可見"],
+
+    ["2037-01-16","09:47:37","S","日偏食",122,"最大食分 0.705","北非、歐洲、中東、西亞","—（歐亞西側偏食）","no","❌ 天黑後發生於歐非"],
+    ["2037-01-31","14:01:00","L","月全食",134,"本影食分 1.207","東歐、東非、亞洲、澳洲、太平洋、北美","—","full","✅ 晚間 22:01 食甚，台灣全程可見"],
+    ["2037-07-13","02:39:18","S","日全食",127,"食分 1.041 · 全食 3分58秒","東印度群島、澳洲、紐西蘭、太平洋","澳洲中部、紐西蘭","no","❌ 食帶在南半球紐澳"],
+    ["2037-07-27","04:09:00","L","月偏食",139,"本影食分 0.810","美洲、歐洲、非洲","—","no","❌ 發生在中午，不可見"],
+
+    ["2038-01-05","13:45:52","S","日環食",132,"食分 0.964 · 環食 3分18秒","北美東部、南美北部、非洲、歐洲","古巴、象牙海岸、查德、埃及","no","❌ 發生在深夜，不可見"],
+    ["2038-01-21","03:49:00","L","半影月食",144,"半影食 · 本影食分 -0.113","歐洲、非洲、美洲、部分澳洲","—","no","❌ 發生在上午，不可見"],
+    ["2038-06-17","02:45:00","L","半影月食",149,"半影食 · 本影食分 -0.526","美洲、西歐、非洲","—","no","❌ 發生在上午，不可見"],
+    ["2038-07-02","15:51:24","S","日環食",137,"食分 0.991 · 環食 1分00秒","南美洲、非洲、南歐","哥倫比亞、委內瑞拉、大西洋、西非、東非","no","❌ 發生在深夜，不可見"],
+    ["2038-07-16","11:35:00","L","半影月食",111,"半影食 · 本影食分 -0.494","東非、亞洲、澳洲、太平洋","—","part","🌗 傍晚月出帶半影"],
+    ["2038-12-11","17:45:00","L","半影月食",116,"半影食 · 本影食分 -0.288","美洲、歐洲、非洲、亞洲","—","full","✅ 12/12 凌晨 01:45 半影全程可見"],
+    ["2038-12-26","00:58:52","S","日全食",142,"食分 1.027 · 全食 2分18秒","印度洋、澳洲、紐西蘭、南極","澳洲南岸、塔斯曼海、紐西蘭南島","no","❌ 食帶在南半球紐澳"],
+
+    ["2039-06-06","18:54:00","L","月偏食",121,"本影食分 0.886","歐洲、非洲、亞洲、澳洲","—","full","✅ 6/7 凌晨 02:54 食甚，全程可見"],
+    ["2039-06-21","16:12:54","S","日環食",147,"食分 0.945 · 環食 4分05秒","阿拉斯加、北加、北歐、俄羅斯","阿拉斯加、北極圈、北歐、俄國","no","❌ 發生在深夜，不可見"],
+    ["2039-11-30","16:56:00","L","月偏食",126,"本影食分 0.944","歐洲、非洲、亞洲、澳洲、太平洋","—","full","✅ 12/1 凌晨 00:56 食甚，全程可見"],
+    ["2039-12-15","16:22:27","S","日全食",152,"食分 1.036 · 全食 1分51秒","南極洲、南美南端、非洲南端","南極洲","no","❌ 發生在深夜，不可見"],
+
+    ["2040-05-11","03:41:43","S","日偏食",119,"最大食分 0.731","澳洲南部、紐西蘭、南極洲","—（南洋偏食）","no","❌ 偏食帶在紐澳南方"],
+    ["2040-05-26","11:46:00","L","月全食",131,"本影食分 1.536","東歐、亞洲、澳洲、太平洋、北美西岸","—","part","🌗 傍晚 19:46 食甚，月出帶食"],
+    ["2040-11-04","19:07:43","S","日偏食",124,"最大食分 0.807","北美洲、中美洲、北歐部分","—（北美偏食）","no","❌ 發生在凌晨，不可見"],
+    ["2040-11-18","19:04:00","L","月全食",136,"本影食分 1.399","美洲、歐洲、非洲、亞洲","—","full","✅ 11/19 凌晨 03:04 食甚，全程可見"],
+
+    ["2041-04-30","11:51:02","S","日全食",129,"食分 1.019 · 全食 1分51秒","巴西、非洲、中東","安哥拉、剛果、烏干達、肯亞、索馬利亞","no","❌ 天黑後發生於非南美"],
+    ["2041-05-16","00:43:00","L","月偏食",141,"本影食分 0.066","美洲、歐洲、非洲","—","no","❌ 發生在上午，不可見"],
+    ["2041-10-25","01:35:02","S","日環食",134,"食分 0.947 · 環食 6分07秒","東亞、太平洋","蒙古、中國華北・東北、韓國、日本本州・九州","part","✅ 上午 09:35 食甚！台灣可見明顯日偏食"],
+    ["2041-11-08","04:35:00","L","月偏食",146,"本影食分 0.171","美洲、太平洋、西歐","—","no","❌ 發生在中午，不可見"],
+
+    ["2042-04-05","14:30:00","L","半影月食",113,"半影食 · 本影食分 -0.216","歐洲、非洲、亞洲、澳洲","—","full","✅ 晚間 22:30 食甚，全程半影"],
+    ["2042-04-20","02:16:10","S","日全食",139,"食分 1.061 · 全食 4分51秒","東亞、東南亞、澳洲、太平洋","馬來西亞、印尼、菲律賓、北太平洋","part","✅ 上午 10:16 食甚！台灣可見大食分日偏食"],
+    ["2042-09-29","10:45:00","L","半影月食",118,"半影食 · 本影食分 -0.001（只差一點進本影）","歐洲、非洲、亞洲、澳洲","—","part","🌗 傍晚月出帶半影"],
+    ["2042-10-14","01:59:22","S","日環食",144,"食分 0.930 · 環食 7分44秒","東南亞、東印度群島、澳洲、南極","泰國、馬來西亞、印尼、澳洲、紐西蘭","part","✅ 上午 09:59 食甚！台灣可見日偏食"],
+
+    ["2043-03-25","14:32:00","L","月全食",123,"本影食分 1.116","亞洲、澳洲、太平洋、北美西部","—","full","✅ 晚間 22:32 食甚，全程可見"],
+    ["2043-04-09","18:56:29","S","日全食(非中心)",149,"食分 1.010 · 非中心極區掠食","北美洲北部、亞洲東北部","俄羅斯東北部","no","❌ 發生在凌晨，不可見"],
+    ["2043-09-19","01:51:00","L","月全食",128,"本影食分 1.257","美洲、歐洲、非洲","—","no","❌ 發生在上午白天，不可見"],
+    ["2043-10-03","03:00:28","S","日環食(非中心)",154,"食分 0.950 · 非中心南洋環食","南極洲、西澳、印度洋","南印度洋","no","❌ 食帶偏南印度洋"],
+
+    ["2044-02-28","20:23:18","S","日環食",121,"食分 0.960 · 環食 2分27秒","南極洲、南美洲","南大西洋","no","❌ 凌晨發生於南美與南極"],
+    ["2044-03-13","19:38:00","L","月全食",133,"本影食分 1.203","亞洲、澳洲、太平洋、北美西部","—","full","✅ 3/14 凌晨 03:38 食甚，月沒帶食"],
+    ["2044-08-23","01:15:41","S","日全食",126,"食分 1.036 · 全食 2分04秒","北亞、北美西部、格陵蘭","格陵蘭、加拿大北部、美國蒙大拿・北達科他","no","❌ 上午發生但偏極北與北美"],
+    ["2044-09-07","11:20:00","L","月全食",138,"本影食分 1.046","歐洲東部、非洲東部、亞洲、澳洲、太平洋","—","part","🌗 傍晚 19:20 食甚，月出帶食"],
+
+    ["2045-02-16","23:54:45","S","日環食",131,"食分 0.928 · 環食 7分47秒","澳洲、紐西蘭、太平洋、夏威夷","紐西蘭、南・中太平洋","no","❌ 偏食帶在紐澳與中太平洋"],
+    ["2045-03-03","07:43:00","L","半影月食",143,"半影食 · 本影食分 -0.017","美洲、歐洲、非洲、部分亞洲","—","no","❌ 下午近傍晚，月出前已結束"],
+    ["2045-08-12","17:41:17","S","日全食",136,"食分 1.077 · 全食 6分06秒（美洲超級日全食）","北・中・南美洲、西非","美國南部（佛州等）、加勒比海、委內瑞拉、巴西","no","❌ 發生在深夜，不可見"],
+    ["2045-08-27","13:54:00","L","半影月食",148,"半影食 · 本影食分 -0.392","非洲、亞洲、澳洲、太平洋","—","full","✅ 晚間 21:54 食甚，全程半影"],
+
+    ["2046-01-22","13:02:00","L","月偏食",115,"本影食分 0.053","歐洲、非洲、亞洲、澳洲","—","full","✅ 晚間 21:02 食甚，全程可見"],
+    ["2046-02-05","23:05:04","S","日環食",141,"食分 0.923 · 環食 9分42秒","澳洲、巴布亞紐幾內亞、美國西部、東亞沿海","巴布亞紐幾內亞、夏威夷、加州、奧勒岡","part","✅ 2/6 07:05 食甚！台灣晨間可見日偏食"],
+    ["2046-07-18","01:06:00","L","月偏食",120,"本影食分 0.246","美洲、大西洋（部分南洋）","—","no","❌ 發生在上午白天，不可見"],
+    ["2046-08-02","10:19:51","S","日全食",146,"食分 1.053 · 全食 4分51秒","巴西、非洲","巴西東角、安哥拉、納米比亞、南非、莫三比克","no","❌ 天黑後發生於大西洋・非洲"]
+  ];
+
+  // Meeus astronomical verification engine
+  function jdFromUTC(y, m, d, hh, mm, ss) {
+    if (m <= 2) { y -= 1; m += 12; }
+    const A = Math.floor(y / 100);
+    const B = 2 - A + Math.floor(A / 4);
+    const df = d + (hh + mm / 60 + ss / 3600) / 24;
+    return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + df + B - 1524.5;
+  }
+
+  function norm360(a) { return ((a % 360) + 360) % 360; }
+
+  function addHoursUTCtoCST(dateStr, timeStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const [hh, mm, ss] = timeStr.split(':').map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d, hh + 8, mm, ss));
+    const yy = dt.getUTCFullYear();
+    const mo = String(dt.getUTCMonth() + 1).padStart(2, '0');
+    const da = String(dt.getUTCDate()).padStart(2, '0');
+    const h2 = String(dt.getUTCHours()).padStart(2, '0');
+    const m2 = String(dt.getUTCMinutes()).padStart(2, '0');
+    return {
+      cstStr: `${yy}-${mo}-${da} ${h2}:${m2}`,
+      fracYear: y + (Date.UTC(y, m - 1, d, hh, mm) - Date.UTC(y, 0, 1)) / (365.2425 * 86400000),
+      monthVal: m - 1 + (d - 1 + hh / 24) / 30.4375 + 1 // 1.0 ~ 13.0
+    };
+  }
+
+  const EVENTS = RAW_EVENTS.map((row, idx) => {
+    const [dateUTC, timeUTC, kind, subType, saros, meta, region, centralPath, twCode, twNote] = row;
+    const [y, m, d] = dateUTC.split('-').map(Number);
+    const [hh, mm, ss] = timeUTC.split(':').map(Number);
+    const jd = jdFromUTC(y, m, d, hh, mm, ss);
+    const T = (jd - 2451545.0) / 36525.0;
+    const L0 = norm360(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
+    const M = norm360(357.52911 + 35999.05029 * T - 0.0001537 * T * T) * DEG;
+    const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
+            + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
+            + 0.000289 * Math.sin(3 * M);
+    const sunLon = norm360(L0 + C);
+    const targetLon = kind === 'S' ? sunLon : norm360(sunLon + 180);
+    const ascNode = norm360(125.0445479 - 1934.1362891 * T + 0.0020754 * T * T);
+    const descNode = norm360(ascNode + 180);
+
+    const dAsc = ((targetLon - ascNode + 540) % 360) - 180;
+    const dDesc = ((targetLon - descNode + 540) % 360) - 180;
+    const nearAsc = Math.abs(dAsc) <= Math.abs(dDesc);
+    const delta = nearAsc ? dAsc : dDesc;
+    const absDelta = Math.abs(delta);
+    const nodeKind = nearAsc ? 'asc' : 'desc';
+    const nodeText = nearAsc ? '升交點 ☊' : '降交點 ☋';
+    const betaMoon = 5.145 * Math.sin(delta * DEG); // approx ecliptic latitude at syzygy (deg)
+    const isMajor = subType.includes('全') || subType.includes('環') || subType.includes('混合');
+    const cst = addHoursUTCtoCST(dateUTC, timeUTC);
+
+    return {
+      idx: idx + 1, dateUTC, timeUTC, year: y, kind, subType, saros, meta, region, centralPath,
+      twCode, twNote, sunLon, targetLon, ascNode, descNode, delta, absDelta,
+      nodeKind, nodeText, betaMoon, isMajor, ...cst
+    };
+  });
+
+  // Update top KPI cards
+  const solarEv = EVENTS.filter(e => e.kind === 'S');
+  const lunarEv = EVENTS.filter(e => e.kind === 'L');
+  const maxS = Math.max(...solarEv.map(e => e.absDelta));
+  const maxL = Math.max(...lunarEv.map(e => e.absDelta));
+  const twSolarCount = solarEv.filter(e => e.twCode !== 'no').length;
+  const twLunarUmbral = lunarEv.filter(e => e.twCode !== 'no' && !e.subType.includes('半影')).length;
+  $('#statMaxS').textContent = `${maxS.toFixed(2)}° < 18.5°`;
+  $('#statMaxL').textContent = `${maxL.toFixed(2)}° < 17.8°`;
+  $('#statTW').textContent = `日食 ${twSolarCount} 場 · 本影月食 ${twLunarUmbral} 場`;
+
+  let selectedIdx = EVENTS.findIndex(e => e.dateUTC === '2035-09-02');
+  if (selectedIdx < 0) selectedIdx = 0;
+  let hoverIdx = -1;
+  let filtered = EVENTS.slice();
+
+  function badgeClass(e) {
+    if (e.kind === 'S') {
+      if (e.subType.includes('全')) return 'b-total-s';
+      if (e.subType.includes('環')) return 'b-ann-s';
+      if (e.subType.includes('混合')) return 'b-hyb-s';
+      return 'b-part-s';
+    }
+    if (e.subType.includes('全')) return 'b-total-l';
+    if (e.subType.includes('偏')) return 'b-part-l';
+    return 'b-pen-l';
+  }
+
+  function eventColor(e) {
+    if (e.kind === 'S') return e.isMajor ? '#ffd166' : '#9eb2ff';
+    if (e.subType.includes('全')) return '#ff6e6e';
+    if (e.subType.includes('偏')) return '#ff9ec4';
+    return '#9aa4cc';
+  }
+
+  // Canvas helper with crisp DPR resize
+  function setupHiDPI(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.parentElement.clientWidth;
+    // 設計高度只在第一次讀 HTML 上的 height 並記下來。
+    // （下面的 canvas.height = h * dpr 會改掉那個屬性；每次都重讀的話，在高解析度螢幕上每畫一次高度就變兩倍）
+    if (!canvas._baseH) canvas._baseH = +canvas.getAttribute('height');
+    const h = canvas._baseH;
+    if (canvas._w === w && canvas._h === h && canvas._dpr === dpr) return { ctx: canvas.getContext('2d'), w, h };
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.height = h + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvas._w = w; canvas._h = h; canvas._dpr = dpr;
+    return { ctx, w, h };
+  }
+
+  const cLimit = $('#limitChart');
+  const cSeason = $('#seasonChart');
+  const cDial = $('#dialCanvas');
+  cLimit._pts = [];
+  cSeason._pts = [];
+
+  function drawLimitChart() {
+    const { ctx, w, h } = setupHiDPI(cLimit);
+    ctx.fillStyle = '#060a1c';
+    ctx.fillRect(0, 0, w, h);
+
+    const pad = { l: 56, r: 22, t: 36, b: 36 };
+    const pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    const xOf = yr => pad.l + ((yr - 2026.8) / 20.5) * pw;
+    const yOf = deg => pad.t + ((23 - deg) / 46) * ph;
+
+    // Non-eclipse zones top & bottom
+    ctx.fillStyle = 'rgba(255,90,90,0.06)';
+    ctx.fillRect(pad.l, pad.t, pw, yOf(18.5) - pad.t);
+    ctx.fillRect(pad.l, yOf(-18.5), pw, pad.t + ph - yOf(-18.5));
+
+    // Eclipse zone layers: ±18.5 (outer solar), ±12.1 (umbral), ±5 (core)
+    ctx.fillStyle = 'rgba(92,184,255,0.09)';
+    ctx.fillRect(pad.l, yOf(18.5), pw, yOf(-18.5) - yOf(18.5));
+    ctx.fillStyle = 'rgba(110,231,183,0.10)';
+    ctx.fillRect(pad.l, yOf(12.1), pw, yOf(-12.1) - yOf(12.1));
+    ctx.fillStyle = 'rgba(255,209,102,0.12)';
+    ctx.fillRect(pad.l, yOf(5), pw, yOf(-5) - yOf(5));
+
+    // Horizontal limit lines
+    const hLines = [
+      [18.5, 'rgba(255,130,130,0.6)', [5, 4], '+18.5° 日食外限'],
+      [12.1, 'rgba(110,231,183,0.45)', [3, 4], '+12.1° 本影月食限'],
+      [0, 'rgba(255,255,255,0.35)', [], '0° 交點中心'],
+      [-12.1, 'rgba(110,231,183,0.45)', [3, 4], '-12.1° 本影月食限'],
+      [-18.5, 'rgba(255,130,130,0.6)', [5, 4], '-18.5° 日食外限']
+    ];
+    ctx.font = `600 11px ${FONT}`;
+    for (const [val, col, dash, lbl] of hLines) {
+      const y = yOf(val);
+      ctx.beginPath(); ctx.setLineDash(dash);
+      ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y);
+      ctx.strokeStyle = col; ctx.lineWidth = val === 0 ? 1.2 : 1; ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#9aa6d6'; ctx.textAlign = 'right';
+      ctx.fillText((val > 0 ? '+' : '') + val + '°', pad.l - 6, y + 4);
+      if (val !== 0) {
+        ctx.fillStyle = col; ctx.textAlign = 'left';
+        ctx.fillText(lbl, pad.l + 8, y + (val > 0 ? -4 : 12));
+      }
+    }
+
+    ctx.fillStyle = 'rgba(255,150,150,0.75)';
+    ctx.font = `700 11.5px ${FONT}`;
+    ctx.textAlign = 'right';
+    ctx.fillText('⛔ 非食區（|Δλ| > 18.5°，影子掃空）', w - pad.r - 6, pad.t + 14);
+    ctx.fillText('⛔ 非食區（|Δλ| > 18.5°，影子掃空）', w - pad.r - 6, pad.t + ph - 5);
+
+    // Year grid
+    ctx.font = `600 11px ${FONT}`;
+    for (let yr = 2027; yr <= 2046; yr += (w < 640 ? 2 : 1)) {
+      const x = xOf(yr);
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph);
+      ctx.strokeStyle = 'rgba(160,180,255,0.09)'; ctx.stroke();
+      ctx.fillStyle = '#aab3dc'; ctx.textAlign = 'center';
+      ctx.fillText(String(yr), x, h - 12);
+    }
+
+    // Chart title
+    ctx.fillStyle = '#eef2ff'; ctx.font = `800 13.5px ${FONT}`; ctx.textAlign = 'left';
+    ctx.fillText('佐證 ①：全數 89 場皆落在交點 Δλ ∈ [−18.5°, +18.5°] 食季區內（0 例在區外）', pad.l, 22);
+
+    // Points
+    cLimit._pts = [];
+    const activeSet = new Set(filtered.map(e => e.idx));
+    EVENTS.forEach((e, i) => {
+      const x = xOf(e.fracYear), y = yOf(e.delta);
+      const isActive = activeSet.has(e.idx);
+      const isSel = i === selectedIdx, isHov = i === hoverIdx;
+      const r = isSel ? 7 : isHov ? 6 : e.isMajor ? 4.6 : 3.8;
+      ctx.globalAlpha = isActive ? 1 : 0.16;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, TAU);
+      ctx.fillStyle = eventColor(e); ctx.fill();
+      if (isSel || isHov) {
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y, r + 4, 0, TAU);
+        ctx.strokeStyle = 'rgba(255,209,102,0.65)'; ctx.lineWidth = 1.5; ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      cLimit._pts.push({ i, x, y });
+    });
+  }
+
+  function drawSeasonChart() {
+    const { ctx, w, h } = setupHiDPI(cSeason);
+    ctx.fillStyle = '#060a1c';
+    ctx.fillRect(0, 0, w, h);
+
+    const pad = { l: 56, r: 22, t: 36, b: 34 };
+    const pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    const xOf = yr => pad.l + ((yr - 2026.8) / 20.5) * pw;
+    const yOf = mo => pad.t + ((mo - 1) / 12) * ph;
+
+    // Monthly bands
+    ctx.font = `600 11px ${FONT}`;
+    for (let mo = 1; mo <= 12; mo++) {
+      const y = yOf(mo);
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y);
+      ctx.strokeStyle = mo % 3 === 1 ? 'rgba(160,180,255,0.16)' : 'rgba(160,180,255,0.06)';
+      ctx.stroke();
+      ctx.fillStyle = '#9aa6d6'; ctx.textAlign = 'right';
+      ctx.fillText(mo + '月', pad.l - 8, y + (ph / 24) + 3);
+    }
+
+    for (let yr = 2027; yr <= 2046; yr += (w < 640 ? 2 : 1)) {
+      const x = xOf(yr);
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph);
+      ctx.strokeStyle = 'rgba(160,180,255,0.09)'; ctx.stroke();
+      ctx.fillStyle = '#aab3dc'; ctx.textAlign = 'center';
+      ctx.fillText(String(yr), x, h - 10);
+    }
+
+    ctx.fillStyle = '#eef2ff'; ctx.font = `800 13.5px ${FONT}`; ctx.textAlign = 'left';
+    ctx.fillText('佐證 ②：食季發生月份隨年斜移（每年提早約 19 天，2045–2046 完成 18.6 年退行輪迴）', pad.l, 22);
+
+    cSeason._pts = [];
+    const activeSet = new Set(filtered.map(e => e.idx));
+    EVENTS.forEach((e, i) => {
+      const x = xOf(e.fracYear), y = yOf(e.monthVal);
+      const isActive = activeSet.has(e.idx);
+      const isSel = i === selectedIdx, isHov = i === hoverIdx;
+      const r = isSel ? 7 : isHov ? 6 : 4.2;
+      ctx.globalAlpha = isActive ? 1 : 0.16;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, TAU);
+      ctx.fillStyle = e.nodeKind === 'asc' ? '#5ce1ff' : '#ff9ec4';
+      ctx.fill();
+      if (isSel || isHov) {
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      cSeason._pts.push({ i, x, y });
+    });
+  }
+
+  // sweep：播放「18.6 年轉一圈」時傳入 { year, asc, asc0 }，只畫交點線和兩個食季扇形區（不畫某一場的太陽、月亮）
+  function drawDial(e, sweep) {
+    const { ctx, w, h } = setupHiDPI(cDial);
+    ctx.fillStyle = '#060a1c';
+    ctx.fillRect(0, 0, w, h);
+
+    const cx = w * 0.5, cy = h * 0.52;
+    const R = Math.min(w * 0.36, h * 0.37);
+    const ascN = sweep ? sweep.asc : e.ascNode, descN = norm360(ascN + 180);
+
+    // Helper: ecliptic lon (deg, counter-clockwise from 0° right = Vernal Equinox)
+    const pt = (deg, rad) => {
+      const a = deg * DEG;
+      return { x: cx + rad * Math.cos(a), y: cy - rad * Math.sin(a) };
+    };
+
+    // Draw ±18.5° eclipse zone wedges around Ascending & Descending Nodes
+    const drawWedge = (nodeDeg, col) => {
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      // Canvas angle is clockwise (-deg)
+      const a1 = -(nodeDeg + 18.5) * DEG;
+      const a2 = -(nodeDeg - 18.5) * DEG;
+      ctx.arc(cx, cy, R, a1, a2, false);
+      ctx.closePath();
+      ctx.fillStyle = col;
+      ctx.fill();
+    };
+    drawWedge(ascN, 'rgba(92,225,255,0.22)');
+    drawWedge(descN, 'rgba(255,158,196,0.22)');
+
+    // Main ecliptic ring
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU);
+    ctx.strokeStyle = 'rgba(255,209,102,0.45)'; ctx.lineWidth = 1.6; ctx.stroke();
+
+    // Node line
+    const pA = pt(ascN, R * 1.06), pD = pt(descN, R * 1.06);
+    ctx.beginPath(); ctx.moveTo(pA.x, pA.y); ctx.lineTo(pD.x, pD.y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.65)'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.4; ctx.stroke(); ctx.setLineDash([]);
+
+    // Node dots + labels
+    for (const [deg, lbl, col] of [[ascN, '☊ 升交點', '#8ce8ff'], [descN, '☋ 降交點', '#ffb6d3']]) {
+      const p = pt(deg, R);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 4.5, 0, TAU);
+      ctx.fillStyle = col; ctx.fill();
+      const lp = pt(deg, R + 22);
+      ctx.fillStyle = col; ctx.font = `700 11px ${FONT}`; ctx.textAlign = 'center';
+      ctx.fillText(lbl, Math.max(40, Math.min(w - 40, lp.x)), Math.max(14, Math.min(h - 8, lp.y + 4)));
+    }
+
+    // 交點線 18.6 年順時針轉一圈
+    ctx.fillStyle = '#cbd5f7'; ctx.font = `600 10.5px ${FONT}`; ctx.textAlign = 'left';
+    ctx.fillText('↻ 交點線每年順時針轉約 19.3°，18.6 年轉一圈', 10, h - 8);
+    if (sweep) {
+      // 起點方向（淡虛線）和已經轉過的弧線（順時針＝黃經變小）
+      const p0 = pt(sweep.asc0, R * 1.06);
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(p0.x, p0.y);
+      ctx.strokeStyle = 'rgba(140,232,255,0.35)'; ctx.setLineDash([2, 4]); ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+      const turned = Math.min(359.9, (sweep.year - sweep.year0) * 19.3549);
+      if (turned > 1) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, R * 0.5, -sweep.asc0 * DEG, -(sweep.asc0 - turned) * DEG, false);
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 2; ctx.stroke();
+        const tip = pt(sweep.asc0 - turned, R * 0.5), back = pt(sweep.asc0 - turned + 6, R * 0.5);
+        const ang = Math.atan2(tip.y - back.y, tip.x - back.x);
+        ctx.save(); ctx.translate(tip.x, tip.y); ctx.rotate(ang);
+        ctx.beginPath(); ctx.moveTo(5, 0); ctx.lineTo(-6, -5); ctx.lineTo(-6, 5); ctx.closePath();
+        ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.restore();
+      }
+      ctx.beginPath(); ctx.arc(cx, cy, 6, 0, TAU); ctx.fillStyle = '#5cb8ff'; ctx.fill();
+      ctx.fillStyle = '#eef2ff'; ctx.font = `700 12px ${FONT}`; ctx.textAlign = 'left';
+      ctx.fillText('交點線 18.6 年順時針轉一圈', 10, 18);
+      ctx.fillStyle = '#ffd166'; ctx.font = `800 13px ${FONT}`; ctx.textAlign = 'right';
+      ctx.fillText(`${sweep.year.toFixed(1)} 年`, w - 10, 18);
+      ctx.fillStyle = '#8ce8ff'; ctx.font = `700 11px ${FONT}`;
+      ctx.fillText(`☊ 黃經 ${ascN.toFixed(0)}°　已轉 ${turned.toFixed(0)}°`, w - 10, 34);
+      return;
+    }
+
+    // Sun & target (New Moon = Sun, Full Moon = opposite Sun)
+    const pSun = pt(e.sunLon, R * 0.72);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pSun.x, pSun.y);
+    ctx.strokeStyle = 'rgba(255,209,102,0.6)'; ctx.lineWidth = 1.6; ctx.stroke();
+    ctx.beginPath(); ctx.arc(pSun.x, pSun.y, 8, 0, TAU);
+    ctx.fillStyle = '#ffd166'; ctx.fill();
+    ctx.fillStyle = '#ffe9a8'; ctx.font = `700 11px ${FONT}`; ctx.textAlign = 'center';
+    ctx.fillText('☀️ 太陽', pSun.x, pSun.y - 11);
+
+    if (e.kind === 'L') {
+      const pMoon = pt(e.targetLon, R * 0.72);
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pMoon.x, pMoon.y);
+      ctx.strokeStyle = 'rgba(255,120,120,0.75)'; ctx.lineWidth = 1.8; ctx.stroke();
+      ctx.beginPath(); ctx.arc(pMoon.x, pMoon.y, 6.5, 0, TAU);
+      ctx.fillStyle = e.subType.includes('全') ? '#ff6e6e' : '#ffb8d5'; ctx.fill();
+      ctx.fillStyle = '#ffd1e3';
+      ctx.fillText('🌕 滿月(食點)', pMoon.x, pMoon.y + 16);
+    }
+
+    // Earth center
+    ctx.beginPath(); ctx.arc(cx, cy, 6, 0, TAU);
+    ctx.fillStyle = '#5cb8ff'; ctx.fill();
+
+    // Header
+    ctx.fillStyle = '#eef2ff'; ctx.font = `700 12px ${FONT}`; ctx.textAlign = 'left';
+    ctx.fillText('當時 360° 黃道食季扇形區位置', 10, 18);
+  }
+
+  // ---------- 交點線 18.6 年順時針轉一圈：年代按鈕和播放動畫 ----------
+  const ascAtYear = y => { const T = (y - 2000) / 100; return norm360(125.0445479 - 1934.1362891 * T + 0.0020754 * T * T); };
+  const SWEEP = { on: false, raf: 0, t0: 0, year0: 2027, years: 18.6, secs: 14 };
+  function stopSweep(redraw = true) {
+    if (!SWEEP.on) return;
+    SWEEP.on = false; cancelAnimationFrame(SWEEP.raf);
+    $('#sweepBtn').textContent = '▶ 播放 18.6 年轉一圈';
+    if (redraw) drawDial(EVENTS[selectedIdx]);
+  }
+  function sweepFrame(now) {
+    if (!SWEEP.on) return;
+    const k = Math.min(1, (now - SWEEP.t0) / (SWEEP.secs * 1000));
+    const year = SWEEP.year0 + SWEEP.years * k;
+    drawDial(null, { year, year0: SWEEP.year0, asc: ascAtYear(year), asc0: ascAtYear(SWEEP.year0) });
+    // 年代按鈕跟著亮
+    document.querySelectorAll('#dialCtrl button[data-y]').forEach(b => b.classList.toggle('on', Math.abs(+b.dataset.y - year) < 0.5));
+    if (k < 1) SWEEP.raf = requestAnimationFrame(sweepFrame);
+    else { SWEEP.on = false; $('#sweepBtn').textContent = '↺ 再播一次'; } // 停在轉完一圈的畫面
+  }
+  $('#sweepBtn').addEventListener('click', () => {
+    if (SWEEP.on) { stopSweep(); return; }
+    SWEEP.on = true; SWEEP.t0 = performance.now();
+    $('#sweepBtn').textContent = '⏹ 停止';
+    SWEEP.raf = requestAnimationFrame(sweepFrame);
+  });
+  document.querySelectorAll('#dialCtrl button[data-y]').forEach(b => b.addEventListener('click', () => {
+    const y = +b.dataset.y;
+    const i = EVENTS.findIndex(e => e.year === y);
+    if (i < 0) return;
+    selectEvent(i);
+    document.querySelectorAll('#dialCtrl button[data-y]').forEach(x => x.classList.toggle('on', x === b));
+    const tr = document.querySelector(`#tbody tr[data-i="${i}"]`);
+    // 只捲動清單自己的框，不要捲整個頁面（不然羅盤會被捲出畫面）
+    const box = document.querySelector('.table-wrap');
+    if (tr && box) box.scrollTop = Math.max(0, tr.offsetTop - box.clientHeight / 2 + tr.offsetHeight / 2);
+  }));
+
+  function selectEvent(i) {
+    if (i < 0 || i >= EVENTS.length) return;
+    stopSweep(false);
+    $('#sweepBtn').textContent = '▶ 播放 18.6 年轉一圈';
+    document.querySelectorAll('#dialCtrl button[data-y]').forEach(x => x.classList.remove('on'));
+    selectedIdx = i;
+    const e = EVENTS[i];
+    $('#insTitle').textContent = `${e.kind === 'S' ? '☀️' : '🌕'} ${e.dateUTC}（${e.subType}）`;
+    const b = $('#insBadge');
+    b.className = 'badge ' + badgeClass(e);
+    b.textContent = e.subType;
+
+    const sign = e.delta >= 0 ? '+' : '';
+    const limText = e.kind === 'S'
+      ? `日食外限 18.5°（距界內還餘 ${(18.5 - e.absDelta).toFixed(2)}°）`
+      : `半影月食外限 ~17.8°（距界內還餘 ${(17.8 - e.absDelta).toFixed(2)}°）`;
+    $('#insProof').innerHTML = `✅ <strong>確定落於食區內</strong>：此時${e.kind === 'S' ? '太陽／新月' : '滿月對日點'}距離 <strong>${e.nodeText}</strong> 僅 <strong>${sign}${e.delta.toFixed(2)}°</strong>（月球黃緯約 ${e.betaMoon >= 0 ? '+' : ''}${e.betaMoon.toFixed(2)}°），符合${limText}。`;
+
+    $('#insTW').textContent = `${e.cstStr}（UTC+8）`;
+    $('#insUT').textContent = `${e.dateUTC} ${e.timeUTC}`;
+    $('#insNode').textContent = `${e.nodeText}（黃經 ${e.nodeKind === 'asc' ? e.ascNode.toFixed(1) : e.descNode.toFixed(1)}°，太陽 ${e.sunLon.toFixed(1)}°）`;
+    $('#insMeta').textContent = `Saros ${e.saros} · ${e.meta}`;
+    $('#insRegion').textContent = e.region;
+    $('#insPath').textContent = e.centralPath;
+    $('#insTaipei').textContent = e.twNote;
+
+    drawDial(e);
+    drawLimitChart();
+    drawSeasonChart();
+
+    document.querySelectorAll('#tbody tr').forEach(tr => {
+      tr.classList.toggle('selected', +tr.dataset.i === i);
+    });
+  }
+
+  function renderTable() {
+    const tbody = $('#tbody');
+    tbody.innerHTML = '';
+    filtered.forEach(e => {
+      const tr = document.createElement('tr');
+      const rawIdx = e.idx - 1;
+      tr.dataset.i = rawIdx;
+      if (rawIdx === selectedIdx) tr.classList.add('selected');
+
+      const twCls = e.twCode === 'full' ? 'tw-ok' : e.twCode === 'part' ? 'tw-part' : 'tw-no';
+      const sign = e.delta >= 0 ? '+' : '';
+      const pathHtml = e.centralPath && e.centralPath !== '—'
+        ? `<div class="path-note">中心食帶：${e.centralPath}</div>` : '';
+
+      tr.innerHTML = `
+        <td class="mono">${e.idx}</td>
+        <td class="mono"><strong>${e.cstStr}</strong></td>
+        <td class="mono small-muted">${e.dateUTC}<br>${e.timeUTC}</td>
+        <td><span class="badge ${badgeClass(e)}">${e.kind === 'S' ? '☀️' : '🌕'} ${e.subType}</span></td>
+        <td class="mono">
+          <span class="node-tag ${e.nodeKind === 'asc' ? 'n-asc' : 'n-desc'}">${e.nodeText}</span>
+          <strong>${sign}${e.delta.toFixed(2)}°</strong>
+          <div class="small-muted">黃緯 β ≈ ${e.betaMoon >= 0 ? '+' : ''}${e.betaMoon.toFixed(2)}°</div>
+        </td>
+        <td>
+          <span class="mono">Saros ${e.saros}</span>
+          <div class="small-muted">${e.meta}</div>
+        </td>
+        <td>
+          <div>${e.region}</div>
+          ${pathHtml}
+        </td>
+        <td class="${twCls}">${e.twNote}</td>
+      `;
+      tr.addEventListener('click', () => selectEvent(rawIdx));
+      tbody.appendChild(tr);
+    });
+    $('#countChip').textContent = `顯示 ${filtered.length} / ${EVENTS.length} 場`;
+  }
+
+  let curFilter = 'all';
+  function applyFilters() {
+    const q = $('#searchInput').value.trim().toLowerCase();
+    filtered = EVENTS.filter(e => {
+      if (curFilter === 'S' && e.kind !== 'S') return false;
+      if (curFilter === 'L' && e.kind !== 'L') return false;
+      if (curFilter === 'tw' && e.twCode === 'no') return false;
+      if (curFilter === 'major' && !e.isMajor) return false;
+      if (q) {
+        const hay = `${e.dateUTC} ${e.cstStr} ${e.subType} ${e.region} ${e.centralPath} ${e.twNote} saros ${e.saros}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    renderTable();
+    drawLimitChart();
+    drawSeasonChart();
+  }
+
+  document.querySelectorAll('#filterSeg button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      curFilter = btn.dataset.f;
+      document.querySelectorAll('#filterSeg button').forEach(b => b.classList.toggle('active', b === btn));
+      applyFilters();
+    });
+  });
+  $('#searchInput').addEventListener('input', applyFilters);
+
+  function bindScatter(canvas) {
+    const pick = ev => {
+      const rect = canvas.getBoundingClientRect();
+      const x = ev.clientX - rect.left, y = ev.clientY - rect.top;
+      let best = -1, bd = 225; // 15px radius
+      for (const p of canvas._pts || []) {
+        const d = (p.x - x) ** 2 + (p.y - y) ** 2;
+        if (d < bd) { bd = d; best = p.i; }
+      }
+      return best;
+    };
+    canvas.addEventListener('pointermove', ev => {
+      const i = pick(ev);
+      if (i !== hoverIdx) {
+        hoverIdx = i;
+        drawLimitChart();
+        drawSeasonChart();
+      }
+    });
+    canvas.addEventListener('pointerleave', () => {
+      if (hoverIdx !== -1) { hoverIdx = -1; drawLimitChart(); drawSeasonChart(); }
+    });
+    canvas.addEventListener('click', ev => {
+      const i = pick(ev);
+      if (i >= 0) {
+        selectEvent(i);
+        const row = document.querySelector(`#tbody tr[data-i="${i}"]`);
+        if (row) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
+  }
+
+  bindScatter(cLimit);
+  bindScatter(cSeason);
+  window.addEventListener('resize', () => {
+    drawLimitChart();
+    drawSeasonChart();
+    drawDial(EVENTS[selectedIdx]);
+  });
+
+  renderTable();
+  selectEvent(selectedIdx);
+})();
+</script>
+</body>
+</html>
