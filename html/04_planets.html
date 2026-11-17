@@ -50,7 +50,6 @@
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
   .detail-panel,.panel.orbit{margin-top:14px}
   .detail-panel{padding:10px 18px}
-  .panel.game{margin-top:16px}
 
   .btn{
     background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink);
@@ -69,22 +68,14 @@
   /* .tilt 整個照自轉軸的角度轉，花紋和光環跟著斜；打光（::after）轉回來，亮面固定在左上 */
   .planet{position:relative;width:var(--s);height:var(--s);flex:none}
   .planet .tilt{position:absolute;inset:0;transform:rotate(var(--tilt,0deg))}
-  .planet .body{position:absolute;inset:0;border-radius:50%;z-index:2;overflow:hidden}
-  .planet .body::after{
-    content:"";position:absolute;inset:0;border-radius:50%;
-    transform:rotate(calc(-1 * var(--tilt,0deg)));
-    background:
-      radial-gradient(circle at 32% 30%, rgba(255,255,255,.3), transparent 42%),
-      radial-gradient(circle at 50% 50%, transparent 55%, rgba(0,0,0,.5) 100%);
-  }
+  .planet .body{position:absolute;inset:0;border-radius:50%;z-index:2;overflow:hidden;background-size:100% 100%;background-repeat:no-repeat}
   .planet .ring{
-    position:absolute;left:-55%;right:-55%;top:28%;bottom:28%;border-radius:50%;
-    border:calc(var(--s) * .07) solid rgba(232,212,160,.85);
-    box-shadow:0 0 0 calc(var(--s) * .03) rgba(200,180,130,.35);
+    position:absolute;left:-55%;right:-55%;top:24%;bottom:24%;
+    background-size:100% 100%;background-repeat:no-repeat;pointer-events:none;
   }
   .planet .ring.back{z-index:1}
-  .planet .ring.front{z-index:3;clip-path:inset(50% -10% -10% -10%)}
-  .p-uranus .ring{border-width:calc(var(--s) * .025);border-color:rgba(200,240,245,.6);box-shadow:none;left:-35%;right:-35%;top:39%;bottom:39%}
+  .planet .ring.front{z-index:3}
+  .p-uranus .ring{left:-35%;right:-35%;top:36%;bottom:36%}
   .planet svg.axis{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:5}
   svg.axis line,svg.axis path{vector-effect:non-scaling-stroke;fill:none;stroke-linecap:round}
   svg.axis .ax{stroke:#fff;stroke-width:2.5px}
@@ -100,44 +91,6 @@
   svg.axis polygon.ccw{fill:var(--ccw);stroke:none} svg.axis polygon.cw{fill:var(--cw);stroke:none}
   .c-ccw{color:var(--ccw)!important} .c-cw{color:var(--cw)!important}
   .legend-dot{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:4px}
-
-  .p-mercury .body{background:
-      radial-gradient(circle 9% at 30% 62%, rgba(60,56,54,.75) 60%, transparent 70%),
-      radial-gradient(circle 6% at 62% 34%, rgba(60,56,54,.7) 60%, transparent 70%),
-      radial-gradient(circle 5% at 70% 68%, rgba(60,56,54,.65) 60%, transparent 70%),
-      radial-gradient(circle 4% at 44% 24%, rgba(60,56,54,.6) 60%, transparent 70%),
-      radial-gradient(circle 12% at 52% 50%, rgba(255,255,255,.12) 60%, transparent 70%),
-      radial-gradient(circle at 40% 40%, #d9d4cc, #8c8580 60%, #4a4644)}
-  .p-venus .body{background:
-      repeating-linear-gradient(168deg, rgba(255,255,255,.22) 0 7%, transparent 7% 16%, rgba(150,95,40,.2) 16% 22%, transparent 22% 30%),
-      radial-gradient(circle at 40% 40%, #f8e7b5, #d9ab5e 60%, #8a6230)}
-  .p-earth .body{background:
-      radial-gradient(ellipse 26% 5% at 62% 30%, rgba(255,255,255,.7) 60%, transparent 75%),
-      radial-gradient(ellipse 22% 4% at 30% 66%, rgba(255,255,255,.6) 60%, transparent 75%),
-      radial-gradient(ellipse 22% 16% at 30% 38%, #4fbf6a 70%, transparent 72%),
-      radial-gradient(ellipse 18% 26% at 66% 60%, #4fbf6a 70%, transparent 72%),
-      radial-gradient(ellipse 14% 9% at 45% 80%, #4fbf6a 70%, transparent 72%),
-      radial-gradient(ellipse 40% 10% at 50% 4%, #f4f8ff 70%, transparent 72%),
-      radial-gradient(ellipse 34% 8% at 50% 97%, #f4f8ff 70%, transparent 72%),
-      radial-gradient(circle at 50% 50%, #3b8fe0, #1a4f9c)}
-  .p-mars .body{background:
-      radial-gradient(ellipse 30% 10% at 50% 5%, #fbe9e0 60%, transparent 64%),
-      radial-gradient(ellipse 18% 6% at 50% 97%, #fbe9e0 60%, transparent 64%),
-      radial-gradient(ellipse 25% 14% at 60% 55%, rgba(110,30,10,.5) 60%, transparent 64%),
-      radial-gradient(ellipse 16% 9% at 28% 42%, rgba(110,30,10,.4) 60%, transparent 64%),
-      radial-gradient(circle at 40% 40%, #f39a6b, #c1440e 60%, #6b2007)}
-  .p-jupiter .body{background:
-      radial-gradient(ellipse 14% 8% at 64% 64%, #c8553d 60%, transparent 66%),
-      repeating-linear-gradient(180deg, #ecd9b8 0 9%, #c99a6b 9% 15%, #f3e5cb 15% 22%, #b9825a 22% 27%, #e2c49c 27% 33%)}
-  .p-saturn .body{background:repeating-linear-gradient(180deg, #f2e2b3 0 12%, #d9bf86 12% 18%, #ecd8a6 18% 28%, #c9a96b 28% 32%)}
-  .p-uranus .body{background:
-      linear-gradient(180deg, transparent 0 40%, rgba(255,255,255,.18) 40% 46%, transparent 46% 100%),
-      radial-gradient(circle at 40% 40%, #d8f6f8, #85d6de 60%, #3a8f9a)}
-  .p-neptune .body{background:
-      radial-gradient(ellipse 12% 7% at 40% 45%, rgba(20,30,90,.6) 60%, transparent 66%),
-      radial-gradient(ellipse 16% 2.5% at 58% 34%, rgba(255,255,255,.65) 60%, transparent 80%),
-      radial-gradient(ellipse 10% 2% at 34% 66%, rgba(255,255,255,.5) 60%, transparent 80%),
-      radial-gradient(circle at 40% 40%, #8db4ff, #3a5fd9 60%, #1a2a7a)}
 
   /* 自轉軸和光環會伸出行星外面，四周留白才不會壓到旁邊 */
   .planet.ax-on{margin:calc(var(--s) * .24) 0}
@@ -164,7 +117,7 @@
   .pick{border:2px solid transparent;border-radius:16px;padding:6px 0;color:var(--ink);font:inherit;cursor:pointer;
     display:flex;flex-direction:column;align-items:center;gap:2px;flex:none;min-width:86px;transition:background .2s,border-color .2s,transform .2s}
   /* 三種行星用背景顏色分類，同一類連成一整塊：岩石行星（橘紅）、氣體巨行星（紫）、冰巨行星（青藍） */
-  .k-rock{--kbg:rgba(240,104,64,.22);--kfg:#ff9d7a}
+  .k-rock{--kbg:rgba(175,215,60,.24);--kfg:#d2f07a}
   .k-gas{--kbg:rgba(170,120,255,.24);--kfg:#c9a6ff}
   .k-ice{--kbg:rgba(60,200,235,.22);--kfg:#8fe3f5}
   .grp{display:flex;flex-direction:column;flex:1 1 auto;background:var(--kbg);border-radius:18px;padding:0 6px}
@@ -229,18 +182,6 @@
   .side-box canvas{position:absolute;inset:0;width:100%;height:100%}
   .hint{color:var(--muted);font-size:13px}
 
-  /* ---------- 聽聲音找行星 ---------- */
-  .game-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .game-head h2{margin:0}
-  .game-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-top:12px}
-  .gbtn{background:rgba(255,255,255,.05);border:2px solid var(--line);border-radius:16px;padding:12px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:8px;color:var(--ink);font:inherit;font-size:15px}
-  .gbtn:hover:not(:disabled){background:rgba(255,255,255,.1)}
-  .gbtn.right{border-color:var(--ok);background:rgba(110,231,183,.15)}
-  .gbtn.wrong{border-color:var(--no);background:rgba(255,158,196,.12)}
-  .gbtn:disabled{cursor:default}
-  .gbtn .nm{min-height:1.4em}
-  .game-fb{min-height:1.7em;font-weight:700}
-  .game-fb .ok{color:var(--ok)} .game-fb .no{color:var(--no)}
   footer{text-align:center;color:var(--muted);font-size:14px;margin-top:22px}
 </style>
 </head>
@@ -325,17 +266,6 @@
     </div>
   </section>
 
-  <section class="panel game">
-    <div class="game-head">
-      <h2>🎧 聽英文，找行星！</h2>
-      <button class="btn primary" id="gStart">▶ 開始 / 下一題</button>
-      <button class="btn" id="gReplay" disabled>🔁 再聽一次</button>
-      <span style="color:var(--muted)" id="gScore">⭐ 0 / 0</span>
-      <span class="game-fb" id="gameFb" aria-live="polite"></span>
-    </div>
-    <div class="game-grid" id="gameGrid"></div>
-  </section>
-
   <footer>☀️ 冥王星以前也算行星，2006 年起被改叫「矮行星」，所以現在是八大行星喔！</footer>
 </div>
 
@@ -409,6 +339,417 @@
     return s + '</svg>';
   }
 
+  // ---------- 3D 球體材質與光環繪製（每顆行星只算一次並快取 DataURL） ----------
+  const _texCache = {}, _ringCache = {};
+  const _clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+  const _mix = (a, b, t) => a + (b - a) * t;
+  const _smooth = (a, b, v) => { const t = _clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  function _hash3(ix, iy, iz) {
+    let n = Math.imul(ix, 374761393) + Math.imul(iy, 668265263) + Math.imul(iz, 2147483647);
+    n = (n ^ (n >>> 13)) * 1274126177;
+    return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+  }
+  function _noise3(x, y, z) {
+    const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z);
+    const fx = x - ix, fy = y - iy, fz = z - iz;
+    const ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy), uz = fz * fz * (3 - 2 * fz);
+    const n000 = _hash3(ix, iy, iz), n100 = _hash3(ix + 1, iy, iz);
+    const n010 = _hash3(ix, iy + 1, iz), n110 = _hash3(ix + 1, iy + 1, iz);
+    const n001 = _hash3(ix, iy, iz + 1), n101 = _hash3(ix + 1, iy, iz + 1);
+    const n011 = _hash3(ix, iy + 1, iz + 1), n111 = _hash3(ix + 1, iy + 1, iz + 1);
+    const nx00 = n000 + (n100 - n000) * ux, nx10 = n010 + (n110 - n010) * ux;
+    const nx01 = n001 + (n101 - n001) * ux, nx11 = n011 + (n111 - n011) * ux;
+    const nxy0 = nx00 + (nx10 - nx00) * uy, nxy1 = nx01 + (nx11 - nx01) * uy;
+    return nxy0 + (nxy1 - nxy0) * uz;
+  }
+  function _fbm3(x, y, z, oct = 4) {
+    let v = 0, amp = 0.5, f = 1;
+    for (let i = 0; i < oct; i++) {
+      v += amp * _noise3(x * f, y * f, z * f);
+      f *= 2.07; amp *= 0.5;
+    }
+    return v;
+  }
+
+  // 水星坑洞清單：[cx, cy, cz, r, ray]
+  const _MERCURY_CRATERS = [
+    [-0.28, -0.18, 0.94, 0.22, 1], [0.34, 0.22, 0.91, 0.19, 1], [-0.46, 0.35, 0.82, 0.16, 0],
+    [0.12, -0.45, 0.88, 0.15, 1], [0.55, -0.16, 0.82, 0.17, 0], [-0.12, 0.52, 0.85, 0.14, 0],
+    [-0.62, -0.05, 0.78, 0.18, 0], [0.22, 0.58, 0.78, 0.13, 0], [-0.32, -0.58, 0.75, 0.14, 0],
+    [0.02, 0.08, 0.99, 0.11, 0], [-0.18, 0.16, 0.97, 0.09, 0], [0.42, -0.42, 0.80, 0.12, 0],
+    [-0.52, -0.36, 0.77, 0.11, 0], [0.64, 0.28, 0.71, 0.14, 0], [-0.05, -0.25, 0.97, 0.08, 0],
+    [0.25, -0.05, 0.97, 0.08, 0], [-0.38, 0.08, 0.92, 0.09, 0], [0.08, 0.34, 0.94, 0.09, 0]
+  ].map(([x, y, z, r, ray]) => { const l = Math.hypot(x, y, z); return [x / l, y / l, z / l, r, ray]; });
+
+  // 地球大陸簡化高斯區塊：[latDeg, lonDeg, rLat, rLon, w]（聚焦東亞／台灣、歐亞、非、澳）
+  const _EARTH_LAND = [
+    [24, 121, 5.5, 4.2, 1.15],   // 台灣與琉球弧
+    [35, 138, 6, 4.5, 0.95],     // 日本列島
+    [32, 110, 16, 18, 1.35],     // 東亞與中國大陸
+    [15, 103, 10, 8, 1.05],      // 中南半島
+    [22, 79, 11, 9, 1.15],       // 印度半島
+    [52, 92, 16, 36, 1.35],      // 西伯利亞與北亞
+    [42, 65, 14, 24, 1.25],      // 中亞
+    [25, 45, 10, 12, 1.15],      // 阿拉伯半島
+    [50, 22, 12, 18, 1.15],      // 歐洲
+    [12, 18, 16, 22, 1.35],      // 北非／撒哈拉
+    [-12, 24, 18, 12, 1.25],     // 南非
+    [-2, 115, 8, 14, 0.88],      // 印尼／婆羅洲／菲律賓
+    [-25, 134, 11, 16, 1.25],    // 澳洲
+    [82, 0, 10, 180, 1.4],       // 北極冰冠
+    [-82, 0, 12, 180, 1.5]       // 南極洲
+  ];
+
+  function getPlanetTex(p) {
+    if (_texCache[p.id]) return _texCache[p.id];
+    const S = 220, cv = document.createElement('canvas');
+    cv.width = cv.height = S;
+    const ctx = cv.getContext('2d'), img = ctx.createImageData(S, S), d = img.data;
+    // 螢幕光源固定在左上方 (-0.38, -0.35, 0.856)，逆轉 --tilt 讓每顆行星轉正後陽光方向都一致
+    const ang = p.tilt * DEG, ca = Math.cos(ang), sa = Math.sin(ang);
+    const lsx = -0.38, lsy = -0.35, lsz = 0.856;
+    const lx = lsx * ca + lsy * sa, ly = -lsx * sa + lsy * ca, lz = lsz;
+    const id = p.id;
+
+    for (let py = 0; py < S; py++) {
+      const ny = (py + 0.5 - S / 2) / (S / 2 - 1);
+      for (let px = 0; px < S; px++) {
+        const nx = (px + 0.5 - S / 2) / (S / 2 - 1);
+        const r2 = nx * nx + ny * ny;
+        if (r2 > 1.02) continue;
+        const edgeAA = _clamp((1.01 - Math.sqrt(r2)) * (S * 0.45), 0, 1);
+        const nz = Math.sqrt(Math.max(0.0001, 1 - Math.min(1, r2)));
+        const lat = Math.asin(_clamp(-ny, -1, 1)); // 北緯為正 (-pi/2 .. +pi/2)
+        const lon = Math.atan2(nx, nz);            // 經度 (-pi .. +pi)
+        let r = 128, g = 128, b = 128;
+        let bnx = nx, bny = ny, bnz = nz;
+        let spec = 0, rimR = 0, rimG = 0, rimB = 0, rimA = 0, limbPow = 0.22, amb = 0.15;
+
+        if (id === 'mercury') {
+          const n1 = _fbm3(nx * 3.2 + 1.3, ny * 3.2 - 0.7, nz * 3.2 + 2.1, 5);
+          const n2 = _fbm3(nx * 11 + 4.1, ny * 11 + 1.9, nz * 11 - 3.4, 3);
+          let alb = 0.52 + (n1 - 0.5) * 0.34 + (n2 - 0.5) * 0.16;
+          // 撞擊坑與明亮輻射紋
+          for (let k = 0; k < _MERCURY_CRATERS.length; k++) {
+            const c = _MERCURY_CRATERS[k];
+            const dx = nx - c[0], dy = ny - c[1], dz = nz - c[2];
+            const dist = Math.hypot(dx, dy, dz), cr = c[3];
+            if (dist < cr * 2.8) {
+              const u = dist / cr;
+              if (u < 1.0) {
+                const bowl = Math.sin(u * Math.PI * 0.5);
+                const slope = Math.cos(u * Math.PI * 0.5) * 0.42 / (dist + 0.001);
+                bnx -= dx * slope; bny -= dy * slope;
+                alb -= (1 - u * u) * 0.08;
+              } else if (u < 1.32) {
+                const rim = Math.sin((u - 1) / 0.32 * Math.PI);
+                const slope = Math.cos((u - 1) / 0.32 * Math.PI) * 0.32 / (dist + 0.001);
+                bnx += dx * slope; bny += dy * slope;
+                alb += rim * 0.11;
+              }
+              if (c[4] && u > 0.85 && u < 2.8) {
+                const angC = Math.atan2(dy, dx);
+                const ray = Math.pow(Math.max(0, Math.cos(angC * 7 + k) * 0.5 + Math.cos(angC * 11 - k) * 0.5), 2);
+                alb += ray * (1 - (u - 0.85) / 1.95) * 0.16;
+              }
+            }
+          }
+          // 微地形法線擾動
+          bnx += (n2 - 0.5) * 0.18; bny += (_noise3(nx * 14, ny * 14, nz * 14) - 0.5) * 0.18;
+          const nl = Math.hypot(bnx, bny, bnz); bnx /= nl; bny /= nl; bnz /= nl;
+          r = 205 * alb; g = 196 * alb; b = 186 * alb;
+          limbPow = 0.08; amb = 0.12;
+
+        } else if (id === 'venus') {
+          // 金星：濃密硫酸雲層＋赤道 V 字形（人字形）高速雲帶
+          const vShift = Math.cos(lat * 1.35) * 1.35;
+          const w = _fbm3(nx * 2.4 + 3.1, ny * 2.4, nz * 2.4 + 1.7, 4);
+          const streak = _fbm3(Math.cos(lon + vShift) * 2.2 + w * 0.9, ny * 5.2 + w * 0.6, Math.sin(lon + vShift) * 2.2, 4);
+          const fine = _fbm3(nx * 7 + streak, ny * 10, nz * 7, 3);
+          const polar = _smooth(0.95, 1.35, Math.abs(lat));
+          const v = _clamp(streak * 0.65 + fine * 0.35 + polar * 0.22 - 0.1, 0, 1);
+          r = _mix(168, 252, v);
+          g = _mix(112, 226, v);
+          b = _mix(48, 168, Math.pow(v, 1.15));
+          rimR = 255; rimG = 222; rimB = 150; rimA = 0.32; limbPow = 0.28; amb = 0.18;
+
+        } else if (id === 'earth') {
+          // 地球：真實感大陸分佈（東亞／台灣、歐亞、非洲、澳洲）＋地形生物群系＋氣旋白雲＋藍天大氣光暈
+          const latD = lat / DEG, lonD = lon / DEG + 98; // 中心對準東經約 98°（東亞、台灣、印度洋、西太平洋）
+          let land = 0;
+          for (let k = 0; k < _EARTH_LAND.length; k++) {
+            const L = _EARTH_LAND[k];
+            const dLat = (latD - L[0]) / L[2];
+            let dLon = ((lonD - L[1] + 540) % 360 - 180) / L[3];
+            const d2 = dLat * dLat + dLon * dLon;
+            if (d2 < 3.2) land += L[4] * Math.exp(-d2 * 1.25);
+          }
+          const coastN = _fbm3(nx * 4.2 + 2.3, ny * 4.2 - 1.4, nz * 4.2 + 0.8, 5);
+          const detailN = _fbm3(nx * 12 + 5.1, ny * 12 + 3.2, nz * 12 - 2.7, 3);
+          const hVal = land * 0.68 + (coastN - 0.45) * 0.65 + (detailN - 0.5) * 0.22;
+          const absLat = Math.abs(latD);
+          if (absLat > 71 + (coastN - 0.5) * 9) {
+            // 南北極冰冠
+            r = 240; g = 246; b = 255;
+          } else if (hVal > 0.36) {
+            // 陸地：依緯度與濕度區分森林綠地、撒哈拉／中亞沙漠、高山雪峰
+            const arid = _smooth(14, 34, absLat) * (1 - _smooth(34, 52, absLat)) * _smooth(20, 92, 110 - lonD) + (coastN - 0.5) * 0.45;
+            const elev = _clamp((hVal - 0.36) * 2.2, 0, 1);
+            let lr = _mix(38, 86, detailN), lg = _mix(118, 158, coastN), lb = _mix(42, 56, detailN);
+            const dMask = _clamp(arid, 0, 1);
+            lr = _mix(lr, 212, dMask); lg = _mix(lg, 176, dMask); lb = _mix(lb, 112, dMask);
+            if (elev > 0.55) {
+              const m = _smooth(0.55, 0.92, elev);
+              lr = _mix(lr, 138, m); lg = _mix(lg, 122, m); lb = _mix(lb, 108, m);
+            }
+            r = lr; g = lg; b = lb;
+            bnx += (detailN - 0.5) * 0.14; bny += (coastN - 0.5) * 0.14;
+          } else {
+            // 海洋：深海藍＋大陸棚淺海松石藍＋陽光海面反光
+            const shelf = _smooth(0.22, 0.36, hVal);
+            r = _mix(12, 36, shelf);
+            g = _mix(58, 146, shelf);
+            b = _mix(138, 198, shelf);
+            spec = 0.38 * (1 - shelf * 0.5);
+          }
+          // 旋渦雲層（含赤道間熱帶輻合帶與中緯度氣旋雲系）
+          const swirl = _fbm3(nx * 3.1 - 1.8, ny * 3.8 + 0.9, nz * 3.1 + 4.2, 4);
+          const cRaw = _fbm3(nx * 5.5 + swirl * 1.1, ny * 6.5 - swirl * 0.8, nz * 5.5 + swirl, 4);
+          const itcz = Math.exp(-Math.pow(latD / 11, 2)) * 0.12;
+          const cloud = _smooth(0.50, 0.74, cRaw + itcz);
+          r = _mix(r, 250, cloud * 0.92);
+          g = _mix(g, 252, cloud * 0.92);
+          b = _mix(b, 255, cloud * 0.94);
+          spec *= (1 - cloud * 0.85);
+          rimR = 88; rimG = 178; rimB = 255; rimA = 0.52; limbPow = 0.18; amb = 0.16;
+
+        } else if (id === 'mars') {
+          // 火星：氧化鐵橘紅沙漠＋暗色玄武岩平原（大瑟提斯）＋水手號大峽谷＋南北極冠
+          const latD = lat / DEG, lonD = lon / DEG;
+          const n1 = _fbm3(nx * 3.0 + 0.7, ny * 3.0 - 2.1, nz * 3.0 + 1.4, 5);
+          const n2 = _fbm3(nx * 9.5 - 1.2, ny * 9.5 + 3.4, nz * 9.5, 3);
+          // 暗色高反照差區（大瑟提斯與南方暗帶）
+          const syrtis = Math.exp(-Math.pow((latD - 8) / 18, 2) - Math.pow((lonD - 18) / 14, 2)) * 0.55;
+          const mareS = Math.exp(-Math.pow((latD + 22) / 14, 2) - Math.pow((lonD + 12) / 36, 2)) * 0.45;
+          // 水手號峽谷（Valles Marineris）：赤道南側橫向深谷
+          const canyon = Math.exp(-Math.pow((latD + 11 - Math.sin(lon * 2) * 2.5) / 2.2, 2) - Math.pow((lonD + 18) / 24, 2));
+          // 奧林帕斯山與塔爾西斯火山
+          const olympus = Math.exp(-Math.pow((latD - 18) / 5.5, 2) - Math.pow((lonD + 42) / 5.5, 2));
+          const shade = _clamp(n1 * 0.75 + n2 * 0.25 - syrtis - mareS - canyon * 0.45 + olympus * 0.18, 0.08, 1);
+          r = _mix(92, 238, shade);
+          g = _mix(44, 128, Math.pow(shade, 1.15));
+          b = _mix(28, 74, Math.pow(shade, 1.3));
+          if (canyon > 0.2) { bny += (latD + 11) * 0.06 * canyon; }
+          bnx += (n2 - 0.5) * 0.2; bny += (n1 - 0.5) * 0.2;
+          // 南北極乾冰／水冰極冠
+          const cap = _smooth(70, 81, Math.abs(latD) + (n1 - 0.5) * 12);
+          r = _mix(r, 252, cap); g = _mix(g, 244, cap); b = _mix(b, 236, cap);
+          rimR = 245; rimG = 158; rimB = 104; rimA = 0.26; limbPow = 0.16; amb = 0.14;
+
+        } else if (id === 'jupiter') {
+          // 木星：真實感赤道區與雲帶（Zones & Belts）、藍灰羽狀雲（Festoons）與南半球大紅斑（Great Red Spot）
+          const latD = lat / DEG, lonD = lon / DEG;
+          const warp = (_fbm3(nx * 2.8, ny * 6.5, nz * 2.8, 4) - 0.5) * 7.5;
+          const eddy = (_fbm3(nx * 5.5 + warp * 0.15, ny * 18, nz * 5.5, 3) - 0.5) * 3.2;
+          const yL = latD + warp + eddy;
+          // 緯度雲帶色彩曲線（EZ 乳白、NEB/SEB 紅棕、NTB/STB 褐橘、極區灰褐）
+          let br = 236, bg = 220, bb = 192;
+          const belt = Math.sin(yL * 0.21) * 0.5 + Math.cos(yL * 0.37 - 0.6) * 0.35 + Math.sin(yL * 0.62 + 1.1) * 0.15;
+          const seb = Math.exp(-Math.pow((yL + 16) / 6.5, 2));
+          const neb = Math.exp(-Math.pow((yL - 13) / 6.0, 2));
+          const ez = Math.exp(-Math.pow(yL / 7.5, 2));
+          const ntb = Math.exp(-Math.pow((yL - 28) / 4.2, 2));
+          const stb = Math.exp(-Math.pow((yL + 31) / 4.5, 2));
+          const pol = _smooth(46, 78, Math.abs(latD));
+          const bMix = _clamp(0.42 - belt * 0.35 + (seb + neb) * 0.52 + (ntb + stb) * 0.32 - ez * 0.38, 0, 1);
+          br = _mix(244, 172, bMix);
+          bg = _mix(230, 102, bMix);
+          bb = _mix(202, 62, bMix);
+          // NEB 南緣藍灰羽狀結構 (festoons)
+          const fest = Math.exp(-Math.pow((yL - 7.5) / 2.8, 2)) * Math.max(0, Math.sin(lon * 9 + warp * 0.5));
+          br = _mix(br, 118, fest * 0.55); bg = _mix(bg, 134, fest * 0.55); bb = _mix(bb, 158, fest * 0.55);
+          // 極區灰藍琥珀霧氣
+          br = _mix(br, 156, pol * 0.65); bg = _mix(bg, 142, pol * 0.65); bb = _mix(bb, 128, pol * 0.55);
+          // 大紅斑（Great Red Spot）：位於南緯 22°、偏右下方，具螺旋結構與外圍淺色環
+          const gx = (lonD - 16) / 17.5, gy = (latD + 22) / 9.2;
+          const gr = Math.hypot(gx, gy);
+          if (gr < 1.45) {
+            const gAng = Math.atan2(gy, gx) + (1.45 - gr) * 2.8;
+            const sw = _noise3(Math.cos(gAng) * 2.5 + gr * 3, Math.sin(gAng) * 2.5, gr * 4);
+            if (gr < 1.0) {
+              const core = 1 - gr * gr;
+              const grR = _mix(218, 178, core * 0.5 + sw * 0.35);
+              const grG = _mix(86, 48, core * 0.6 + sw * 0.3);
+              const grB = _mix(52, 32, core * 0.6);
+              const m = _smooth(1.0, 0.72, gr);
+              br = _mix(br, grR, m); bg = _mix(bg, grG, m); bb = _mix(bb, grB, m);
+            } else {
+              const collar = Math.sin((gr - 1.0) / 0.45 * Math.PI);
+              br = _mix(br, 248, collar * 0.65); bg = _mix(bg, 236, collar * 0.65); bb = _mix(bb, 214, collar * 0.65);
+            }
+          }
+          r = br; g = bg; b = bb;
+          rimR = 245; rimG = 220; rimB = 175; rimA = 0.2; limbPow = 0.34; amb = 0.15;
+
+        } else if (id === 'saturn') {
+          // 土星：細緻柔和的奶油金／琥珀條紋＋北極六角形暗冠＋光環投射在北半球的半透明陰影
+          const latD = lat / DEG;
+          const w = (_fbm3(nx * 2.2, ny * 9, nz * 2.2, 3) - 0.5) * 2.8;
+          const yL = latD + w;
+          const band = Math.sin(yL * 0.24) * 0.35 + Math.cos(yL * 0.48 + 0.4) * 0.25 + Math.sin(yL * 0.95) * 0.12;
+          const eqBright = Math.exp(-Math.pow(yL / 14, 2)) * 0.22;
+          const pol = _smooth(54, 82, Math.abs(latD));
+          const t = _clamp(0.52 + band * 0.32 + eqBright - pol * 0.28, 0, 1);
+          r = _mix(186, 248, t);
+          g = _mix(154, 226, t);
+          b = _mix(104, 174, Math.pow(t, 1.1));
+          r = _mix(r, 142, pol * 0.55); g = _mix(g, 146, pol * 0.45); b = _mix(b, 132, pol * 0.35);
+          // 光環在土星本體上的細緻投影陰影帶
+          const ringShadow = Math.exp(-Math.pow((latD - 18 + nx * nx * 6) / 4.2, 2)) * 0.32;
+          r *= (1 - ringShadow); g *= (1 - ringShadow); b *= (1 - ringShadow);
+          rimR = 248; rimG = 228; rimB = 180; rimA = 0.22; limbPow = 0.36; amb = 0.16;
+
+        } else if (id === 'uranus') {
+          // 天王星：柔滑青藍甲烷大氣＋微弱緯度雲帶＋偏亮的北極雲冠（Voyager 2 / HST 特徵）
+          const latD = lat / DEG;
+          const w = (_fbm3(nx * 2.5, ny * 6, nz * 2.5, 3) - 0.5) * 0.06;
+          const hood = _smooth(38, 72, latD) * 0.22;
+          const band = Math.cos(lat * 3.2) * 0.05 + hood + w;
+          const cloudSpeck = Math.exp(-Math.pow((latD - 32) / 3.5, 2) - Math.pow((lon / DEG - 24) / 7, 2)) * 0.22;
+          const v = _clamp(0.58 + band + cloudSpeck, 0, 1);
+          r = _mix(88, 224, v);
+          g = _mix(188, 248, v);
+          b = _mix(204, 252, v);
+          rimR = 165; rimG = 248; rimB = 255; rimA = 0.32; limbPow = 0.34; amb = 0.18;
+
+        } else if (id === 'neptune') {
+          // 海王星：深邃鈷藍／寶藍大氣＋高速噴流暗帶＋大暗斑（Great Dark Spot）＋高空白色甲烷卷雲（Scooter）
+          const latD = lat / DEG, lonD = lon / DEG;
+          const w = (_fbm3(nx * 3.0, ny * 8.5, nz * 3.0, 4) - 0.5) * 4.2;
+          const yL = latD + w;
+          const band = Math.sin(yL * 0.26) * 0.28 + Math.cos(yL * 0.55 - 0.8) * 0.18;
+          let v = _clamp(0.48 + band * 0.35, 0, 1);
+          r = _mix(18, 78, v);
+          g = _mix(58, 146, v);
+          b = _mix(168, 252, v);
+          // 大暗斑（Great Dark Spot，南緯 20°）與伴隨的高空白色甲烷冰晶卷雲
+          const gx = (lonD + 14) / 16, gy = (latD + 20) / 8.5;
+          const gr = Math.hypot(gx, gy);
+          if (gr < 1.15) {
+            const m = _smooth(1.15, 0.45, gr);
+            r = _mix(r, 12, m * 0.72); g = _mix(g, 32, m * 0.72); b = _mix(b, 112, m * 0.65);
+          }
+          // 大暗斑邊緣白雲＋南緯 42° Scooter 白斑＋中緯度細長白色卷雲條
+          const compCloud = Math.exp(-Math.pow((latD + 13) / 2.2, 2) - Math.pow((lonD + 11 + w) / 9, 2)) * 0.85;
+          const scooter = Math.exp(-Math.pow((latD + 41) / 2.6, 2) - Math.pow((lonD - 18) / 5.5, 2)) * 0.8;
+          const streak1 = Math.exp(-Math.pow((yL - 26) / 1.6, 2) - Math.pow((lonD - 8) / 22, 2)) * 0.65;
+          const streak2 = Math.exp(-Math.pow((yL + 31) / 1.5, 2) - Math.pow((lonD + 26) / 18, 2)) * 0.55;
+          const cw = _clamp(compCloud + scooter + streak1 + streak2, 0, 0.92);
+          r = _mix(r, 242, cw); g = _mix(g, 248, cw); b = _mix(b, 255, cw);
+          rimR = 110; rimG = 182; rimB = 255; rimA = 0.38; limbPow = 0.32; amb = 0.16;
+        }
+
+        // 3D 球面漫反射、晨昏線柔化、邊緣減光（Limb Darkening）與大氣邊緣散射（Fresnel Rim）
+        const ndotl = bnx * lx + bny * ly + bnz * lz;
+        const diff = _smooth(-0.22, 0.88, ndotl);
+        const limb = Math.pow(nz, limbPow);
+        const shade = (amb + (1 - amb) * diff) * limb;
+        r *= shade; g *= shade; b *= shade;
+
+        if (spec > 0 && ndotl > 0) {
+          const hx = lx, hy = ly, hz = lz + 1, hl = Math.hypot(hx, hy, hz);
+          const sDot = Math.max(0, (bnx * hx + bny * hy + bnz * hz) / hl);
+          const sVal = Math.pow(sDot, 28) * spec * diff;
+          r += 255 * sVal; g += 245 * sVal; b += 220 * sVal;
+        }
+        if (rimA > 0) {
+          const fres = Math.pow(1 - nz, 2.8) * rimA * (0.35 + 0.65 * _clamp(ndotl + 0.35, 0, 1));
+          r = _mix(r, rimR, fres); g = _mix(g, rimG, fres); b = _mix(b, rimB, fres);
+        }
+
+        const idx = (py * S + px) * 4;
+        d[idx] = _clamp(Math.round(r), 0, 255);
+        d[idx + 1] = _clamp(Math.round(g), 0, 255);
+        d[idx + 2] = _clamp(Math.round(b), 0, 255);
+        d[idx + 3] = Math.round(255 * edgeAA);
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return (_texCache[p.id] = cv.toDataURL());
+  }
+
+  // 土星（含 C 環、B 環、卡西尼縫、A 環、恩克縫與球體陰影）與天王星細光環材質
+  function getRingTex(id, isFront) {
+    const key = id + (isFront ? '_f' : '_b');
+    if (_ringCache[key]) return _ringCache[key];
+    const W = 360, H = 120, cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext('2d'), img = ctx.createImageData(W, H), d = img.data;
+    const isSat = id === 'saturn';
+    for (let py = 0; py < H; py++) {
+      const ny = (py + 0.5 - H / 2) / (H / 2 - 2);
+      // back 只畫上半圈（行星後方），front 只畫下半圈（跨過行星前方）
+      if (isFront ? ny < -0.02 : ny > 0.02) continue;
+      const seamFade = isFront ? _smooth(-0.02, 0.04, ny) : _smooth(0.02, -0.04, ny);
+      for (let px = 0; px < W; px++) {
+        const nx = (px + 0.5 - W / 2) / (W / 2 - 2);
+        const r = Math.hypot(nx, ny);
+        if (r < 0.48 || r > 0.995) continue;
+        let rr = 230, rg = 210, rb = 165, a = 0;
+        if (isSat) {
+          // C 環 (0.49..0.60)、B 環 (0.60..0.785)、卡西尼縫 (0.785..0.825)、A 環 (0.825..0.965，含恩克縫 0.935)、F 環 (0.982)
+          const groove = Math.sin(r * 210) * 0.06 + Math.sin(r * 430 + 1.2) * 0.04;
+          if (r >= 0.49 && r < 0.60) {
+            const u = (r - 0.49) / 0.11;
+            a = _smooth(0.49, 0.52, r) * (0.16 + 0.14 * u + groove * 0.5);
+            rr = 185; rg = 168; rb = 138;
+          } else if (r >= 0.60 && r < 0.785) {
+            const u = (r - 0.60) / 0.185;
+            const bEdge = _smooth(0.60, 0.618, r) * _smooth(0.785, 0.772, r);
+            a = bEdge * (0.78 + 0.16 * Math.sin(u * Math.PI) + groove);
+            rr = _mix(232, 248, u) + groove * 90;
+            rg = _mix(206, 228, u) + groove * 80;
+            rb = _mix(156, 182, u) + groove * 60;
+          } else if (r >= 0.785 && r < 0.825) {
+            // 卡西尼縫（Cassini Division）
+            a = 0.05; rr = 140; rg = 126; rb = 100;
+          } else if (r >= 0.825 && r <= 0.965) {
+            const aEdge = _smooth(0.825, 0.838, r) * _smooth(0.965, 0.952, r);
+            const encke = 1 - 0.78 * Math.exp(-Math.pow((r - 0.935) / 0.0055, 2));
+            a = aEdge * encke * (0.58 + groove * 0.7);
+            rr = 224 + groove * 70; rg = 204 + groove * 60; rb = 166 + groove * 50;
+          } else if (r > 0.974 && r < 0.992) {
+            a = Math.exp(-Math.pow((r - 0.983) / 0.004, 2)) * 0.28;
+            rr = 236; rg = 218; rb = 178;
+          }
+          // 土星本體投射在後方光環右上側的陰影
+          if (!isFront && nx > 0.05 && ny < 0) {
+            const sh = _smooth(0.52, 0.18, nx + ny * 0.45);
+            rr *= (1 - sh * 0.68); rg *= (1 - sh * 0.68); rb *= (1 - sh * 0.68);
+          }
+        } else {
+          // 天王星：細緻同心暗冰環（α, β, η, γ, δ 與最亮的外層 ε 環）
+          const r1 = Math.exp(-Math.pow((r - 0.68) / 0.012, 2)) * 0.28;
+          const r2 = Math.exp(-Math.pow((r - 0.75) / 0.011, 2)) * 0.34;
+          const r3 = Math.exp(-Math.pow((r - 0.82) / 0.012, 2)) * 0.38;
+          const eps = Math.exp(-Math.pow((r - 0.91) / 0.018, 2)) * 0.68;
+          const dust = (r > 0.65 && r < 0.93) ? 0.08 : 0;
+          a = _clamp(r1 + r2 + r3 + eps + dust, 0, 0.78);
+          rr = 195; rg = 238; rb = 246;
+        }
+        a = _clamp(a * seamFade, 0, 1);
+        if (a <= 0.004) continue;
+        const idx = (py * W + px) * 4;
+        d[idx] = _clamp(Math.round(rr), 0, 255);
+        d[idx + 1] = _clamp(Math.round(rg), 0, 255);
+        d[idx + 2] = _clamp(Math.round(rb), 0, 255);
+        d[idx + 3] = Math.round(255 * a);
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return (_ringCache[key] = cv.toDataURL());
+  }
+
   // axis：'none' 不畫軸、'line' 畫軸和弧線、'full' 再加上度數文字
   function planetEl(p, size, axis = 'none') {
     const el = document.createElement('div');
@@ -416,7 +757,10 @@
     el.style.setProperty('--s', size + 'px');
     el.style.setProperty('--tilt', p.tilt + 'deg');
     const hasRing = p.id === 'saturn' || p.id === 'uranus';
-    el.innerHTML = '<span class="tilt">' + (hasRing ? '<span class="ring back"></span>' : '') + '<span class="body"></span>' + (hasRing ? '<span class="ring front"></span>' : '') + '</span>'
+    const bUrl = getPlanetTex(p);
+    const rBack = hasRing ? `<span class="ring back" style="background-image:url(${getRingTex(p.id, false)})"></span>` : '';
+    const rFront = hasRing ? `<span class="ring front" style="background-image:url(${getRingTex(p.id, true)})"></span>` : '';
+    el.innerHTML = `<span class="tilt">${rBack}<span class="body" style="background-image:url(${bUrl})"></span>${rFront}</span>`
       + (axis !== 'none' ? axisSvg(p, axis === 'full', size) : '');
     el.setAttribute('aria-hidden', 'true');
     return el;
@@ -741,53 +1085,6 @@
   window.addEventListener('resize', () => {
     fitStrip(); drawOrbit(); drawSide();
   });
-
-  // ---------- 聽英文找行星 ----------
-  let answer = null, answered = true, right = 0, total = 0;
-  const grid = $('#gameGrid'), fb = $('#gameFb');
-  const gbtns = PLANETS.map((p, i) => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'gbtn';
-    b.append(planetEl(p, Math.round(30 * Math.pow(p.d, 0.3))));
-    b.insertAdjacentHTML('beforeend', '<span class="nm"></span>');
-    b.addEventListener('click', () => guess(i));
-    grid.append(b);
-    return b;
-  });
-  const showNames = on => gbtns.forEach((b, i) => {
-    b.querySelector('.nm').textContent = on ? `${PLANETS[i].zh} ${PLANETS[i].en}` : '？';
-  });
-  showNames(true);
-  const sayAnswer = () => { stopSpeaking(); speak(PLANETS[answer].en); };
-
-  $('#gStart').addEventListener('click', () => {
-    let next;
-    do { next = Math.floor(Math.random() * 8); } while (next === answer);
-    answer = next; answered = false;
-    gbtns.forEach(b => { b.disabled = false; b.classList.remove('right', 'wrong'); });
-    showNames(false);
-    fb.textContent = '🎧 仔細聽……是哪一顆行星呢？';
-    $('#gReplay').disabled = false;
-    sayAnswer();
-  });
-  $('#gReplay').addEventListener('click', () => { if (answer !== null) sayAnswer(); });
-
-  function guess(i) {
-    if (answered || answer === null) return;
-    answered = true; total++;
-    const p = PLANETS[answer];
-    const ok = i === answer;
-    if (ok) right++;
-    gbtns.forEach(b => { b.disabled = true; });
-    gbtns[answer].classList.add('right');
-    if (!ok) gbtns[i].classList.add('wrong');
-    showNames(true);
-    fb.innerHTML = ok
-      ? `<span class="ok">🎉 答對了！</span> 就是 ${p.zh} ${p.en}！`
-      : `<span class="no">🤔 差一點！</span> 正確答案是 ${p.zh} ${p.en}。`;
-    $('#gScore').textContent = `⭐ ${right} / ${total}`;
-    sayPlanet(p);
-  }
 
   select(cur);
   fitStrip();
