@@ -40,6 +40,7 @@
   .quiz-opts button.wrong{border-color:var(--cw);background:rgba(255,158,196,.15)}
   .quiz-opts button:disabled{cursor:default}
   .quiz-opts.long{grid-template-columns:1fr}
+  .quiz-opts .on{display:inline-flex;align-items:center;justify-content:center;width:1.55em;height:1.55em;margin-right:8px;border-radius:50%;background:rgba(255,209,102,.18);color:var(--sun);font-size:.9em;vertical-align:1px}
   .quiz-opts.long button{text-align:left;font-size:17px}
   .quiz-fb{margin-top:14px;min-height:1.7em}
   .quiz-fb .ok{color:var(--ccw);font-weight:800}
@@ -110,15 +111,17 @@
 <header class="topbar">
   <nav class="top">
     <a href="../index.html" title="回首頁" aria-label="回首頁">🏠</a>
-    <a href="01_moon-phases.html">🌙 月亮變變變</a>
-    <a href="02_earth-moon-orbit.html">🌍 地球帶著月亮跑</a>
+    <a href="01_moon-phases.html">🌙 月亮</a>
+    <a href="02_earth-moon-orbit.html">🌍 地球公轉</a>
     <a href="03_eclipses.html">📅 未來20年日食月食</a>
     <a href="04_planets.html">🪐 八大行星</a>
+    <a href="05_pluto.html">🧊 冥王星</a>
+    <a href="06_milky-way.html">🌌 銀河系</a>
   </nav>
 </header>
 <div class="wrap">
   <h1>⭐ 小測驗</h1>
-  <p class="sub">三個測驗分開玩：<a href="#moonQuiz">🌙 月亮與地球</a>・<a href="#planetQuiz">🪐 八大行星</a>・<a href="#listenQuiz">🎧 聽英文，找行星</a>・<a href="#scoreBoard">🏆 我的成績</a></p>
+  <p class="sub">五個測驗分開玩：<a href="#moonQuiz">🌙 月亮與地球</a>・<a href="#planetQuiz">🪐 八大行星</a>・<a href="#listenQuiz">🎧 聽英文，找行星</a>・<a href="#plutoQuiz">🧊 冥王星</a>・<a href="#galaxyQuiz">🌌 銀河系</a>・<a href="#scoreBoard">🏆 我的成績</a></p>
   <section class="panel" id="moonQuiz">
     <div class="qhead">
       <h2 class="qh">🌙 <span style="color:var(--moon)">月亮</span>與<span style="color:var(--moon)">地球</span><span class="qcount" id="moonCount">12 題</span></h2>
@@ -129,7 +132,7 @@
   </section>
   <section class="panel" id="planetQuiz">
     <div class="qhead">
-      <h2 class="qh">🪐 八大行星<span class="qcount" id="planetCount">10 題</span></h2>
+      <h2 class="qh">🪐 八大行星<span class="qcount" id="planetCount">14 題</span></h2>
       <span class="back"><a class="quiz-link" href="04_planets.html">← 回去看 🪐 八大行星</a></span>
     </div>
     <p class="qsub">題目都來自「🪐 八大行星」頁，答錯了可以回去再看看！</p>
@@ -149,36 +152,94 @@
     </div>
     <div class="game-grid" id="gameGrid"></div>
   </section>
+  <section class="panel" id="plutoQuiz">
+    <div class="qhead">
+      <h2 class="qh">🧊 冥王星 Pluto<span class="qcount" id="plutoCount">5 題</span></h2>
+      <span class="back"><a class="quiz-link" href="05_pluto.html">← 回去看 🧊 冥王星</a></span>
+    </div>
+    <p class="qsub">題目都來自「🧊 冥王星」頁，答錯了可以回去再看看！</p>
+    <div id="plquiz"></div>
+  </section>
+  <section class="panel" id="galaxyQuiz">
+    <div class="qhead">
+      <h2 class="qh">🌌 銀河系 Milky Way<span class="qcount" id="galaxyCount">9 題</span></h2>
+      <span class="back"><a class="quiz-link" href="06_milky-way.html">← 回去看 🌌 銀河系</a></span>
+    </div>
+    <p class="qsub">題目都來自「🌌 銀河系」頁，答錯了可以回去再看看！</p>
+    <div id="gquiz"></div>
+  </section>
 
   <section class="panel board" id="scoreBoard">
     <h2 class="qh">🏆 我的成績</h2>
-    <p class="qsub">三個測驗都是一題一分：月亮與地球滿分 12 分、八大行星滿分 10 分、聽英文找行星滿分 8 分，加起來滿分 30 分。再玩一次的話，以最新的分數為準。</p>
+    <p class="qsub">五個測驗都是一題一分：月亮與地球滿分 12 分、八大行星滿分 14 分、聽英文找行星滿分 8 分、冥王星滿分 5 分、銀河系滿分 9 分，加起來滿分 48 分。再玩一次的話，以最新的分數為準。</p>
     <div class="board-rows">
       <a href="#moonQuiz" class="board-row"><span>🌙 月亮與地球</span><b data-k="moon">還沒玩</b></a>
       <a href="#planetQuiz" class="board-row"><span>🪐 八大行星</span><b data-k="planet">還沒玩</b></a>
       <a href="#listenQuiz" class="board-row"><span>🎧 聽英文，找行星</span><b data-k="listen">還沒玩</b></a>
+      <a href="#plutoQuiz" class="board-row"><span>🧊 冥王星</span><b data-k="pluto">還沒玩</b></a>
+      <a href="#galaxyQuiz" class="board-row"><span>🌌 銀河系</span><b data-k="galaxy">還沒玩</b></a>
     </div>
-    <div class="board-total">總分 <b id="totalPts">0</b> / <span id="maxPts">30</span> 分</div>
-    <p class="board-msg" id="boardMsg">三個測驗都玩玩看，把總分加起來吧！</p>
+    <div class="board-total">總分 <b id="totalPts">0</b> / <span id="maxPts">48</span> 分</div>
+    <p class="board-msg" id="boardMsg">五個測驗都玩玩看，把總分加起來吧！</p>
   </section>
 </div>
 <script>
-// ---------- 三個測驗的分數和總分 ----------
-// 三個測驗都是一題一分
-window.QUIZ_MAX = { moon: 12, planet: 10, listen: 8 };
+// ---------- 五個測驗的分數和總分 ----------
+// 五個測驗都是一題一分
+window.QUIZ_MAX = { moon: 12, planet: 14, listen: 8, pluto: 5, galaxy: 9 };
 const QUIZ_MAX_SUM = Object.values(QUIZ_MAX).reduce((a, b) => a + b, 0);
 window.QUIZ_SCORES = {};
+// 答完後按鈕倒數（例如「下一題 →（4）」），時間到自動換題；直接按就馬上換
+window.AUTO_NEXT_SEC = 3;
+window.autoNext = (btn, go) => {
+  const base = btn.textContent; let left = AUTO_NEXT_SEC, done = false;
+  const fire = () => { if (done) return; done = true; clearInterval(timer); go(); };
+  const show = () => { btn.textContent = `${base}（${left}）`; };
+  show();
+  const timer = setInterval(() => {
+    if (!btn.isConnected) { clearInterval(timer); done = true; return; }   // 畫面已經換掉了
+    left--; left <= 0 ? fire() : show();
+  }, 1000);
+  btn.addEventListener('click', fire);
+};
+
+// ---------- 答對、答錯的音效（用瀏覽器即時合成，不用音檔） ----------
+// 答對：往上的兩聲「叮咚」鈴聲；答錯：往下的兩聲柔和「嘟嘟」
+let sfxCtx = null;
+window.playSfx = ok => {
+  try {
+    sfxCtx = sfxCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (sfxCtx.state === 'suspended') sfxCtx.resume();
+    const t0 = sfxCtx.currentTime + 0.02;
+    const master = sfxCtx.createGain(); master.gain.value = 0.28; master.connect(sfxCtx.destination);
+    const tone = (freq, start, dur, type, peak) => {
+      const o = sfxCtx.createOscillator(), g = sfxCtx.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(peak, start + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      o.connect(g); g.connect(master); o.start(start); o.stop(start + dur + 0.05);
+    };
+    if (ok) {
+      // 鈴聲：基音加一個高八度的泛音
+      [[880, 0], [1318.5, 0.14]].forEach(([f, d]) => { tone(f, t0 + d, 0.6, 'sine', 0.9); tone(f * 2, t0 + d, 0.35, 'sine', 0.25); });
+    } else {
+      tone(311, t0, 0.22, 'triangle', 0.8);
+      tone(233, t0 + 0.2, 0.38, 'triangle', 0.8);
+    }
+  } catch (e) { /* 不支援音效的瀏覽器就安靜跳過 */ }
+};
 // key：moon／planet／listen；回傳一句「目前總分」給各測驗的成績頁用
 window.reportScore = (key, right, total) => {
   const max = QUIZ_MAX[key], pts = Math.round(right / total * max);
   QUIZ_SCORES[key] = pts;
   const el = document.querySelector(`#scoreBoard [data-k="${key}"]`);
   el.textContent = `${pts} / ${max} 分`; el.classList.add('done');
-  const keys = Object.keys(QUIZ_SCORES), sum = keys.reduce((a, k) => a + QUIZ_SCORES[k], 0), left = 3 - keys.length;
+  const keys = Object.keys(QUIZ_SCORES), sum = keys.reduce((a, k) => a + QUIZ_SCORES[k], 0), left = Object.keys(QUIZ_MAX).length - keys.length;
   document.querySelector('#totalPts').textContent = sum;
   document.querySelector('#boardMsg').textContent = left > 0 ? `還有 ${left} 個測驗沒玩，玩完再看總分！`
     : sum === QUIZ_MAX_SUM ? `🎉 滿分 ${QUIZ_MAX_SUM} 分！你是天文小博士！` : sum >= QUIZ_MAX_SUM * 0.8 ? '👍 好厲害！差一點就滿分了！' : '💪 再挑戰看看，分數會越來越高喔！';
-  return { pts, max, line: `目前總分 ${sum} / ${QUIZ_MAX_SUM} 分` + (left > 0 ? `（還有 ${left} 個測驗沒玩）` : '（三個都玩完了！）') + '　<a href="#scoreBoard">看我的成績 ↓</a>' };
+  return { pts, max, line: `目前總分 ${sum} / ${QUIZ_MAX_SUM} 分` + (left > 0 ? `（還有 ${left} 個測驗沒玩）` : '（全部都玩完了！）') + '　<a href="#scoreBoard">看我的成績 ↓</a>' };
 };
 </script>
 <script>
@@ -316,9 +377,9 @@ window.reportScore = (key, right, total) => {
     const q = QUIZ[qorder[qi]];
     quizBox.innerHTML = `
       <div class="quiz-top"><span>第 ${qi + 1} / ${QUIZ.length} 題</span><span>⭐ ${score}</span></div>
-      <p class="quiz-q">${q.q}</p>
+      <p class="quiz-q">${qi + 1}. ${q.q}</p>
       ${q.age != null ? '<canvas class="quiz-moon"></canvas>' : ''}
-      <div class="quiz-opts${q.opts.some(o => o.replace(/<[^>]+>/g, '').length > 14) ? ' long' : ''}">${q.opts.map((o, i) => `<button data-i="${i}">${o}</button>`).join('')}</div>
+      <div class="quiz-opts${q.opts.some(o => o.replace(/<[^>]+>/g, '').length > 14) ? ' long' : ''}">${q.opts.map((o, i) => `<button data-i="${i}"><b class="on">${i + 1}</b>${o}</button>`).join('')}</div>
       <div class="quiz-fb" aria-live="polite"></div>`;
     if (q.age != null) {
       const look = moonLook(phiFromAge(q.age * DEG, 1));
@@ -328,12 +389,13 @@ window.reportScore = (key, right, total) => {
     btns.forEach(b => b.addEventListener('click', () => {
       const i = +b.dataset.i, ok = i === q.a;
       if (ok) score++;
+      playSfx(ok);
       btns.forEach(x => { x.disabled = true; if (+x.dataset.i === q.a) x.classList.add('right'); });
       if (!ok) b.classList.add('wrong');
       const fb = quizBox.querySelector('.quiz-fb');
       fb.innerHTML = `<span class="${ok ? 'ok' : 'no'}">${ok ? '🎉 答對了！' : '🤔 再想想～'}</span> ${q.why}
         <div style="margin-top:10px"><button class="btn primary" id="nextQ">${qi === QUIZ.length - 1 ? '看成績' : '下一題 →'}</button></div>`;
-      $('#nextQ').addEventListener('click', () => { qi++; renderQuiz(); });
+      autoNext($('#nextQ'), () => { qi++; renderQuiz(); });
     }));
   }
 
@@ -828,7 +890,7 @@ window.reportScore = (key, right, total) => {
     if (synth) synth.cancel();
   }
 
-  // ---------- 考考你：八大行星 10 題（內容都來自 04_planets.html 的行星介紹；每顆行星至少一題） ----------
+  // ---------- 考考你：八大行星 14 題（內容都來自 04_planets.html：行星介紹每顆至少一題，加上主小行星帶、木星和土星守門員） ----------
   // pl：答完後在說明旁邊畫出這顆行星（答題前不畫，才不會洩漏答案）
   const PQUIZ = [
     { q: '哪一顆行星<em>離太陽最近</em>，繞太陽也<em>跑得最快</em>？',
@@ -861,6 +923,20 @@ window.reportScore = (key, right, total) => {
     { q: '下面哪一組，<em>四顆都是「岩石行星」</em>？',
       opts: ['木星 Jupiter、土星 Saturn、天王星 Uranus、海王星 Neptune', '水星 Mercury、金星 Venus、地球 Earth、火星 Mars', '地球 Earth、火星 Mars、木星 Jupiter、土星 Saturn'], a: 1,
       why: '離太陽比較近的水星、金星、地球、火星是岩石行星；木星、土星是氣體巨行星；天王星、海王星是冰巨行星。' },
+    // ↓ 這兩題原本在銀河系測驗，2026-11-18 搬過來（兩個小行星帶和木星守門員的動畫在八大行星頁）
+    { q: '太陽系的<em>主小行星帶</em>在哪裡？',
+      opts: ['地球和月亮中間', '海王星外面', '火星和木星中間'], a: 2,
+      why: '主小行星帶在火星和木星中間，有幾百萬顆岩石小行星，最大的是穀神星。' },
+    { q: '為什麼說木星像太陽系的「<em>守門員</em>」？',
+      opts: ['木星會發光，照亮飛進來的彗星', '木星的引力很大，會把經過的彗星吸過去撞上，或甩出太陽系', '木星會把太陽光擋住'], a: 1, pl: 'jupiter',
+      why: '木星比其他七顆行星加起來還重兩倍多，引力很大。1994 年就有一顆彗星斷成 20 多塊，一塊一塊撞上木星！' },
+    // ↓ 土星「二號守門員」（agy 整理、八大行星頁木星守門員區的小卡）
+    { q: '除了木星，還有哪一顆行星也會幫忙擋彗星，像太陽系的「<em>二號守門員</em>」？',
+      opts: ['水星 Mercury', '土星 Saturn', '地球 Earth'], a: 1, pl: 'saturn',
+      why: '土星也會用引力幫忙把一些彗星甩出太陽系，可是它比木星輕、又離得更遠，所以只能當二號守門員。' },
+    { q: '為什麼土星 Saturn 擋彗星的本領，<em>沒有木星 Jupiter 厲害</em>？',
+      opts: ['土星 Saturn 有光環，會把引力擋住', '土星 Saturn 比較輕（只有木星 Jupiter 約三成重），又離太陽更遠', '土星 Saturn 轉得太慢'], a: 1, pl: 'saturn',
+      why: '土星大約 95 個地球重，木星約 318 個；土星離太陽約 9.5 天文單位，比木星的 5.2 遠了快一倍，遇到彗星的機會少很多。光環不會擋住引力喔！' },
   ];
   // 每回題目順序都打亂（給不同小朋友玩）；選項順序不動，因為有些選項是照大小或時間排的
   const shuffled = n => { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const m = Math.floor(Math.random() * (k + 1)); [a[k], a[m]] = [a[m], a[k]]; } return a; };
@@ -879,13 +955,14 @@ window.reportScore = (key, right, total) => {
     const q = PQUIZ[porder[pqi]];
     pbox.innerHTML = `
       <div class="quiz-top"><span>第 ${pqi + 1} / ${PQUIZ.length} 題</span><span>⭐ ${pscore}</span></div>
-      <p class="quiz-q">${q.q}</p>
-      <div class="quiz-opts${q.opts.some(o => o.replace(/<[^>]+>/g, '').length > 14) ? ' long' : ''}">${q.opts.map((o, i) => `<button data-i="${i}">${o}</button>`).join('')}</div>
+      <p class="quiz-q">${pqi + 1}. ${q.q}</p>
+      <div class="quiz-opts${q.opts.some(o => o.replace(/<[^>]+>/g, '').length > 14) ? ' long' : ''}">${q.opts.map((o, i) => `<button data-i="${i}"><b class="on">${i + 1}</b>${o}</button>`).join('')}</div>
       <div class="quiz-fb" aria-live="polite"></div>`;
     const btns = pbox.querySelectorAll('.quiz-opts button');
     btns.forEach(b => b.addEventListener('click', () => {
       const i = +b.dataset.i, ok = i === q.a;
       if (ok) pscore++;
+      playSfx(ok);
       btns.forEach(x => { x.disabled = true; if (+x.dataset.i === q.a) x.classList.add('right'); });
       if (!ok) b.classList.add('wrong');
       const fb = pbox.querySelector('.quiz-fb');
@@ -895,7 +972,7 @@ window.reportScore = (key, right, total) => {
         const p = PLANETS.find(x => x.id === q.pl);
         fb.querySelector('.fb-pl').append(planetEl(p, p.id === 'jupiter' || p.id === 'saturn' ? 56 : 46));
       }
-      fb.querySelector('[data-act="next"]').addEventListener('click', () => { pqi++; renderPQuiz(); });
+      autoNext(fb.querySelector('[data-act="next"]'), () => { pqi++; renderPQuiz(); });
     }));
   }
   renderPQuiz();
@@ -962,7 +1039,9 @@ window.reportScore = (key, right, total) => {
     startBtn.textContent = '🔁 再玩一次';
   }
 
+  let listenTimer = null;
   startBtn.addEventListener('click', () => {
+    clearInterval(listenTimer);
     if (state === 'idle') { order = makeOrder(); qn = 0; right = 0; ask(); }
     else if (state === 'answered') { qn < ROUNDS ? ask() : showEnd(); }
   });
@@ -974,6 +1053,7 @@ window.reportScore = (key, right, total) => {
     const p = PLANETS[answer];
     const ok = i === answer;
     if (ok) right++;
+    playSfx(ok);
     gbtns.forEach(b => { b.disabled = true; });
     gbtns[answer].classList.add('right');
     if (!ok) gbtns[i].classList.add('wrong');
@@ -984,10 +1064,160 @@ window.reportScore = (key, right, total) => {
     replayBtn.disabled = true;
     startBtn.disabled = false;
     startBtn.textContent = qn < ROUNDS ? '下一題 →' : '看成績';
+    // 倒數自動下一題（直接按也可以）
+    const base = startBtn.textContent; let left = AUTO_NEXT_SEC;
+    startBtn.textContent = `${base}（${left}）`;
+    clearInterval(listenTimer);
+    listenTimer = setInterval(() => {
+      if (state !== 'answered') { clearInterval(listenTimer); return; }
+      left--;
+      if (left <= 0) { clearInterval(listenTimer); qn < ROUNDS ? ask() : showEnd(); }
+      else startBtn.textContent = `${base}（${left}）`;
+    }, 1000);
     updateScore();
-    stopSpeaking(); speak(p.en);
+    // 答對只響「叮咚」，不再唸一次；答錯先響「嘟嘟」，再唸正確答案的英文讓小朋友再聽一次（這中間按了下一題就不唸）
+    stopSpeaking();
+    if (!ok) {
+      const tok = speakToken;
+      setTimeout(() => { if (tok === speakToken) speak(p.en); }, 700);
+    }
   }
 
+})();
+</script>
+<script>
+// ---------- 🌌 銀河系 9 題（內容都來自 06_milky-way.html；和其他測驗分開計分） ----------
+(() => {
+  const $ = s => document.querySelector(s);
+  const GQUIZ = [
+    { q: '太陽在銀河系 Milky Way 的<em>哪一條旋臂</em>上？',
+      opts: ['英仙臂', '獵戶臂', '人馬臂', '盾牌-半人馬臂'], a: 1,
+      why: '太陽在獵戶臂上！從銀河中心往外數是第 ④ 條，夾在 ③ 人馬臂和 ⑤ 英仙臂中間。' },
+    { q: '從銀河中心 Galactic Center <em>由內往外數</em>，太陽在<em>第幾條</em>旋臂上？',
+      opts: ['第 2 條', '第 3 條', '第 4 條', '第 5 條'], a: 2,
+      why: '由內往外是 ① 矩尺-外臂、② 盾牌-半人馬臂、③ 人馬臂、④ 獵戶臂，太陽就在第 ④ 條獵戶臂上！' },
+    { q: '太陽離<em>銀河中心 Galactic Center</em>大約有多遠？',
+      opts: ['大約 2 萬 6 千光年', '大約 260 光年', '大約 26 億光年'], a: 0,
+      why: '大約 2 萬 6 千光年！我們今天看到銀河中心的光，是它 2 萬 6 千年前發出來的。' },
+    { q: '從<em>北邊往下看</em>，銀河系 Milky Way 是怎麼轉的？',
+      opts: ['逆時針', '順時針', '不會轉'], a: 1,
+      why: '從北邊往下看，銀河系是順時針轉的。' },
+    { q: '太陽繞銀河中心 Galactic Center <em>一圈</em>，大約要多久？',
+      opts: ['1 年', '2300 年', '大約 2 億 3 千萬年'], a: 2,
+      why: '大約 2 億 3 千萬年，叫做一個「銀河年」。太陽上一次在現在這個位置時，恐龍才剛出現！' },
+    { q: '銀河系 Milky Way 的<em>正中間</em>住著什麼？',
+      opts: ['一個超大質量黑洞「人馬座 A*」', '一顆超級大的太陽', '一大片冰塊'], a: 0,
+      why: '是超大質量黑洞「人馬座 A*」，大約有 400 萬個太陽那麼重。2022 年科學家拍到了它的照片！' },
+    { q: '為什麼晚上看到的銀河 Milky Way，是<em>一條白白的帶子</em>？',
+      opts: ['因為銀河系 Milky Way 是一根長長的棍子', '因為雲把它遮成一條', '因為我們住在銀河系 Milky Way 這張「大餅」裡面，沿著盤面看出去星星最多'], a: 2,
+      why: '銀河系像一張薄薄的大餅，我們就住在裡面。沿著盤面看出去，星星一層疊一層，就連成一條帶子。' },
+    { q: '在台灣，<em>哪個季節</em>的晚上，銀河 Milky Way 最亮最好看？',
+      opts: ['冬天', '夏天', '春天'], a: 1,
+      why: '夏天！晚上銀河中心在南方的人馬座，銀河從南方往上經過頭頂附近，最亮最寬。' },
+    // ↓ 題目裡說了「銀河系是順時針」，所以一定排在「從北邊往下看，銀河系怎麼轉」那題後面
+    { q: '從北邊往下看，銀河系 Milky Way 是<em>順時針</em>轉的。那太陽系的<em>八大行星繞太陽</em>，從北邊往下看是怎麼轉？',
+      opts: ['也是順時針', '逆時針', '不會轉'], a: 1,
+      why: '行星繞太陽是逆時針，跟銀河系的順時針剛好相反！不過太陽系的黃道面跟銀河系的盤面斜了大約 60 度，所以這兩個「北邊」不是同一個方向。' },
+  ];
+  // 每回題目順序都打亂（給不同小朋友玩）；選項順序不動
+  const shuffled = n => { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const m = Math.floor(Math.random() * (k + 1)); [a[k], a[m]] = [a[m], a[k]]; } return a; };
+  // 第 1、2 題固定（先問太陽在哪一條旋臂，再問由內往外是第幾條），第 3 題以後每回打亂
+  const SPIN = GQUIZ.findIndex(q => q.q.startsWith('從<em>北邊往下看</em>，銀河系')), SPIN2 = GQUIZ.length - 1;
+  const makeOrder = () => {
+    const units = [];
+    for (let k = 2; k < GQUIZ.length; k++) if (k !== SPIN && k !== SPIN2) units.push([k]);
+    units.push([SPIN, SPIN2]);   // 這兩題綁在一起
+    return [0, 1, ...shuffled(units.length).flatMap(u => units[u])];
+  };
+  let gi = 0, gscore = 0, gorder = makeOrder();
+  const box = $('#gquiz');
+  $('#galaxyCount').textContent = GQUIZ.length + ' 題';
+  function render() {
+    if (gi >= GQUIZ.length) {
+      const stars = '⭐'.repeat(gscore) + '☆'.repeat(GQUIZ.length - gscore);
+      const msg = gscore === GQUIZ.length ? '太厲害了！你是銀河小博士！' : gscore >= Math.ceil(GQUIZ.length * 0.7) ? '很棒喔！再去銀河系那頁多看看吧！' : '沒關係，去銀河系那頁看看，再挑戰一次！';
+      const r = reportScore('galaxy', gscore, GQUIZ.length);
+      box.innerHTML = `<div class="quiz-end"><div class="big">🌌</div><p class="quiz-q">答對 ${gscore} / ${GQUIZ.length} 題</p><p>${stars}</p><p class="pts">得分 <b>${r.pts}</b> / ${r.max} 分</p><p>${msg}</p><p class="tot">${r.line}</p><button class="btn primary" data-act="again">再玩一次</button></div>`;
+      box.querySelector('[data-act="again"]').addEventListener('click', () => { gi = 0; gscore = 0; gorder = makeOrder(); render(); });
+      return;
+    }
+    const q = GQUIZ[gorder[gi]];
+    box.innerHTML = `
+      <div class="quiz-top"><span>第 ${gi + 1} / ${GQUIZ.length} 題</span><span>⭐ ${gscore}</span></div>
+      <p class="quiz-q">${gi + 1}. ${q.q}</p>
+      <div class="quiz-opts${q.opts.some(o => o.replace(/<[^>]+>/g, '').length > 14) ? ' long' : ''}">${q.opts.map((o, i) => `<button data-i="${i}"><b class="on">${i + 1}</b>${o}</button>`).join('')}</div>
+      <div class="quiz-fb" aria-live="polite"></div>`;
+    const btns = box.querySelectorAll('.quiz-opts button');
+    btns.forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.i, ok = i === q.a;
+      if (ok) gscore++;
+      playSfx(ok);
+      btns.forEach(x => { x.disabled = true; if (+x.dataset.i === q.a) x.classList.add('right'); });
+      if (!ok) b.classList.add('wrong');
+      const fb = box.querySelector('.quiz-fb');
+      fb.innerHTML = `<span class="${ok ? 'ok' : 'no'}">${ok ? '🎉 答對了！' : '🤔 再想想～'}</span> ${q.why}
+        <div style="margin-top:10px"><button class="btn primary" data-act="next">${gi === GQUIZ.length - 1 ? '看成績' : '下一題 →'}</button></div>`;
+      autoNext(fb.querySelector('[data-act="next"]'), () => { gi++; render(); });
+    }));
+  }
+  render();
+})();
+</script>
+<script>
+// ---------- 🧊 冥王星 5 題（內容都來自 05_pluto.html；和其他測驗分開計分） ----------
+(() => {
+  const $ = s => document.querySelector(s);
+  const LQUIZ = [
+    { q: '冥王星 Pluto 以前是第九大行星，<em>2006 年起改叫什麼</em>？',
+      opts: ['矮行星', '衛星', '彗星'], a: 0,
+      why: '2006 年天文學家訂出行星的三個條件，冥王星沒有「清空軌道」，所以改叫矮行星。' },
+    { q: '冥王星 Pluto 和我們的<em>月亮</em>比，誰比較大？',
+      opts: ['冥王星比較大', '月亮比較大', '一樣大'], a: 1,
+      why: '冥王星的直徑大約 2377 公里，月亮大約 3474 公里，冥王星只有月亮的三分之二左右！' },
+    { q: '2015 年<em>新視野號</em>飛過冥王星 Pluto，拍到一大片冰原，形狀像什麼？',
+      opts: ['星星', '笑臉', '愛心'], a: 2,
+      why: '是一顆冰做的「愛心」！後來用發現冥王星的湯博的名字，叫做「湯博區」。' },
+    { q: '冥王星 Pluto <em>繞太陽一圈</em>，大約要多久？',
+      opts: ['1 年', '88 天', '248 年'], a: 2,
+      why: '大約 248 年！它從 1930 年被發現到現在還沒繞完一圈，要到 2178 年才第一次繞完。' },
+    { q: '冥王星 Pluto 的軌道有一段跑進海王星 Neptune 裡面，<em>為什麼永遠不會相撞</em>？',
+      opts: ['海王星看到冥王星會轉彎躲開', '海王星繞 3 圈、冥王星剛好繞 2 圈，加上冥王星的軌道斜了 17°，兩個總是錯開', '冥王星很小，撞上也沒關係'], a: 1,
+      why: '3:2 的節奏讓它們在時間上錯開，17° 的傾斜讓它們在空間上錯開，兩個最近也還隔著大約 17 AU！' },
+  ];
+  // 每回題目順序都打亂（給不同小朋友玩）；選項順序不動
+  const shuffled = n => { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const m = Math.floor(Math.random() * (k + 1)); [a[k], a[m]] = [a[m], a[k]]; } return a; };
+  let li = 0, lscore = 0, lorder = shuffled(LQUIZ.length);
+  const box = $('#plquiz');
+  $('#plutoCount').textContent = LQUIZ.length + ' 題';
+  function render() {
+    if (li >= LQUIZ.length) {
+      const stars = '⭐'.repeat(lscore) + '☆'.repeat(LQUIZ.length - lscore);
+      const msg = lscore === LQUIZ.length ? '太厲害了！你是冥王星小博士！' : lscore >= Math.ceil(LQUIZ.length * 0.7) ? '很棒喔！再去冥王星那頁多看看吧！' : '沒關係，去冥王星那頁看看，再挑戰一次！';
+      const r = reportScore('pluto', lscore, LQUIZ.length);
+      box.innerHTML = `<div class="quiz-end"><div class="big">🧊</div><p class="quiz-q">答對 ${lscore} / ${LQUIZ.length} 題</p><p>${stars}</p><p class="pts">得分 <b>${r.pts}</b> / ${r.max} 分</p><p>${msg}</p><p class="tot">${r.line}</p><button class="btn primary" data-act="again">再玩一次</button></div>`;
+      box.querySelector('[data-act="again"]').addEventListener('click', () => { li = 0; lscore = 0; lorder = shuffled(LQUIZ.length); render(); });
+      return;
+    }
+    const q = LQUIZ[lorder[li]];
+    box.innerHTML = `
+      <div class="quiz-top"><span>第 ${li + 1} / ${LQUIZ.length} 題</span><span>⭐ ${lscore}</span></div>
+      <p class="quiz-q">${li + 1}. ${q.q}</p>
+      <div class="quiz-opts${q.opts.some(o => o.replace(/<[^>]+>/g, '').length > 14) ? ' long' : ''}">${q.opts.map((o, i) => `<button data-i="${i}"><b class="on">${i + 1}</b>${o}</button>`).join('')}</div>
+      <div class="quiz-fb" aria-live="polite"></div>`;
+    const btns = box.querySelectorAll('.quiz-opts button');
+    btns.forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.i, ok = i === q.a;
+      if (ok) lscore++;
+      playSfx(ok);
+      btns.forEach(x => { x.disabled = true; if (+x.dataset.i === q.a) x.classList.add('right'); });
+      if (!ok) b.classList.add('wrong');
+      const fb = box.querySelector('.quiz-fb');
+      fb.innerHTML = `<span class="${ok ? 'ok' : 'no'}">${ok ? '🎉 答對了！' : '🤔 再想想～'}</span> ${q.why}
+        <div style="margin-top:10px"><button class="btn primary" data-act="next">${li === LQUIZ.length - 1 ? '看成績' : '下一題 →'}</button></div>`;
+      autoNext(fb.querySelector('[data-act="next"]'), () => { li++; render(); });
+    }));
+  }
+  render();
 })();
 </script>
 </body>

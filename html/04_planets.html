@@ -182,6 +182,41 @@
   .side-box canvas{position:absolute;inset:0;width:100%;height:100%}
   .hint{color:var(--muted);font-size:13px}
 
+
+  /* ---------- 兩個小行星帶、木星守門員（從銀河系頁搬過來；樣式只套用在 .mv 這兩塊） ---------- */
+  .mv{margin-top:16px;--cyan:#8fe3f5}
+  .mv h2{font-size:22px;margin:0 0 6px}
+  .mv h3{font-size:18px;margin:0 0 4px;color:var(--sun)}
+  .mv em{font-style:normal;color:var(--sun)}
+  .mv .lead-txt{color:var(--muted);margin:0 0 12px}
+  .mv .ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .mv .ctrl .read{color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums}
+  .mv .cap{color:var(--muted);font-size:13.5px;margin:6px 2px 0}
+  .mv .card{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+  .mv .card p{margin:0}
+  .mv .card + .card{margin-top:10px}
+  .mv .cvbox{position:relative;border-radius:16px;overflow:hidden;background:#03050d}
+  .mv .cvbox canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  /* 小行星帶 */
+  .mv .belt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .mv .belt-box{height:520px}
+  .mv .belt-col h2{font-size:20px}
+  .mv .belt-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+  .mv .belt-cards .card + .card{margin-top:0}
+  /* 木星守門員 */
+  .mv .jup-grid{display:grid;grid-template-columns:minmax(0,640px) minmax(0,1fr);gap:18px;align-items:start}
+  .mv .jup-box{aspect-ratio:1/1}
+  .mv .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+  .mv .stat{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+  .mv .stat small{display:block;color:var(--muted);font-size:13.5px}
+  .mv .stat b{font-size:26px;font-variant-numeric:tabular-nums}
+  .mv .stat.earth b{color:var(--ok)} .mv .stat.hit b{color:#ffb15c} .mv .stat.out b{color:var(--cyan)}
+  .mv .cmp{margin:12px 0}
+  .mv .cmp-row{display:grid;grid-template-columns:110px minmax(0,1fr) 70px;align-items:center;gap:8px;margin:6px 0;font-size:15px}
+  .mv .cmp-bar{height:18px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden}
+  .mv .cmp-bar i{display:block;height:100%;width:0;border-radius:9px;transition:width .4s}
+  .mv .cmp-row b{text-align:right;font-variant-numeric:tabular-nums}
+  .mv .cmp-msg{min-height:1.7em;font-weight:700;color:var(--sun)}
   footer{text-align:center;color:var(--muted);font-size:14px;margin-top:22px}
 </style>
 </head>
@@ -189,11 +224,13 @@
 <div class="wrap">
   <nav class="top">
     <a href="../index.html" title="回首頁" aria-label="回首頁">🏠</a>
-    <a href="01_moon-phases.html">🌙 月亮變變變</a>
-    <a href="02_earth-moon-orbit.html">🌍 地球帶著月亮跑</a>
+    <a href="01_moon-phases.html">🌙 月亮</a>
+    <a href="02_earth-moon-orbit.html">🌍 地球公轉</a>
     <a href="03_eclipses.html">📅 未來20年日食月食</a>
     <a href="04_planets.html" aria-current="page">🪐 八大行星</a>
-    <a href="05_quiz.html">⭐ 小測驗</a>
+    <a href="05_pluto.html">🧊 冥王星</a>
+    <a href="06_milky-way.html">🌌 銀河系</a>
+    <a href="07_quiz.html">⭐ 小測驗</a>
   </nav>
 
   <section class="panel system">
@@ -248,6 +285,10 @@
         <button data-v="5">每秒 5 年</button>
       </div>
       <button class="btn" id="oToday">回到今天</button>
+      <div class="seg" id="oLang" aria-label="行星名字的語言">
+        <button data-v="zh" class="active">名字：中文</button>
+        <button data-v="en">English</button>
+      </div>
       <div class="view-row">
         <span>觀看角度：側面</span>
         <input type="range" id="oView" min="0" max="90" step="1" value="90" aria-label="觀看角度，從側面到從北邊往下看">
@@ -262,6 +303,99 @@
         <h2>從側面看：八條軌道幾乎在同一個平面</h2>
         <div class="side-box"><canvas id="sideCanvas" aria-label="從側面看各行星軌道面和黃道面的夾角"></canvas></div>
         <p class="hint">距離和橢圓軌道都照真實比例；太陽和行星的圓點有放大，不然會小到看不見。公轉方向：從北邊看都是逆時針。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ 兩個小行星帶 -->
+  <section class="panel mv" id="belts">
+    <div class="orbit-head">
+      <h2 style="margin:0">🪨 太陽系裡的兩個小行星帶</h2>
+      <div class="seg" id="bSpeed" aria-label="轉動速度">
+        <button data-v="0.0833">每秒 1 個月</button>
+        <button data-v="0.5" class="active">每秒半年</button>
+        <button data-v="5">每秒 5 年</button>
+      </div>
+      <div class="seg" id="bLang" aria-label="行星名字的語言">
+        <button data-v="zh" class="active">名字：中文</button>
+        <button data-v="en">English</button>
+      </div>
+    </div>
+    <p class="lead-txt" style="margin:8px 0 10px">太陽系裡有兩圈「碎石帶」：裡面一圈在<em>火星和木星中間</em>，外面一圈在<em>海王星外面</em>。</p>
+    <div class="belt-grid">
+      <div class="belt-col">
+        <div class="ctrl">
+          <h2 style="margin:0">① 主小行星帶</h2>
+          <span class="read" id="inRead"></span>
+        </div>
+        <div class="cvbox belt-box"><canvas id="inCanvas" aria-label="內太陽系：水星到木星，以及火星和木星中間的主小行星帶"></canvas></div>
+      </div>
+      <div class="belt-col">
+        <div class="ctrl">
+          <h2 style="margin:0">② 古柏帶</h2>
+          <span class="read" id="outRead"></span>
+        </div>
+        <div class="cvbox belt-box"><canvas id="outCanvas" aria-label="外太陽系：木星到海王星，以及海王星外面的古柏帶和冥王星"></canvas></div>
+      </div>
+    </div>
+    <p class="cap">距離照真實比例（1 天文單位＝地球到太陽的距離，大約 1.5 億公里）；行星的圓點有放大，不然會小到看不見。兩張圖的比例尺不一樣：右邊那張把左邊整張縮在中間一點點。</p>
+    <div class="belt-cards">
+      <div class="card"><h3>🪨 主小行星帶</h3><p>在火星和木星中間，離太陽大約 <em>2.2～3.3 天文單位</em>，有<em>幾百萬顆</em>岩石小行星。最大的是<em>穀神星</em>（直徑約 940 公里，現在算矮行星）。全部加起來還不到月球的 5% 重，彼此離得很遠，太空船飛過去不會撞到。</p></div>
+      <div class="card"><h3>🧊 古柏帶</h3><p>在海王星外面，大約 <em>30～50 天文單位</em>，住著很多<em>冰凍的小天體</em>，像太陽系的冷凍庫。<em>冥王星</em>就住在這裡（虛線是它扁扁的軌道）。2019 年，新視野號飛過一顆叫「阿羅科斯」的古柏帶天體，長得像<em>雪人</em>！</p></div>
+      <div class="card"><h3>🪐 木星留下的痕跡</h3><p>主小行星帶裡有幾條<em>空隙</em>（柯克伍德空隙）：在那裡繞一圈的時間剛好跟木星成簡單的比例（例如木星繞 1 圈、它繞 3 圈），一直被木星拉，就被清空了。木星<em>前面和後面 60 度</em>，還有兩群「<em>特洛伊小行星</em>」跟著木星一起跑。</p></div>
+    </div>
+  </section>
+
+  <!-- ④ 木星守門員 -->
+  <section class="panel mv" id="jupiter">
+    <h2>🛡️ 木星是太陽系的守門員？</h2>
+    <div class="jup-grid">
+      <div>
+        <div class="ctrl">
+          <button class="btn primary" id="jStart">▶ 放出 40 顆彗星</button>
+          <div class="seg" id="jMode">
+            <button data-v="1" class="active">🪐 有木星</button>
+            <button data-v="0">🚫 拿掉木星</button>
+          </div>
+          <div class="seg" id="jSpeed">
+            <button data-v="5">每秒 5 年</button>
+            <button data-v="15" class="active">每秒 15 年</button>
+            <button data-v="30">每秒 30 年</button>
+          </div>
+          <button class="btn" id="jNew">🎲 換一批彗星</button>
+        </div>
+        <div class="cvbox jup-box"><canvas id="jupCanvas" aria-label="彗星飛進太陽系，經過木星附近時被吸過去或甩出去的動畫"></canvas></div>
+        <p class="cap">示意動畫：為了看得清楚，<em>木星的引力放大了 10 倍</em>，撞上木星的範圍也放大了；距離也有壓縮，越外面縮得越多。</p>
+      </div>
+      <div>
+        <div class="card">
+          <h3>木星是怎麼「守門」的？</h3>
+          <p>木星是最重的行星，比其他七顆行星加起來還重<em>兩倍多</em>，引力很大。從太陽系外圍飛進來的彗星，經過木星附近時，可能<em>被吸過去撞上木星</em>，或像盪鞦韆一樣<em>被甩出太陽系</em>。這樣它們就沒辦法一次又一次回來，經過地球附近。</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><small>經過時間</small><b id="jYears">0</b> 年 / 300 年</div>
+          <div class="stat earth"><small>彗星穿過地球軌道</small><b id="jCross">0</b> 次</div>
+          <div class="stat hit"><small>撞上木星</small><b id="jHit">0</b> 顆</div>
+          <div class="stat out"><small>被甩出太陽系</small><b id="jOut">0</b> 顆</div>
+        </div>
+        <div class="card cmp">
+          <h3>比一比：300 年裡，彗星穿過地球軌道幾次？</h3>
+          <div class="cmp-row"><span>🪐 有木星</span><div class="cmp-bar"><i id="barWith" style="background:var(--ok)"></i></div><b id="cmpWith">—</b></div>
+          <div class="cmp-row"><span>🚫 拿掉木星</span><div class="cmp-bar"><i id="barWithout" style="background:var(--no)"></i></div><b id="cmpWithout">—</b></div>
+          <div class="cmp-msg" id="cmpMsg">先放一次「有木星」，再按「拿掉木星」放一次，看看差多少！（兩次放的是同一批彗星）</div>
+        </div>
+        <div class="card">
+          <h3>真的發生過！</h3>
+          <p>1994 年，「<em>舒梅克-李維 9 號</em>」彗星被木星的引力扯成 20 多塊，一塊一塊撞上木星，在木星上留下比地球還大的黑色疤痕。</p>
+        </div>
+        <div class="card">
+          <h3>🪐 土星呢？二號守門員！</h3>
+          <p>土星也會幫忙，但力氣比較小，像「<em>二號守門員</em>」：土星大約 95 個地球重，只有木星（約 318 個地球重）的<em>三成</em>；它離太陽也更遠（約 9.5 天文單位，木星是 5.2），繞一圈要 29.5 年，遇到飛進來的彗星機會少很多。土星能幫忙把一些冰凍的彗星甩出太陽系，不過有時候也會把它們往裡面推，交給木星「接手」。</p>
+        </div>
+        <div class="card">
+          <h3>小提醒</h3>
+          <p>掉到地上的太空石頭叫「<em>隕石</em>」，大部分其實來自主小行星帶。木星清掉了很多經過的彗星，但它<em>不是完美的盾牌</em>：科學家發現，木星有時候也會把小行星推往地球的方向。</p>
+        </div>
       </div>
     </div>
   </section>
@@ -920,7 +1054,8 @@
   // 從黃道面北邊往下看：行星都逆時針繞太陽。軌道是橢圓，距離照真實比例
   const FONT = '"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif';
   const nowYears = () => (Date.now() - Date.UTC(2000, 0, 1, 12)) / (365.25 * 86400000);
-  const orb = { t: nowYears(), playing: false, speed: 0.5, last: 0, view: 90 };
+  const orb = { t: nowYears(), playing: false, speed: 0.5, last: 0, view: 90, en: false };
+  const orbName = p => orb.en ? p.en : p.zh;   // 軌道圖上的行星名字：中文或英文
   // 兩張圖都照真實比例：左圖畫到海王星，右圖把內圈放大、只畫到火星
   const FAR = 30.4, NEAR = 1.7;   // 海王星、火星離太陽最遠時的距離（天文單位）再多一點
   const rPix = (au, R, mode) => R * au / (mode === 'inner' ? NEAR : FAR);
@@ -991,17 +1126,17 @@
         // 名字放在行星外側，才不會壓到裡面的軌道
         const ux = Math.cos(q.a), uy = -Math.sin(q.a), off = pr + 8;
         let al = ux > 0.3 ? 'left' : ux < -0.3 ? 'right' : 'center', tx = q.x + ux * off;
-        const tw = ctx.measureText(p.zh).width, ty = Math.max(30, Math.min(h - 10, q.y + uy * (off + 4)));
+        const tw = ctx.measureText(orbName(p)).width, ty = Math.max(30, Math.min(h - 10, q.y + uy * (off + 4)));
         // 名字會超出畫布邊緣時，改放到行星的另一側
         if (al === 'left' && tx + tw > w - 4) { al = 'right'; tx = q.x - off; }
         else if (al === 'right' && tx - tw < 4) { al = 'left'; tx = q.x + off; }
         else if (al === 'center') tx = Math.max(tw / 2 + 4, Math.min(w - tw / 2 - 4, tx));
         ctx.textAlign = al; ctx.textBaseline = 'middle';
-        ctx.fillText(p.zh, tx, ty);
+        ctx.fillText(orbName(p), tx, ty);
       } else {
         // 接近側面時軌道擠在一起：名字上下交錯放，才不會全部疊在一條線上
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(p.zh, q.x, q.y + (i % 2 ? 1 : -1) * (pr + 12 + (i % 4 > 1 ? 16 : 0)));
+        ctx.fillText(orbName(p), q.x, q.y + (i % 2 ? 1 : -1) * (pr + 12 + (i % 4 > 1 ? 16 : 0)));
       }
     }
     // 左圖：用虛線框出右圖放大的範圍
@@ -1049,7 +1184,7 @@
       ctx.beginPath(); ctx.moveTo(cx + dx + 2, cy - dy); ctx.lineTo(x1 + 18, ly); ctx.stroke();
       ctx.globalAlpha = 1;
       ctx.font = `${sel ? 700 : 400} 13px ${FONT}`; ctx.fillStyle = sel ? '#ffd166' : '#dfe4ff'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-      ctx.fillText(p.id === 'earth' ? '地球 0°（黃道面）' : `${p.zh} ${p.inc}°`, x1 + 22, ly);
+      ctx.fillText(p.id === 'earth' ? `${orbName(p)} 0°（黃道面）` : `${orbName(p)} ${p.inc}°`, x1 + 22, ly);
     });
     ctx.fillStyle = '#ffd166'; ctx.beginPath(); ctx.arc(cx, cy, 7, 0, TAU); ctx.fill();
   }
@@ -1070,6 +1205,10 @@
     document.querySelectorAll('#oSpeed button').forEach(x => x.classList.toggle('active', x === b));
   }));
   $('#oView').addEventListener('input', e => { orb.view = +e.target.value; drawOrbit(); });
+  $('#oLang').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    $('#oLang').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+    orb.en = b.dataset.v === 'en'; drawOrbit(); drawSide();
+  }));
   $('#oToday').addEventListener('click', () => { orb.t = nowYears(); drawOrbit(); });
   for (const id of ['#orbitCanvas', '#innerCanvas']) $(id).addEventListener('click', e => {
     const cv = e.currentTarget, g = cv._geo, pos = cv._pos || [];
@@ -1089,6 +1228,325 @@
   select(cur);
   fitStrip();
   drawOrbit(); drawSide();
+})();
+</script>
+<script>
+// ---------- 兩個小行星帶、木星守門員（從 06_milky-way.html 搬過來，獨立一段程式） ----------
+(() => {
+  const $ = s => document.querySelector(s);
+  const DEG = Math.PI / 180, TAU = Math.PI * 2;
+  // 可以重現的亂數（同一個種子每次產生一樣的數列）
+  function rng(seed) {
+    let a = seed >>> 0;
+    return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function gauss(r) { let u = 0, v = 0; while (u === 0) u = r(); v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); }
+
+  // 畫布跟著容器大小、螢幕解析度調整；回傳 CSS 像素的寬高
+  function fit(cv) {
+    const dpr = window.devicePixelRatio || 1, r = cv.getBoundingClientRect();
+    const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, W: r.width, H: r.height };
+  }
+  function segInit(id, onChange) {
+    const box = $(id);
+    box.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      box.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+      onChange(+b.dataset.v);
+    }));
+    return +box.querySelector('.active').dataset.v;
+  }
+  // 畫在畫布上的文字：深色外框讓字在亮的背景上也看得清楚
+  function label(ctx, text, x, y, color, size = 14, align = 'center', boxes) {
+    ctx.font = `700 ${size}px "PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif`;
+    if (boxes) { const w = ctx.measureText(text).width, x0 = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x; boxes.push([x0, y - size / 2, x0 + w, y + size / 2]); }
+    ctx.textAlign = align; ctx.textBaseline = 'middle';
+    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(3,5,13,.85)'; ctx.strokeText(text, x, y);
+    ctx.fillStyle = color; ctx.fillText(text, x, y);
+  }
+  const fmtYears = y => y >= 1e8 ? (y / 1e8).toFixed(y >= 1e9 ? 0 : 1).replace(/\.0$/, '') + ' 億年' : y >= 1e4 ? Math.round(y / 1e4).toLocaleString() + ' 萬年' : Math.round(y) + ' 年';
+
+  // 只在畫面上看得到時才更新，省電
+  const visible = new Map();
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => visible.set(e.target, e.isIntersecting)), { rootMargin: '100px' }) : null;
+  const watch = el => { visible.set(el, true); if (io) io.observe(el); };
+  const isVis = el => visible.get(el) !== false;
+
+  const keplerE = (M, e) => { let E = M; for (let k = 0; k < 8; k++) E -= (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E)); return E; };
+
+  // =====================================================================
+  // ③ 兩個小行星帶（單位：天文單位 AU；時間：年；角度從 2000 年初的平黃經算起）
+  // =====================================================================
+  const YEARS_SINCE_2000 = (Date.now() - Date.UTC(2000, 0, 1)) / (365.25 * 864e5);
+  const PL = {
+    mercury: { zh: '水星', en: 'Mercury', a: 0.387, T: 0.2408, L0: 252.25, c: '#b9b2aa', r: 3 },
+    venus: { zh: '金星', en: 'Venus', a: 0.723, T: 0.6152, L0: 181.98, c: '#e9c77e', r: 4 },
+    earth: { zh: '地球', en: 'Earth', a: 1.0, T: 1.0, L0: 100.46, c: '#5aa9f0', r: 4.5 },
+    mars: { zh: '火星', en: 'Mars', a: 1.524, T: 1.8808, L0: 355.43, c: '#e8743f', r: 3.5 },
+    jupiter: { zh: '木星', en: 'Jupiter', a: 5.203, T: 11.8626, L0: 34.40, c: '#dcb88c', r: 7.5 },
+    saturn: { zh: '土星', en: 'Saturn', a: 9.537, T: 29.4475, L0: 49.94, c: '#ead9a0', r: 6.5 },
+    uranus: { zh: '天王星', en: 'Uranus', a: 19.19, T: 84.0168, L0: 313.23, c: '#8fdfe6', r: 5.5 },
+    neptune: { zh: '海王星', en: 'Neptune', a: 30.07, T: 164.79, L0: 304.88, c: '#6f95ff', r: 5.5 },
+  };
+  const plAng = (p, t) => (p.L0 + 360 * (YEARS_SINCE_2000 + t) / p.T) * DEG;
+  // 主小行星帶：避開幾條柯克伍德空隙（和木星成 3:1、5:2、7:3、2:1 的地方）
+  const GAPS = [[2.502, 0.04], [2.825, 0.035], [2.958, 0.03], [3.279, 0.06]];
+  const mainBelt = [], trojans = [], kuiper = [];
+  (function buildBelts() {
+    const r = rng(42);
+    while (mainBelt.length < 2400) {
+      const a = 2.1 + r() * 1.25;
+      if (GAPS.some(([g, w]) => Math.abs(a - g) < w)) continue;
+      if (a > 3.3 && r() < 0.7) continue;
+      mainBelt.push({ a, th: r() * TAU, dr: gauss(r) * 0.035, b: 0.35 + r() * 0.5 });
+    }
+    // 特洛伊小行星：木星前後 60 度
+    for (let k = 0; k < 360; k++) {
+      const lead = k < 200 ? 1 : -1;
+      trojans.push({ a: 5.203 + gauss(r) * 0.12, off: lead * 60 * DEG + gauss(r) * 11 * DEG });
+    }
+    // 古柏帶：冥族小天體（39.4 AU，和海王星成 3:2）、古典古柏帶（42～48 AU）、散開的
+    for (let k = 0; k < 2000; k++) {
+      const u = r();
+      const a = u < 0.3 ? 39.4 + gauss(r) * 0.35 : u < 0.8 ? 42 + r() * 6 : 30 + r() * 25;
+      kuiper.push({ a, th: r() * TAU, dr: gauss(r) * (u < 0.8 ? 0.8 : 2.5), b: 0.3 + r() * 0.55 });
+    }
+  })();
+  // 冥王星：扁扁的軌道（1989 年過近日點）
+  const PLUTO = { a: 39.48, e: 0.2488, w: 224.07 * DEG, T: 247.94, tp: 1989.7 - 2000 };
+  function plutoXY(t) {
+    const M = TAU * (YEARS_SINCE_2000 + t - PLUTO.tp) / PLUTO.T;
+    const E = keplerE(((M % TAU) + TAU) % TAU, PLUTO.e);
+    const x = PLUTO.a * (Math.cos(E) - PLUTO.e), y = PLUTO.a * Math.sqrt(1 - PLUTO.e ** 2) * Math.sin(E);
+    return [x * Math.cos(PLUTO.w) - y * Math.sin(PLUTO.w), x * Math.sin(PLUTO.w) + y * Math.cos(PLUTO.w)];
+  }
+
+  const beltIn = { cv: $('#inCanvas'), t: 0, speed: 0.25 }, beltOut = { cv: $('#outCanvas'), t: 0, speed: 20 };
+  watch(beltIn.cv); watch(beltOut.cv);
+
+  function orbitCircle(ctx, cx, cy, rad, color, dash) {
+    ctx.beginPath(); ctx.arc(cx, cy, rad, 0, TAU);
+    ctx.setLineDash(dash || []); ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
+  }
+  // 名字用中文還是英文：跟上面「太陽系的軌道」的切換鈕一樣（#oLang），兩組按鈕連動
+  const langEn = () => { const b = document.querySelector('#oLang .active'); return !!b && b.dataset.v === 'en'; };
+  const syncLang = () => { const en = langEn(); document.querySelectorAll('#bLang button').forEach(b => b.classList.toggle('active', (b.dataset.v === 'en') === en)); };
+  document.querySelectorAll('#bLang button').forEach(b => b.addEventListener('click', () => {
+    const o = document.querySelector(`#oLang [data-v="${b.dataset.v}"]`); if (o) o.click(); syncLang();
+  }));
+  document.querySelectorAll('#oLang button').forEach(b => b.addEventListener('click', syncLang));
+  const nameOf = p => langEn() ? p.en : p.zh;
+  // 速度按鈕：跟上面軌道圖的 #oSpeed 連動（按哪一組，兩組一起換）
+  const syncSpeed = () => {
+    const v = (document.querySelector('#oSpeed .active') || {}).dataset?.v;
+    document.querySelectorAll('#bSpeed button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+  };
+  document.querySelectorAll('#bSpeed button').forEach(b => b.addEventListener('click', () => {
+    const o = document.querySelector(`#oSpeed [data-v="${b.dataset.v}"]`); if (o) o.click(); syncSpeed();
+  }));
+  document.querySelectorAll('#oSpeed button').forEach(b => b.addEventListener('click', syncSpeed));
+  syncSpeed();
+  function planetDot(ctx, p, x, y, lab = true) {
+    ctx.beginPath(); ctx.arc(x, y, p.r, 0, TAU); ctx.fillStyle = p.c; ctx.fill();
+    if (lab) label(ctx, nameOf(p), x, y - p.r - 9, p.c, 12);
+  }
+  function drawSun(ctx, cx, cy, r) {
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 2.4);
+    g.addColorStop(0, '#fff7d1'); g.addColorStop(0.4, '#ffd166'); g.addColorStop(1, 'rgba(255,159,67,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r * 2.4, 0, TAU); ctx.fill();
+  }
+  function drawBeltIn() {
+    const B = beltIn, { ctx, W, H } = fit(B.cv), cx = W / 2, cy = H / 2;
+    const k = (Math.min(W, H) / 2 - 14) / 5.75;
+    ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, H);
+    for (const id of ['mercury', 'venus', 'earth', 'mars', 'jupiter']) orbitCircle(ctx, cx, cy, PL[id].a * k, 'rgba(160,180,255,0.22)');
+    // 主小行星帶
+    for (const m of mainBelt) {
+      const th = m.th + TAU * B.t / Math.pow(m.a, 1.5), rr = (m.a + m.dr) * k;
+      ctx.fillStyle = `rgba(214,196,170,${m.b})`;
+      ctx.fillRect(cx + rr * Math.cos(th) - 0.8, cy - rr * Math.sin(th) - 0.8, 1.6, 1.6);
+    }
+    const jA = plAng(PL.jupiter, B.t);
+    for (const tj of trojans) {
+      const th = jA + tj.off, rr = tj.a * k;
+      ctx.fillStyle = 'rgba(150,230,170,0.7)';
+      ctx.fillRect(cx + rr * Math.cos(th) - 0.9, cy - rr * Math.sin(th) - 0.9, 1.8, 1.8);
+    }
+    drawSun(ctx, cx, cy, 7);
+    for (const id of ['mercury', 'venus', 'earth', 'mars', 'jupiter']) {
+      const p = PL[id], a = plAng(p, B.t);
+      planetDot(ctx, p, cx + p.a * k * Math.cos(a), cy - p.a * k * Math.sin(a), id !== 'mercury' && id !== 'venus');
+    }
+    label(ctx, '主小行星帶', cx, cy - 2.75 * k, '#f0dcc0', 14);
+    const l4 = jA + 60 * DEG, l5 = jA - 60 * DEG;
+    label(ctx, '特洛伊小行星', cx + 5.2 * k * Math.cos(l4), cy - 5.2 * k * Math.sin(l4) + 16, '#a8f0bc', 12);
+    label(ctx, '特洛伊小行星', cx + 5.2 * k * Math.cos(l5), cy - 5.2 * k * Math.sin(l5) + 16, '#a8f0bc', 12);
+    $('#inRead').textContent = `經過 ${B.t < 1 ? Math.round(B.t * 12) + ' 個月' : B.t.toFixed(1) + ' 年'}`;
+  }
+  function drawBeltOut() {
+    const B = beltOut, { ctx, W, H } = fit(B.cv), cx = W / 2, cy = H / 2;
+    const k = (Math.min(W, H) / 2 - 14) / 54;
+    ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, H);
+    for (const id of ['jupiter', 'saturn', 'uranus', 'neptune']) orbitCircle(ctx, cx, cy, PL[id].a * k, 'rgba(160,180,255,0.22)');
+    for (const m of kuiper) {
+      const th = m.th + TAU * B.t / Math.pow(m.a, 1.5), rr = (m.a + m.dr) * k;
+      ctx.fillStyle = `rgba(170,215,255,${m.b})`;
+      ctx.fillRect(cx + rr * Math.cos(th) - 0.8, cy - rr * Math.sin(th) - 0.8, 1.6, 1.6);
+    }
+    // 冥王星的軌道（虛線）
+    ctx.beginPath();
+    for (let i = 0; i <= 120; i++) {
+      const E = i / 120 * TAU, x = PLUTO.a * (Math.cos(E) - PLUTO.e), y = PLUTO.a * Math.sqrt(1 - PLUTO.e ** 2) * Math.sin(E);
+      const X = x * Math.cos(PLUTO.w) - y * Math.sin(PLUTO.w), Y = x * Math.sin(PLUTO.w) + y * Math.cos(PLUTO.w);
+      i ? ctx.lineTo(cx + X * k, cy - Y * k) : ctx.moveTo(cx + X * k, cy - Y * k);
+    }
+    ctx.setLineDash([4, 5]); ctx.strokeStyle = 'rgba(255,200,230,0.5)'; ctx.stroke(); ctx.setLineDash([]);
+    drawSun(ctx, cx, cy, 3.5);
+    for (const id of ['jupiter', 'saturn', 'uranus', 'neptune']) {
+      const p = PL[id], a = plAng(p, B.t);
+      planetDot(ctx, { ...p, r: p.r * 0.8 }, cx + p.a * k * Math.cos(a), cy - p.a * k * Math.sin(a), id !== 'jupiter');
+    }
+    const [px, py] = plutoXY(B.t);
+    ctx.beginPath(); ctx.arc(cx + px * k, cy - py * k, 3.5, 0, TAU); ctx.fillStyle = '#ffc8e6'; ctx.fill();
+    label(ctx, langEn() ? 'Pluto' : '冥王星', cx + px * k, cy - py * k - 12, '#ffc8e6', 12);
+    label(ctx, '古柏帶', cx, cy - 45 * k, '#cfe8ff', 14);
+    label(ctx, '（木星在這一圈小小的裡面）', cx, cy + 5.2 * k + 14, 'rgba(220,184,140,0.9)', 11);
+    $('#outRead').textContent = `經過 ${Math.round(B.t)} 年`;
+  }
+
+  // =====================================================================
+  // ④ 木星守門員：彗星從外面飛進來，受太陽和木星的引力（木星放大 10 倍）
+  // 單位：AU、年；太陽 GM = 4π²。用 tmp/jup_tune.py 先試過參數。
+  // =====================================================================
+  const GM = 4 * Math.PI * Math.PI, AJ = 5.203, PJ = Math.pow(AJ, 1.5), JMASS = 0.00954, HIT_R = 0.5;
+  const EARTH_ZONE = 1.2, YEARS = 300, N_COMETS = 40, VIEW_R = 16, DT = 0.005;
+  const jup = { cv: $('#jupCanvas'), withJ: true, speed: 15, run: null, seed: 1117, results: {} };
+  watch(jup.cv);
+  jup.speed = segInit('#jSpeed', v => { jup.speed = v; });
+  segInit('#jMode', v => { jup.withJ = !!v; jup.run = null; resetStats(); $('#jStart').textContent = '▶ 放出 40 顆彗星'; });
+
+  function newRun() {
+    const r = rng(jup.seed), comets = [];
+    for (let k = 0; k < N_COMETS; k++) {
+      const r0 = 11 + r() * 4, q = 0.3 + r() * 0.9, ang = r() * TAU;   // 近日點都在地球軌道裡面
+      const v = Math.sqrt(GM * 2 * q / (r0 * (r0 + q))), sgn = r() < 0.8 ? 1 : -1;
+      comets.push({ x: r0 * Math.cos(ang), y: r0 * Math.sin(ang), vx: -sgn * v * Math.sin(ang), vy: sgn * v * Math.cos(ang), alive: true, inZone: false, trail: [], fade: 1 });
+    }
+    return { t: 0, comets, cross: 0, hit: 0, out: 0, flashes: [], done: false, withJ: jup.withJ };
+  }
+  function resetStats() { ['#jYears', '#jCross', '#jHit', '#jOut'].forEach(id => { $(id).textContent = '0'; }); }
+  $('#jStart').addEventListener('click', () => { jup.run = newRun(); $('#jStart').textContent = '🔁 重新放一次'; });
+  // 換一批：新的彗星位置，清掉之前的比較
+  $('#jNew').addEventListener('click', () => {
+    jup.seed = Math.floor(Math.random() * 1e9); jup.results = {}; jup.run = null; resetStats();
+    ['#cmpWith', '#cmpWithout'].forEach(id => { $(id).textContent = '—'; });
+    ['#barWith', '#barWithout'].forEach(id => { $(id).style.width = '0'; });
+    $('#cmpMsg').textContent = '換好了！先放一次「有木星」，再按「拿掉木星」放一次，看看差多少！';
+    $('#jStart').textContent = '▶ 放出 40 顆彗星';
+  });
+
+  function stepJup(R, years) {
+    const n = Math.ceil(years / DT), dt = years / n;
+    for (let s = 0; s < n && R.t < YEARS; s++) {
+      const ja = TAU * R.t / PJ, jx = AJ * Math.cos(ja), jy = AJ * Math.sin(ja);
+      for (const c of R.comets) {
+        if (!c.alive) continue;
+        const r2 = c.x * c.x + c.y * c.y, r = Math.sqrt(r2);
+        let ax = -GM * c.x / (r2 * r), ay = -GM * c.y / (r2 * r);
+        if (R.withJ) {
+          const dx = c.x - jx, dy = c.y - jy, d2 = dx * dx + dy * dy + 0.01, d = Math.sqrt(d2);
+          if (d < HIT_R) { c.alive = false; R.hit++; R.flashes.push({ x: jx, y: jy, age: 0, c: '#ffb15c' }); continue; }
+          ax -= GM * JMASS * dx / (d2 * d); ay -= GM * JMASS * dy / (d2 * d);
+        }
+        c.vx += ax * dt; c.vy += ay * dt; c.x += c.vx * dt; c.y += c.vy * dt;
+        const rr = Math.hypot(c.x, c.y);
+        if (rr > 30) { c.alive = false; R.out++; continue; }
+        if (rr < 0.08) { c.alive = false; continue; }
+        const inz = rr < EARTH_ZONE;
+        if (inz && !c.inZone) { R.cross++; R.flashes.push({ x: c.x, y: c.y, age: 0, c: '#6ee7b7' }); }
+        c.inZone = inz;
+      }
+      R.t += dt;
+    }
+    if (R.t >= YEARS && !R.done) { R.done = true; finishRun(R); }
+  }
+  function finishRun(R) {
+    jup.results[R.withJ ? 'with' : 'without'] = R.cross;
+    const a = jup.results.with, b = jup.results.without, mx = Math.max(a || 0, b || 0, 1);
+    $('#cmpWith').textContent = a != null ? a + ' 次' : '—';
+    $('#cmpWithout').textContent = b != null ? b + ' 次' : '—';
+    $('#barWith').style.width = (a != null ? a / mx * 100 : 0) + '%';
+    $('#barWithout').style.width = (b != null ? b / mx * 100 : 0) + '%';
+    $('#cmpMsg').textContent = a != null && b != null
+      ? (b > a ? `拿掉木星後，彗星穿過地球軌道的次數變成 ${(b / a).toFixed(1)} 倍！木星真的幫忙擋掉很多。` : '這一批剛好差不多，按「🎲 換一批彗星」再試試看！')
+      : a != null ? '再按「🚫 拿掉木星」，放同一批彗星比比看！' : '再按「🪐 有木星」，放同一批彗星比比看！';
+    $('#jStart').textContent = '🔁 重新放一次';
+  }
+  // 越外面縮得越多（距離開根號），太陽系裡面才不會擠成一團
+  const jMap = (x, y, k) => { const r = Math.hypot(x, y) || 1e-9, f = k * Math.sqrt(r / VIEW_R) / r; return [x * f, y * f]; };
+  function drawJup(dtReal) {
+    const R = jup.run, { ctx, W, H } = fit(jup.cv), cx = W / 2, cy = H / 2, k = Math.min(W, H) / 2 - 10;
+    if (R && !R.done) stepJup(R, Math.min(dtReal, 0.1) * jup.speed);
+    ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, H);
+    const ringAt = (au, color, dash, lw = 1.2) => { orbitCircle(ctx, cx, cy, k * Math.sqrt(au / VIEW_R), color, dash); };
+    ringAt(EARTH_ZONE, 'rgba(110,231,183,0.75)', [5, 4]);
+    label(ctx, '地球軌道', cx, cy - k * Math.sqrt(EARTH_ZONE / VIEW_R) - 11, '#6ee7b7', 12);
+    if (!R || R.withJ) { ringAt(AJ, 'rgba(220,184,140,0.45)'); }
+    ringAt(VIEW_R * 0.98, 'rgba(160,180,255,0.12)');
+    drawSun(ctx, cx, cy, 6);
+    const t = R ? R.t : 0;
+    if (!R || R.withJ) {
+      const ja = TAU * t / PJ, [jx, jy] = jMap(AJ * Math.cos(ja), AJ * Math.sin(ja), k);
+      ctx.beginPath(); ctx.arc(cx + jx, cy - jy, 11, 0, TAU); ctx.fillStyle = 'rgba(255,177,92,0.18)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + jx, cy - jy, 7.5, 0, TAU); ctx.fillStyle = '#dcb88c'; ctx.fill();
+      label(ctx, '木星', cx + jx, cy - jy - 18, '#ffd9a8', 13);
+    } else {
+      label(ctx, '（木星被拿掉了）', cx, cy + k * Math.sqrt(AJ / VIEW_R) + 2, 'rgba(255,158,196,0.9)', 13);
+    }
+    if (R) {
+      for (const c of R.comets) {
+        const [px, py] = jMap(c.x, c.y, k), X = cx + px, Y = cy - py;
+        if (c.alive) { c.trail.push([X, Y]); if (c.trail.length > 16) c.trail.shift(); }
+        else if (c.trail.length) c.trail.shift();
+        for (let i = 1; i < c.trail.length; i++) {
+          ctx.beginPath(); ctx.moveTo(c.trail[i - 1][0], c.trail[i - 1][1]); ctx.lineTo(c.trail[i][0], c.trail[i][1]);
+          ctx.strokeStyle = `rgba(160,230,255,${i / c.trail.length * 0.6})`; ctx.lineWidth = 1.5; ctx.stroke();
+        }
+        if (c.alive) { ctx.beginPath(); ctx.arc(X, Y, 2.6, 0, TAU); ctx.fillStyle = '#e8f8ff'; ctx.fill(); }
+      }
+      R.flashes = R.flashes.filter(f => f.age < 0.6);
+      for (const f of R.flashes) {
+        f.age += Math.min(dtReal, 0.1);
+        const [px, py] = jMap(f.x, f.y, k);
+        ctx.beginPath(); ctx.arc(cx + px, cy - py, 4 + f.age * 30, 0, TAU);
+        ctx.strokeStyle = f.c; ctx.globalAlpha = 1 - f.age / 0.6; ctx.lineWidth = 2; ctx.stroke(); ctx.globalAlpha = 1;
+      }
+      $('#jYears').textContent = Math.min(YEARS, Math.round(R.t));
+      $('#jCross').textContent = R.cross; $('#jHit').textContent = R.hit; $('#jOut').textContent = R.out;
+    } else {
+      label(ctx, '按「▶ 放出 40 顆彗星」開始', cx, cy + k * 0.62, '#ffd166', 15);
+    }
+  }
+
+
+  // ---------- 動畫迴圈 ----------
+  let last = performance.now();
+  function step(dt) {
+    // 速度跟上面「太陽系的軌道」選的一樣（#oSpeed），兩張圖用同一個時間
+    const sp = +(document.querySelector('#oSpeed .active') || { dataset: { v: 0.5 } }).dataset.v;
+    beltIn.t += dt * sp; beltOut.t = beltIn.t;
+    if (isVis(beltIn.cv)) drawBeltIn();
+    if (isVis(beltOut.cv)) drawBeltOut();
+    if (isVis(jup.cv) || (jup.run && !jup.run.done)) drawJup(dt);
+  }
+  function frame(now) {
+    step(Math.min(0.1, (now - last) / 1000)); last = now;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  window.__belts = { jup, beltIn, beltOut, stepJup, newRun, drawJup, step, drawBeltIn, drawBeltOut };   // 給測試用
 })();
 </script>
 </body>

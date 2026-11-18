@@ -29,7 +29,9 @@
   }
   h1{margin:0 0 28px;font-size:44px;line-height:1.3;text-align:center}
   h1 span{color:var(--sun)}
-  .grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;width:100%;max-width:1500px}
+  .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;width:100%;max-width:1400px}
+  @media (max-width:1100px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:640px){.grid{grid-template-columns:1fr}}
   a.card{
     display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink);
     background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px 20px;
@@ -47,12 +49,12 @@
   <main class="grid">
     <a class="card" href="html/01_moon-phases.html">
       <span class="num">01</span><span class="ico">🌙</span>
-      <h2>月亮變變變</h2>
+      <h2>月亮</h2>
       <p>上弦月、下弦月是怎麼來的？地球自轉、四季和月亮的亮面。</p>
     </a>
     <a class="card" href="html/02_earth-moon-orbit.html">
       <span class="num">02</span><span class="ico">🌍</span>
-      <h2>地球帶著月亮跑</h2>
+      <h2>地球公轉</h2>
       <p>月亮跟著地球繞太陽，日食和月食為什麼一年只有兩個食季？</p>
     </a>
     <a class="card" href="html/03_eclipses.html">
@@ -63,12 +65,22 @@
     <a class="card" href="html/04_planets.html">
       <span class="num">04</span><span class="ico">🪐</span>
       <h2>八大行星</h2>
-      <p>自轉軸、大小、英文名字怎麼唸，還有太陽系的軌道圖。</p>
+      <p>自轉軸、大小、英文名字怎麼唸、太陽系的軌道圖，還有兩個小行星帶和木星守門員！</p>
     </a>
-    <a class="card" href="html/05_quiz.html">
-      <span class="num">05</span><span class="ico">⭐</span>
+    <a class="card" href="html/05_pluto.html">
+      <span class="num">05</span><span class="ico">🧊</span>
+      <h2>冥王星</h2>
+      <p>為什麼冥王星不再是行星？它和海王星的軌道交叉，卻永遠不會相撞！</p>
+    </a>
+    <a class="card" href="html/06_milky-way.html">
+      <span class="num">06</span><span class="ico">🌌</span>
+      <h2>銀河系</h2>
+      <p>太陽在哪一條旋臂上？從台灣看銀河的四季、銀河中心的黑洞，還有 Milky Way 名字的由來！</p>
+    </a>
+    <a class="card" href="html/07_quiz.html">
+      <span class="num">07</span><span class="ico">⭐</span>
       <h2>小測驗</h2>
-      <p>月亮 12 題、八大行星 10 題、聽英文找行星 8 題，看看總分幾分！</p>
+      <p>月亮 12、八大行星 14、聽英文 8、冥王星 5、銀河系 9 題，看看總分幾分！</p>
     </a>
   </main>
 </body>

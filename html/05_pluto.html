@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>冥王星 Pluto</title>
+<style>
+  :root{
+    --bg:#0a0f24;--panel:rgba(22,31,70,.78);--line:rgba(160,180,255,.18);
+    --ink:#f2f4ff;--muted:#aab3dc;--sun:#ffd166;--radius:20px;
+    /* 兩張軌道圖用的顏色 */
+    --nep:#6f95ff;--plu:#ff9a6b;--faint:#8a93b8;--card:#18214a;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;min-height:100vh;color:var(--ink);font-size:17px;line-height:1.75;overflow-x:hidden;
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #26336f 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 25%, #1a2355 0%, transparent 55%),
+      var(--bg);
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.55;
+    background-image:
+      radial-gradient(1.2px 1.2px at 20px 30px,#fff,transparent),
+      radial-gradient(1px 1px at 140px 80px,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 210px 190px,#ffeebb,transparent),
+      radial-gradient(1px 1px at 60px 220px,#fff,transparent),
+      radial-gradient(1px 1px at 180px 20px,#cfe3ff,transparent);
+    background-size:260px 260px;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:0 20px 40px}
+  nav.top{display:flex;gap:8px;padding:8px 0;flex-wrap:wrap}
+  nav.top a{color:var(--muted);text-decoration:none;padding:4px 14px;border-radius:999px;border:1px solid var(--line);font-size:15px}
+  nav.top a[aria-current]{color:#0a0f24;background:var(--sun);border-color:transparent;font-weight:700}
+  h1{font-size:34px;margin:6px 0 0;line-height:1.3}
+  h1 span{color:var(--sun)}
+  .lead-txt{color:var(--muted);margin:0 0 12px}
+  h2{font-size:23px;margin:0 0 10px;line-height:1.4}
+  h3{font-size:18px;margin:14px 0 6px;color:var(--sun)}
+  em,strong{font-style:normal;color:var(--sun);font-weight:700}
+  p{margin:0 0 10px}
+  ul,ol{padding-left:1.4em;margin:0 0 10px}
+  li{margin:4px 0}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-top:16px}
+  .btn{background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:7px 14px;font:inherit;font-size:15px;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.14)}
+  .btn.primary{background:var(--sun);color:#1d1a0b;border-color:transparent;font-weight:700}
+  input[type=range]{accent-color:var(--sun)}
+  .card{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+  .card p{margin:0}
+  .fun{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+  .two{display:grid;grid-template-columns:minmax(0,640px) minmax(0,1fr);gap:22px;align-items:start}
+  .fig{background:#03050d;border:1px solid var(--line);border-radius:16px;padding:12px}
+  svg{display:block;width:100%;height:auto}
+  svg text{font-size:12px;fill:var(--muted)}
+  .lead-line{stroke:var(--faint);stroke-width:.6;stroke-dasharray:3 3}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0}
+  .stat{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+  .stat .k{font-size:13.5px;color:var(--muted)}
+  .stat .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:0}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;font-size:15px;color:var(--muted)}
+  .controls{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;font-size:15px;color:var(--muted)}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13.5px;color:var(--muted);margin:8px 0 10px}
+  .sw{display:inline-block;width:18px;vertical-align:middle;margin-right:6px}
+  table{width:100%;max-width:460px;border-collapse:collapse;font-size:16px;margin:8px 0 14px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:500}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .note{border-left:3px solid var(--sun);padding:4px 0 4px 14px;color:var(--muted);margin:14px 0 4px}
+  .cap{color:var(--muted);font-size:13.5px;margin:6px 2px 0}
+  footer{text-align:center;color:var(--muted);font-size:13.5px;margin-top:22px}
+  @media (max-width:1000px){ .two{grid-template-columns:1fr} }
+  @media (max-width:640px){ h1{font-size:28px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a href="../index.html" title="回首頁" aria-label="回首頁">🏠</a>
+    <a href="01_moon-phases.html">🌙 月亮</a>
+    <a href="02_earth-moon-orbit.html">🌍 地球公轉</a>
+    <a href="03_eclipses.html">📅 未來20年日食月食</a>
+    <a href="04_planets.html">🪐 八大行星</a>
+    <a href="05_pluto.html" aria-current="page">🧊 冥王星</a>
+    <a href="06_milky-way.html">🌌 銀河系</a>
+    <a href="07_quiz.html">⭐ 小測驗</a>
+  </nav>
+
+  <h1>🧊 <span>冥王星 Pluto</span>：軌道和海王星交叉，卻永遠不會相撞</h1>
+  <p class="lead-txt">冥王星以前是第九大行星，2006 年起改叫「矮行星」。為什麼？它的軌道明明跑進海王星裡面，為什麼不會撞上？用兩張互動圖來看看！</p>
+
+  <!-- 認識冥王星 -->
+  <section class="panel" id="intro">
+    <h2>🔎 認識冥王星</h2>
+    <div class="fun">
+      <div class="card"><h3>🔭 1930 年才被發現</h3><p>美國天文學家<em>湯博</em>比對同一片星空、不同晚上拍的照片，發現有一個小光點在移動，就是冥王星。</p></div>
+      <div class="card"><h3>👧 名字是 11 歲女孩取的</h3><p>英國女孩<em>維妮夏</em>想到用羅馬神話裡的冥王「Pluto」來命名：冥王住在又黑又冷的地底，就像這顆離太陽很遠的星球。</p></div>
+      <div class="card"><h3>🌕 比月亮還小</h3><p>冥王星的直徑大約 <em>2377 公里</em>，比我們的月亮（約 3474 公里）還小，大概只有月亮的三分之二。</p></div>
+      <div class="card"><h3>🌑 有 5 顆衛星</h3><p>最大的衛星叫<em>凱倫</em>（Charon），差不多有冥王星的一半大，兩個常常被說成一對「雙星」。</p></div>
+      <div class="card"><h3>💗 冰做的「愛心」</h3><p>2015 年，<em>新視野號</em>飛過冥王星，拍到一大片像愛心的冰原，後來以發現者的名字叫做「湯博區」。</p></div>
+      <div class="card"><h3>⏳ 繞太陽一圈要 248 年</h3><p>從 1930 年被發現到現在，冥王星<em>還沒繞完一圈</em>，要到 2178 年才第一次繞完。那裡非常冷，大約零下 230°C。它住在海王星外面的<em>古柏帶</em>（可以去「🪐 八大行星」頁看古柏帶的動畫）。</p></div>
+    </div>
+  </section>
+
+  <!-- 一、行星的定義 -->
+  <section class="panel" id="definition">
+    <h2>一、行星的定義：「清空軌道」是什麼意思？</h2>
+    <div class="two">
+      <div>
+        <p>國際天文學聯合會（IAU）在 2006 年訂出行星的三個條件：</p>
+        <ol>
+          <li>繞太陽公轉</li>
+          <li>質量夠大，自身引力讓它接近圓球形</li>
+          <li>已經清除軌道附近的區域</li>
+        </ol>
+        <p>第 3 條並不是說軌道上一個天體都沒有，而是說這顆天體在它的軌道區域有<strong>引力上的主導地位</strong>。附近的小天體要嘛被它吞併或甩走，要嘛被它的引力控制住。</p>
+        <p>天文學家 Steven Soter 提出「行星判別值 µ」，也就是行星質量除以同一軌道區域內其他天體的總質量：</p>
+        <table>
+          <thead><tr><th>天體</th><th class="num">µ 值（約）</th></tr></thead>
+          <tbody>
+            <tr><td>地球</td><td class="num">1,700,000</td></tr>
+            <tr><td>木星</td><td class="num">625,000</td></tr>
+            <tr><td>海王星</td><td class="num">24,000</td></tr>
+            <tr><td>火星</td><td class="num">5,100</td></tr>
+            <tr><td>穀神星（矮行星）</td><td class="num">0.33</td></tr>
+            <tr><td>冥王星（矮行星）</td><td class="num">0.077</td></tr>
+          </tbody>
+        </table>
+        <p>八大行星都在幾千到上百萬之間，矮行星都小於 1，兩組差距非常明顯。</p>
+      </div>
+      <div>
+        <h3 style="margin-top:0">例子：特洛伊小行星</h3>
+        <p>木星軌道上有超過 1 萬顆已知的<strong>特洛伊小行星</strong>，聚集在木星前方和後方約 60° 的拉格朗日點 L4、L5。它們被木星的引力困在那裡，總質量和木星比起來可以忽略，所以並不影響木星「清空軌道」的資格。（「🪐 八大行星」頁的主小行星帶動畫裡，綠色的兩群就是它們。）</p>
+        <p>地球也有兩顆已知的特洛伊小行星，都在 L4：</p>
+        <ul>
+          <li><strong>2010 TK7</strong>：直徑約 300 公尺，2010 年由 NASA 的 WISE 望遠鏡發現</li>
+          <li><strong>2020 XL5</strong>：直徑約 1.2 公里，2020 年由 Pan-STARRS 發現，預計約 4,000 年後離開</li>
+        </ul>
+        <p>地球的特洛伊天體很少，一方面是 L4、L5 離太陽只有 60°，很難觀測；另一方面是金星和木星的干擾讓地球的拉格朗日點不太穩定，這些天體多半只是暫時被捕獲。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 二、軌道交叉：圖一 -->
+  <section class="panel" id="resonance">
+    <h2>二、冥王星和海王星的軌道交叉</h2>
+    <p>冥王星的近日點約 29.7 AU，比海王星的軌道（約 30.1 AU）更靠近太陽。1979 到 1999 年間，冥王星確實比海王星更接近太陽。但兩者永遠不會相撞，主要原因有兩個：<strong>3:2 軌道共振</strong>，以及<strong>軌道傾角</strong>。（1 AU＝地球到太陽的距離，大約 1.5 億公里。）</p>
+    <div class="two">
+      <div>
+        <h3 style="margin-top:0">圖一：3:2 軌道共振（俯視）</h3>
+        <div class="fig">
+          <svg viewBox="0 0 680 500" role="img" aria-label="海王星與冥王星 3:2 軌道共振俯視動畫">
+            <circle cx="340" cy="250" r="135.5" fill="none" stroke="var(--nep)" stroke-width="1.2" opacity=".7"/>
+            <ellipse cx="295.5" cy="250" rx="177.75" ry="172" fill="none" stroke="var(--plu)" stroke-width="1.2" stroke-dasharray="4 4" opacity=".75"/>
+            <circle cx="340" cy="250" r="9" fill="var(--sun)"/>
+            <line id="r-link" stroke="var(--faint)" stroke-width=".7" stroke-dasharray="3 3"/>
+            <circle cx="473.6" cy="250" r="3" fill="none" stroke="var(--plu)" stroke-width="1"/>
+            <line class="lead-line" x1="477" y1="250" x2="540" y2="250"/>
+            <text x="546" y="246">冥王星近日點</text>
+            <text x="546" y="262">29.7 AU</text>
+            <text x="40" y="246">冥王星遠日點</text>
+            <text x="40" y="262">49.3 AU</text>
+            <line class="lead-line" x1="100" y1="250" x2="114" y2="250"/>
+            <circle id="r-nep" r="8" fill="var(--nep)"/>
+            <circle id="r-plu" r="5" fill="var(--plu)"/>
+            <text x="340" y="485" text-anchor="middle">俯視圖，未畫出冥王星 17° 的軌道傾角。比例約 1 AU = 4.5 px</text>
+          </svg>
+          <div class="stats">
+            <div class="stat"><div class="k"><span class="dot" style="background:var(--nep)"></span>海王星圈數</div><div class="v" id="r-nN">0.00</div></div>
+            <div class="stat"><div class="k"><span class="dot" style="background:var(--plu)"></span>冥王星圈數</div><div class="v" id="r-nP">0.00</div></div>
+            <div class="stat"><div class="k">目前距離</div><div class="v" id="r-d">—</div></div>
+            <div class="stat"><div class="k">最近距離</div><div class="v" id="r-min">—</div></div>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="r-play">暫停</button>
+            <button class="btn" id="r-reset">重設</button>
+            <span>速度</span>
+            <input type="range" id="r-spd" min="1" max="10" step="1" value="4" style="flex:1;min-width:120px">
+            <span id="r-yr" style="min-width:80px;text-align:right">0 年</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <ul>
+          <li><strong>3:2 的節奏</strong>：海王星繞太陽 3 圈，冥王星剛好繞 2 圈，然後回到相同的相對位置。一個完整週期約 495 年。</li>
+          <li><strong>冥王星在近日點時</strong>（跑進海王星軌道內側），海王星總是在約 90° 之外。</li>
+          <li><strong>海王星追上冥王星時</strong>（兩者在同一方向），冥王星總是在遠日點附近的最外側。</li>
+          <li>動畫中的最近距離約 19 AU（動畫是把軌道壓平的簡化模型；真實的最近距離大約 17 AU）。冥王星離天王星最近時（約 11 AU）反而比離海王星還近。</li>
+        </ul>
+        <p class="note">這也說明了為什麼海王星符合「清空軌道」、冥王星不符合：冥王星的軌道是被海王星的引力安排好的。和冥王星處在同一個 2:3 共振的天體有一大群，稱為冥族小天體（Plutinos），冥王星只是其中最大的一顆。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 圖二：立體 -->
+  <section class="panel" id="tilt">
+    <h2>圖二：立體空間中的兩條軌道</h2>
+    <p>按「從平面轉到北極俯視」，視角會從貼著黃道面的側視，慢慢升到太陽系北極正上方往下看。也可以自己拖動滑桿調整角度。</p>
+    <div class="two">
+      <div class="fig">
+        <svg id="t-svg" viewBox="0 0 680 470" role="img" aria-label="海王星與冥王星軌道立體視角，可從側視轉到俯視">
+          <polygon id="t-plane" fill="var(--faint)" fill-opacity=".12" stroke="var(--faint)" stroke-width=".6" stroke-opacity=".5"/>
+          <g id="t-drops"></g>
+          <path id="t-below" fill="none" stroke="var(--plu)" stroke-width="1.2" stroke-dasharray="3 4" opacity=".55"/>
+          <path id="t-nOrb" fill="none" stroke="var(--nep)" stroke-width="1.5"/>
+          <circle id="t-sun" r="7" fill="var(--sun)"/>
+          <path id="t-above" fill="none" stroke="var(--plu)" stroke-width="1.9"/>
+          <line id="t-periLine" stroke="var(--plu)" stroke-width="1" stroke-dasharray="2 2"/>
+          <circle id="t-an" r="4" fill="var(--card)" stroke="var(--plu)" stroke-width="1.3"/>
+          <circle id="t-dn" r="4" fill="var(--card)" stroke="var(--plu)" stroke-width="1.3"/>
+          <circle id="t-peri" r="3" fill="var(--plu)"/>
+          <text id="t-anT">升交點 41.1 AU</text>
+          <text id="t-dnT">降交點 33.7 AU</text>
+          <text id="t-periT">近日點，在黃道面上方約 8 AU</text>
+          <circle id="t-nep" r="7" fill="var(--nep)"/>
+          <line id="t-pluDrop" stroke="var(--plu)" stroke-width=".8" opacity=".6"/>
+          <circle id="t-plu" r="5" fill="var(--plu)"/>
+          <text id="t-view" x="340" y="455" text-anchor="middle"></text>
+        </svg>
+        <div class="legend">
+          <span><span class="sw" style="border-top:2px solid var(--nep)"></span>海王星軌道（幾乎在黃道面上）</span>
+          <span><span class="sw" style="border-top:2px solid var(--plu)"></span>冥王星軌道：黃道面上方</span>
+          <span><span class="sw" style="border-top:2px dashed var(--plu);opacity:.6"></span>黃道面下方</span>
+          <span><span class="sw" style="height:10px;background:var(--faint);opacity:.3"></span>黃道面</span>
+        </div>
+        <div class="controls">
+          <span>視角仰角</span><input type="range" id="t-el" min="0" max="90" step="1" value="12"><span id="t-elV" style="min-width:40px;text-align:right">12°</span>
+          <span>水平旋轉</span><input type="range" id="t-az" min="0" max="360" step="1" value="250"><span id="t-azV" style="min-width:40px;text-align:right">250°</span>
+        </div>
+        <div class="row">
+          <button class="btn primary" id="t-sweep">從平面轉到北極俯視</button>
+          <button class="btn" id="t-play">暫停公轉</button>
+        </div>
+      </div>
+      <div>
+        <ol>
+          <li>冥王星的軌道相對黃道面傾斜約 <strong>17°</strong>。海王星的軌道傾角只有 1.8°，圖中當作 0°。</li>
+          <li>冥王星只在<strong>升交點</strong>和<strong>降交點</strong>這兩個位置穿過黃道面。這兩點離太陽約 <strong>41.1 AU</strong> 和 <strong>33.7 AU</strong>，都在海王星軌道（30.1 AU）的外側。</li>
+          <li>冥王星跑進海王星軌道內側的那一段在近日點附近，那時它在黃道面<strong>上方約 8 AU</strong>。</li>
+        </ol>
+        <p>也就是說，冥王星在海王星的平面上時，位置在海王星軌道外面；它跑進海王星軌道裡面時，又不在那個平面上。兩條軌道在空間中沒有交點，只有從正上方俯視時看起來像交叉。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 三、結論 -->
+  <section class="panel" id="conclusion">
+    <h2>三、結論</h2>
+    <ul>
+      <li>「清空軌道」指的是<strong>引力主導</strong>，不是軌道上完全沒有東西。木星、地球、海王星都有被它們控制的小天體。</li>
+      <li>冥王星和海王星的軌道只是在俯視圖上「交叉」。<strong>3:2 共振</strong>讓兩者在時間上錯開，<strong>17° 傾角</strong>讓兩者在空間上錯開，最近距離始終約 17 AU。</li>
+      <li>冥王星的軌道由海王星主導，它只是冥族小天體之一，這是它在 2006 年被歸類為矮行星的原因之一。</li>
+    </ul>
+    <p class="note">真實的共振並非完美鎖死：冥王星相對海王星的位置會以約 2 萬年的週期小幅擺盪，但始終維持在安全範圍內。圖中的軌道是簡化的示意，忽略了這些擺盪與其他行星的攝動。</p>
+  </section>
+
+  <footer>軌道參數（近似值）：冥王星半長軸 39.48 AU、離心率 0.249、傾角 17.16°、升交點經度 110.3°、近日點幅角 113.8°；海王星半長軸 30.07 AU，公轉週期約 164.8 年。</footer>
+</div>
+
+<script>
+// ---------- 圖一：3:2 軌道共振（俯視） ----------
+(function(){
+  const S=4.5,cx=340,cy=250,aN=30.1,aP=39.5,e=0.25,PN=164.8;
+  let t=0,run=true,dmin=Infinity,last=null;
+  const $=id=>document.getElementById(id);
+  function kep(M){let E=M;for(let i=0;i<8;i++)E-=(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));return E;}
+  function draw(){
+    const th=2*Math.PI*t+Math.PI/2;
+    const nx=aN*Math.cos(th),ny=aN*Math.sin(th);
+    const E=kep(2*Math.PI*t*2/3);
+    const px=aP*(Math.cos(E)-e),py=aP*Math.sqrt(1-e*e)*Math.sin(E);
+    const NX=cx+nx*S,NY=cy-ny*S,PX=cx+px*S,PY=cy-py*S;
+    $('r-nep').setAttribute('cx',NX);$('r-nep').setAttribute('cy',NY);
+    $('r-plu').setAttribute('cx',PX);$('r-plu').setAttribute('cy',PY);
+    const l=$('r-link');l.setAttribute('x1',NX);l.setAttribute('y1',NY);l.setAttribute('x2',PX);l.setAttribute('y2',PY);
+    const d=Math.hypot(nx-px,ny-py);if(t>0)dmin=Math.min(dmin,d);
+    $('r-nN').textContent=t.toFixed(2);$('r-nP').textContent=(t*2/3).toFixed(2);
+    $('r-d').textContent=d.toFixed(1)+' AU';
+    $('r-min').textContent=isFinite(dmin)?dmin.toFixed(1)+' AU':'—';
+    $('r-yr').textContent=Math.round(t*PN)+' 年';
+  }
+  function loop(ts){
+    if(last!==null&&run)t+=(ts-last)/1000*0.04*(+$('r-spd').value);
+    last=ts;draw();requestAnimationFrame(loop);
+  }
+  $('r-play').onclick=function(){run=!run;this.textContent=run?'暫停':'播放';};
+  $('r-reset').onclick=function(){t=0;dmin=Infinity;draw();};
+  draw();requestAnimationFrame(loop);
+  window.__res={step:dt=>{t+=dt;draw();},get dmin(){return dmin;}};   // 給測試用
+})();
+
+// ---------- 圖二：立體空間中的兩條軌道 ----------
+(function(){
+  const D=Math.PI/180,S=4.1,cx=340,cy=225;
+  const aP=39.48,e=0.2488,inc=17.16*D,Om=110.3*D,w=113.8*D,pp=aP*(1-e*e),aN=30.07,vp=Om+w;
+  let el=12*D,az=250*D,t=0,play=true,last=null,sweeping=null;
+  const $=id=>document.getElementById(id);
+  function pl(nu){const r=pp/(1+e*Math.cos(nu)),u=w+nu;return[r*(Math.cos(Om)*Math.cos(u)-Math.sin(Om)*Math.sin(u)*Math.cos(inc)),r*(Math.sin(Om)*Math.cos(u)+Math.cos(Om)*Math.sin(u)*Math.cos(inc)),r*Math.sin(u)*Math.sin(inc)];}
+  function pr(p){const X1=p[0]*Math.cos(az)-p[1]*Math.sin(az),Y1=p[0]*Math.sin(az)+p[1]*Math.cos(az);return[cx+X1*S,cy-(Y1*Math.sin(el)+p[2]*Math.cos(el))*S];}
+  function f(q){return q[0].toFixed(1)+' '+q[1].toFixed(1);}
+  function setXY(id,q){$(id).setAttribute('cx',q[0]);$(id).setAttribute('cy',q[1]);}
+  function lbl(id,q,dx,dy){const n=$(id);n.setAttribute('x',q[0]+dx);n.setAttribute('y',q[1]+dy);n.setAttribute('text-anchor',q[0]>cx?'start':'end');}
+  function kep(M){let E=M;for(let i=0;i<8;i++)E-=(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));return E;}
+  function drawStatic(){
+    let pts='';for(let k=0;k<=72;k++){const a=k*5*D;pts+=f(pr([52*Math.cos(a),52*Math.sin(a),0]))+' ';}
+    $('t-plane').setAttribute('points',pts);
+    let n='';for(let k=0;k<=120;k++){const a=k*3*D;n+=(k?'L':'M')+f(pr([aN*Math.cos(a),aN*Math.sin(a),0]));}
+    $('t-nOrb').setAttribute('d',n);
+    let ab='',be='',pa=null,pb=null,drops='';
+    for(let k=0;k<=360;k++){const nu=k*D,p=pl(nu),q=pr(p);
+      if(p[2]>=0){ab+=(pa?'L':'M')+f(q);pa=1;pb=null;}else{be+=(pb?'L':'M')+f(q);pb=1;pa=null;}
+      if(k%12===0){const g=pr([p[0],p[1],0]);drops+='<line x1="'+q[0].toFixed(1)+'" y1="'+q[1].toFixed(1)+'" x2="'+g[0].toFixed(1)+'" y2="'+g[1].toFixed(1)+'" stroke="var(--plu)" stroke-width="0.5" opacity="0.35"/>';}}
+    $('t-above').setAttribute('d',ab);$('t-below').setAttribute('d',be);$('t-drops').innerHTML=drops;
+    setXY('t-sun',pr([0,0,0]));
+    const A=pr(pl(-w)),Dn=pr(pl(Math.PI-w)),P=pl(0),Pq=pr(P),Pg=pr([P[0],P[1],0]);
+    setXY('t-an',A);setXY('t-dn',Dn);setXY('t-peri',Pq);
+    const L=$('t-periLine');L.setAttribute('x1',Pq[0]);L.setAttribute('y1',Pq[1]);L.setAttribute('x2',Pg[0]);L.setAttribute('y2',Pg[1]);
+    lbl('t-anT',A,A[0]>cx?8:-8,A[1]>cy?16:-8);lbl('t-dnT',Dn,Dn[0]>cx?8:-8,Dn[1]>cy?16:-8);lbl('t-periT',Pq,Pq[0]>cx?8:-8,-10);
+    const d=Math.round(el/D);
+    $('t-view').textContent=d<=3?'側視：沿著黃道面看過去':d>=87?'俯視：從太陽系北極上方往下看':'仰角 '+d+'°';
+  }
+  function drawMoving(){
+    const lam=vp+Math.PI/2+2*Math.PI*t;
+    setXY('t-nep',pr([aN*Math.cos(lam),aN*Math.sin(lam),0]));
+    const E=kep(2*Math.PI*t*2/3),nu=2*Math.atan2(Math.sqrt(1+e)*Math.sin(E/2),Math.sqrt(1-e)*Math.cos(E/2));
+    const p=pl(nu),q=pr(p),g=pr([p[0],p[1],0]);setXY('t-plu',q);
+    const L=$('t-pluDrop');L.setAttribute('x1',q[0]);L.setAttribute('y1',q[1]);L.setAttribute('x2',g[0]);L.setAttribute('y2',g[1]);
+  }
+  function sync(){$('t-el').value=Math.round(el/D);$('t-elV').textContent=Math.round(el/D)+'°';$('t-azV').textContent=Math.round(az/D)+'°';}
+  $('t-el').oninput=ev=>{el=ev.target.value*D;sweeping=null;sync();drawStatic();};
+  $('t-az').oninput=ev=>{az=ev.target.value*D;sync();drawStatic();};
+  $('t-sweep').onclick=()=>{sweeping={s:performance.now()};};
+  $('t-play').onclick=function(){play=!play;this.textContent=play?'暫停公轉':'繼續公轉';};
+  function loop(ts){
+    if(last!==null&&play)t+=(ts-last)/1000*0.12;last=ts;
+    if(sweeping){const k=Math.min(1,(ts-sweeping.s)/4500),s=k*k*(3-2*k);el=s*90*D;sync();drawStatic();if(k>=1)sweeping=null;}
+    drawMoving();requestAnimationFrame(loop);
+  }
+  sync();drawStatic();drawMoving();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
