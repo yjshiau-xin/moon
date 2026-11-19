@@ -216,6 +216,18 @@
   .note{color:#dfe4ff;margin:12px 4px 0}
   .note b{color:var(--moon)}
 
+  /* ---------- ④ 永遠看到同一面 ---------- */
+  .lock-grid{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:22px;align-items:start;margin-top:8px}
+  .lock-box{position:relative;aspect-ratio:1/1;background:#03050d;border-radius:16px;overflow:hidden}
+  .lock-box canvas,.lock-face-box canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .lock-ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted)}
+  .lock-face-row{display:flex;align-items:center;gap:18px;margin:16px 0 6px}
+  .lock-face-box{position:relative;width:170px;height:170px;flex:none;background:#03050d;border-radius:50%}
+  .lock-face-title{color:var(--muted);font-size:15px}
+  .lock-see{font-size:24px;font-weight:800;margin:2px 0}
+  .lock-day{color:var(--muted);font-variant-numeric:tabular-nums}
+  .lock-msg{font-size:17px;min-height:3.4em}
+  @media (max-width:1000px){ .lock-grid{grid-template-columns:1fr} }
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
   .card .ico{font-size:30px;line-height:1}
@@ -448,12 +460,40 @@
     <p class="note">🔍 <b>小發現：</b>月亮在<b>同一個位置</b>，看起來的形狀一模一樣（因為太陽照的方向沒變）。可是轉的方向相反，<b>先出現哪個形狀</b>就相反了！所以在想像世界裡，<b>上弦月會變成左邊亮</b>。（這裡畫的是月亮在正南方時的樣子）</p>
   </section>
 
+  <section class="panel" id="lock" style="margin-top:16px">
+    <h2>④ 為什麼永遠只看得到月亮的同一面？</h2>
+    <div class="lock-grid">
+      <div class="lock-box"><canvas id="lockCanvas" aria-label="從北極上方看月亮繞地球，月亮上的紅旗標出它的正面"></canvas></div>
+      <div>
+        <div class="lock-ctrl">
+          <span>月亮自轉：</span>
+          <div class="seg" id="lockMode">
+            <button data-v="sync" class="active ccw">跟著轉（真實）</button>
+            <button data-v="none">不自轉</button>
+            <button data-v="rev">反方向轉</button>
+          </div>
+          <button class="btn primary" id="lockPlay">⏸ 暫停</button>
+        </div>
+        <div class="lock-face-row">
+          <div class="lock-face-box"><canvas id="lockFace" aria-label="從地球看到的月亮是哪一面"></canvas></div>
+          <div>
+            <div class="lock-face-title">從地球看到的月亮</div>
+            <div id="lockSee" class="lock-see"></div>
+            <div id="lockDay" class="lock-day"></div>
+          </div>
+        </div>
+        <p id="lockMsg" class="lock-msg"></p>
+        <p class="note">🔍 <b>小知識：</b>月亮自己轉一圈和繞地球一圈都是大約 <b>27.3 天</b>，轉得剛剛好，這叫「<b>同步自轉</b>」（也叫潮汐鎖定）。所以從地球永遠看不到月亮的背面，一直到 1959 年太空船飛到月亮後面，人類才第一次看到：背面幾乎沒有暗暗的「月海」，到處都是坑洞。冥王星的衛星凱倫也是這樣喔！（這張圖只看「哪一面朝著地球」，沒有畫月相的亮暗。）</p>
+      </div>
+    </div>
+  </section>
+
   <section>
     <div class="cards">
       <div class="card">
         <div class="ico">🔦</div>
         <h3>亮面永遠朝著太陽</h3>
-        <p>月亮像一顆大球，太陽永遠照亮朝向太陽的那一半。所以<em>太陽在哪一邊，月亮就哪一邊亮</em>。</p>
+        <p>月亮像一顆大球，太陽永遠照亮朝向太陽的那一半。</p>
         <p>傍晚太陽在西邊下山，這時看到的上弦月亮面朝西（右邊）；清晨太陽從東邊升起，這時看到的下弦月亮面朝東（左邊）。</p>
       </div>
       <div class="card">
@@ -1773,6 +1813,93 @@
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+})();
+</script>
+<script>
+// ---------- ④ 為什麼永遠只看得到月亮的同一面？（獨立的一段程式） ----------
+(() => {
+  const $ = s => document.querySelector(s), TAU = Math.PI * 2, PERIOD = 27.3;   // 月亮繞地球一圈 27.3 天
+  const cv = $('#lockCanvas'), fc = $('#lockFace');
+  let mode = 'sync', play = true, t = 0, last = performance.now();   // t：經過幾天
+  document.querySelectorAll('#lockMode button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#lockMode button').forEach(x => x.classList.toggle('active', x === b));
+    mode = b.dataset.v;
+  }));
+  $('#lockPlay').addEventListener('click', () => { play = !play; $('#lockPlay').textContent = play ? '⏸ 暫停' : '▶ 播放'; });
+  function fit(c) {
+    const dpr = window.devicePixelRatio || 1, r = c.getBoundingClientRect();
+    const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, W: r.width, H: r.height };
+  }
+  // 月亮表面：正面有幾塊暗暗的月海（像玉兔），背面幾乎沒有月海、坑洞很多。經度 0 是正面中心
+  const MARIA = [[-0.35, 0.35, 0.32], [0.1, 0.45, 0.28], [0.35, 0.15, 0.25], [-0.15, -0.05, 0.3], [0.25, -0.35, 0.22], [-0.55, -0.3, 0.2]];   // [經度, 緯度, 大小]（弧度）
+  const CRATERS = []; { let a = 7; const rnd = () => (a = (a * 9301 + 49297) % 233280) / 233280; for (let k = 0; k < 90; k++) CRATERS.push([Math.PI * (0.45 + rnd() * 1.1), (rnd() - 0.5) * 2.6, 0.05 + rnd() * 0.12]); }
+  const angDist = (l1, b1, l2, b2) => Math.acos(Math.max(-1, Math.min(1, Math.sin(b1) * Math.sin(b2) + Math.cos(b1) * Math.cos(b2) * Math.cos(l1 - l2))));
+  function surface(lon, lat) {
+    let v = 205;
+    for (const [l, b, r] of MARIA) { const d = angDist(lon, lat, l, b); if (d < r) v -= 85 * (1 - (d / r) ** 2); }
+    for (const [l, b, r] of CRATERS) { const d = angDist(lon, lat, l, b); if (d < r) v -= d > r * 0.75 ? -25 : 30; }
+    return v;
+  }
+  // 月亮自轉的角度（紅旗＝正面中心指的方向）。phi：月亮在軌道上的角度
+  const spin = phi => mode === 'sync' ? phi + Math.PI : mode === 'none' ? Math.PI * 0.5 : -phi + Math.PI;
+  function draw() {
+    const phi = TAU * t / PERIOD, psi = spin(phi);
+    // ----- 從北極上方看 -----
+    const { ctx, W, H } = fit(cv), cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.36, mr = Math.min(W, H) * 0.075;
+    ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, H);
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.setLineDash([4, 6]); ctx.strokeStyle = 'rgba(160,180,255,0.4)'; ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+    const eg = ctx.createRadialGradient(cx - 6, cy - 6, 2, cx, cy, 26); eg.addColorStop(0, '#9fd2ff'); eg.addColorStop(1, '#2a6fd0');
+    ctx.beginPath(); ctx.arc(cx, cy, 24, 0, TAU); ctx.fillStyle = eg; ctx.fill();
+    const mx = cx + R * Math.cos(phi), my = cy - R * Math.sin(phi);
+    // 從地球看月亮的視線
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(mx, my); ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 1; ctx.stroke();
+    // 月亮：紅旗那一半是正面（深灰、有月海），另一半是背面（淺灰、坑洞）
+    ctx.beginPath(); ctx.arc(mx, my, mr, 0, TAU); ctx.fillStyle = '#d8d8d2'; ctx.fill();
+    ctx.beginPath(); ctx.arc(mx, my, mr, -psi - Math.PI / 2, -psi + Math.PI / 2); ctx.closePath(); ctx.fillStyle = '#8f8f8a'; ctx.fill();
+    ctx.beginPath(); ctx.arc(mx, my, mr, 0, TAU); ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+    // 紅旗
+    const fx = mx + Math.cos(psi) * mr * 1.9, fy = my - Math.sin(psi) * mr * 1.9;
+    ctx.beginPath(); ctx.moveTo(mx + Math.cos(psi) * mr, my - Math.sin(psi) * mr); ctx.lineTo(fx, fy); ctx.strokeStyle = '#ff5a5a'; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(fx, fy, 4, 0, TAU); ctx.fillStyle = '#ff5a5a'; ctx.fill();
+    // 公轉方向（逆時針）
+    ctx.beginPath(); ctx.arc(cx, cy, R + 22, -0.35, -1.0, true); ctx.strokeStyle = 'rgba(110,231,183,0.85)'; ctx.lineWidth = 2.5; ctx.stroke();
+    const ax = cx + (R + 22) * Math.cos(-1.0), ay = cy + (R + 22) * Math.sin(-1.0);
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ax + 10 * Math.cos(-1.0 - 2.2), ay + 10 * Math.sin(-1.0 - 2.2)); ctx.lineTo(ax + 10 * Math.cos(-1.0 - 0.9), ay + 10 * Math.sin(-1.0 - 0.9)); ctx.closePath(); ctx.fillStyle = 'rgba(110,231,183,0.85)'; ctx.fill();
+    ctx.font = '700 14px "PingFang TC","Noto Sans TC",sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#cfe0ff'; ctx.fillText('地球', cx, cy + 38);
+    ctx.fillStyle = '#ff9a9a'; ctx.fillText('紅旗＝正面', fx + (fx > mx ? 40 : -40), fy);
+    ctx.fillStyle = '#aab3dc'; ctx.font = '13px "PingFang TC",sans-serif'; ctx.fillText('從北極上方往下看', cx, 16);
+    // ----- 從地球看到的那一面 -----
+    const alpha = Math.atan2(Math.sin(phi + Math.PI - psi), Math.cos(phi + Math.PI - psi));   // 朝著地球的經度（0＝正面中心）
+    const f = fit(fc), S = Math.min(f.W, f.H), img = f.ctx.createImageData(Math.round(S), Math.round(S)), d = img.data, r0 = S / 2 - 2;
+    for (let y = 0; y < img.height; y++) for (let x = 0; x < img.width; x++) {
+      const dx = (x + 0.5 - S / 2) / r0, dy = (y + 0.5 - S / 2) / r0, q = dx * dx + dy * dy;
+      if (q > 1) continue;
+      const z = Math.sqrt(1 - q), lat = Math.asin(-dy), lon = alpha + Math.atan2(dx, z);   // 往右看是月亮的東邊（經度變大）
+      const v = surface(lon, lat) * (0.75 + 0.25 * z), k = (y * img.width + x) * 4;
+      d[k] = d[k + 1] = v; d[k + 2] = v * 0.97; d[k + 3] = 255;
+    }
+    f.ctx.clearRect(0, 0, f.W, f.H); f.ctx.putImageData(img, 0, 0);
+    // 用畫面寬度和 ImageData 一樣大小（dpr＝1 時）；高解析度螢幕時放大畫
+    if (fc.width !== img.width) { const tmp = document.createElement('canvas'); tmp.width = img.width; tmp.height = img.height; tmp.getContext('2d').putImageData(img, 0, 0); f.ctx.clearRect(0, 0, f.W, f.H); f.ctx.drawImage(tmp, 0, 0, f.W, f.H); }
+    const a = Math.abs(alpha) / Math.PI;   // 0＝正面，1＝背面
+    $('#lockSee').textContent = a < 0.2 ? '🐰 正面（有玉兔的那一面）' : a > 0.8 ? '🕳️ 背面（坑洞很多）' : '🌗 一半正面、一半背面';
+    $('#lockDay').textContent = `第 ${Math.floor(t % PERIOD) + 1} 天（繞地球一圈 27.3 天）`;
+    $('#lockMsg').textContent = mode === 'sync' ? '月亮自轉一圈剛好等於繞地球一圈，紅旗永遠指著地球，所以我們永遠看到同一面。'
+      : mode === 'none' ? '如果月亮不自轉，紅旗一直指著同一個方向。繞到地球另一邊時，我們就會看到它的背面！'
+      : '如果月亮反方向轉，正面和背面換得更快：不到半個月就輪一次。';
+  }
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (play) t += dt * 4;   // 1 秒 4 天
+    const r = cv.getBoundingClientRect();
+    if (r.bottom > 0 && r.top < innerHeight) draw();   // 看得到才畫
+    requestAnimationFrame(frame);
+  }
+  draw(); requestAnimationFrame(frame);
+  window.__lock = { setMode: m => { mode = m; }, setT: v => { t = v; draw(); }, draw };   // 給測試用
 })();
 </script>
 </body>

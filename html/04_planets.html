@@ -198,6 +198,12 @@
   .mv .cvbox{position:relative;border-radius:16px;overflow:hidden;background:#03050d}
   .mv .cvbox canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   /* 小行星帶 */
+  .mv .sd-grid{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:18px;align-items:start;margin-top:10px}
+  .mv .sd-box{aspect-ratio:1/1}
+  .mv .sd-stats{margin-top:0}
+  .mv .sd-now{font-size:18px;font-weight:700;margin-bottom:10px}
+  .mv .sd-now.day{border-color:rgba(255,209,102,.7)} .mv .sd-now.night{border-color:rgba(130,150,255,.5)}
+  .mv .card + .card{margin-top:10px}
   .mv .belt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
   .mv .belt-box{height:520px}
   .mv .belt-col h2{font-size:20px}
@@ -261,7 +267,7 @@
       <dl class="facts">
         <div><dt>離太陽</dt><dd id="dDist"></dd></div>
         <div><dt>衛星（月亮）</dt><dd id="dMoons"></dd></div>
-        <div><dt>自轉一圈（一天）</dt><dd id="dDay"></dd></div>
+        <div><dt>自轉一圈</dt><dd id="dDay"></dd></div>
         <div><dt>繞太陽一圈（一年）</dt><dd id="dYear"></dd></div>
         <div><dt>自轉軸傾斜</dt><dd id="dTilt"></dd></div>
         <div><dt>自轉方向（從北邊往下看）</dt><dd id="dSpin"></dd></div>
@@ -400,6 +406,40 @@
     </div>
   </section>
 
+  <section class="panel mv" id="solarday">
+    <div class="orbit-head">
+      <h2 style="margin:0">🕐 水星和金星的「一天」有多長？</h2>
+      <div class="seg" id="sdPlanet">
+        <button data-v="mercury" class="active">水星 Mercury</button>
+        <button data-v="venus">金星 Venus</button>
+      </div>
+      <div class="seg" id="sdSpeed">
+        <button data-v="5">每秒 5 天</button>
+        <button data-v="15" class="active">每秒 15 天</button>
+      </div>
+      <button class="btn primary" id="sdPlay">⏸ 暫停</button>
+      <button class="btn" id="sdReset">↺ 重來</button>
+    </div>
+    <div class="sd-grid">
+      <div class="cvbox sd-box"><canvas id="sdCanvas" aria-label="水星或金星繞太陽，表面站著一個小人，看他多久才看到下一次日出"></canvas></div>
+      <div>
+        <div class="stats sd-stats">
+          <div class="stat"><small>經過</small><b id="sdDays">0</b> 個地球天</div>
+          <div class="stat"><small>繞太陽（一年）</small><b id="sdYears">0.00</b> 圈</div>
+          <div class="stat"><small>自轉</small><b id="sdSpins">0.00</b> 圈</div>
+          <div class="stat earth"><small>小人看到日出</small><b id="sdRises">0</b> 次</div>
+        </div>
+        <div class="card sd-now" id="sdNow"></div>
+        <div class="card" id="sdInfo"></div>
+        <div class="card">
+          <h3>「自轉一圈」不等於「一天」</h3>
+          <p><em>自轉一圈</em>是對著遠方的星星轉一圈；<em>一天</em>是從日出到下一次日出。因為行星一邊自轉、一邊繞太陽，兩個不一樣長。地球也一樣：自轉一圈是 23 小時 56 分，一天是 24 小時，只是差得很少。</p>
+        </div>
+      </div>
+    </div>
+    <p class="cap">示意圖：從太陽系北邊往下看；行星畫得很大，軌道畫成圓形（水星真實的軌道比較扁，但平均算起來一樣是 176 個地球天）。小人站的地方照到太陽是白天，背對太陽是晚上。</p>
+  </section>
+
   <footer>☀️ 冥王星以前也算行星，2006 年起被改叫「矮行星」，所以現在是八大行星喔！</footer>
 </div>
 
@@ -427,7 +467,7 @@
       au: 5.2, day: '約 10 小時', year: '約 12 年', moons: '90 多顆', tilt: 3.1, tiltNote: '幾乎直立', inc: 1.3, node: 100.47, a: 5.2026, e: 0.0484, peri: 14.75, T: 11.862615, L0: 34.40, col: '#dcb88c',
       fun: ['<em>最大的行星</em>，裡面可以裝下 <em>1300 多個地球</em>！', '「<em>大紅斑</em>」是一個<em>比地球還大</em>的超級風暴，已經吹了好幾百年。'] },
     { id: 'saturn', zh: '土星', en: 'Saturn', myth: ['用<em>農業之神</em>來命名，他是<em>朱比特的父親</em>', '薩圖恩 Saturn：農業之神', '克洛諾斯 Cronus'], type: '氣體巨行星', d: 9.14, km: 116460,
-      au: 9.58, day: '約 10.7 小時', year: '約 29 年', moons: '270 多顆', tilt: 26.7, tiltNote: '光環跟著一起斜', inc: 2.5, node: 113.66, a: 9.5371, e: 0.0542, peri: 92.43, T: 29.447498, L0: 49.94, col: '#ead9a0',
+      au: 9.54, day: '約 10.7 小時', year: '約 29 年', moons: '270 多顆', tilt: 26.7, tiltNote: '光環跟著一起斜', inc: 2.5, node: 113.66, a: 9.5371, e: 0.0542, peri: 92.43, T: 29.447498, L0: 49.94, col: '#ead9a0',
       fun: ['有美麗的<em>光環</em>，是由好多<em>冰塊和石頭</em>組成的。', '它很「輕」，平均<em>密度比水還小</em>。如果有夠大的浴缸，它<em>會浮起來</em>！'] },
     { id: 'uranus', zh: '天王星', en: 'Uranus', myth: ['<em>唯一直接用希臘神名</em>的行星，他是<em>克洛諾斯的父親</em>', '凱路斯 Caelus：天空之神', '烏拉諾斯 Ouranos：天空之神'], type: '冰巨行星', d: 4.0, km: 50724,
       au: 19.2, day: '約 17 小時', year: '約 84 年', moons: '20 多顆', tilt: 97.8, tiltNote: '躺著轉', inc: 0.77, node: 74.02, a: 19.1913, e: 0.0472, peri: 170.96, T: 84.016846, L0: 313.23, col: '#8fdfe6',
@@ -1547,6 +1587,101 @@
   }
   requestAnimationFrame(frame);
   window.__belts = { jup, beltIn, beltOut, stepJup, newRun, drawJup, step, drawBeltIn, drawBeltOut };   // 給測試用
+})();
+</script>
+<script>
+// ---------- 水星和金星的「一天」（獨立的一段程式） ----------
+(() => {
+  const $ = s => document.querySelector(s), TAU = Math.PI * 2;
+  // 自轉一圈（對著星星）、繞太陽一圈的天數；dir：+1 和公轉同方向（逆時針），−1 反著轉
+  const PL = {
+    mercury: { zh: '水星', sid: 58.646, orb: 87.969, dir: 1, col: '#b9b2aa' },
+    venus: { zh: '金星', sid: 243.02, orb: 224.70, dir: -1, col: '#e9c77e' },
+  };
+  const solar = p => 1 / Math.abs(p.dir / p.sid - 1 / p.orb);   // 從日出到下一次日出（太陽日）
+  let key = 'mercury', speed = 15, play = true, t = 0, rises = 0, wasDay = false, flash = 0, last = performance.now();
+  const seg = (id, f) => document.querySelectorAll(id + ' button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll(id + ' button').forEach(x => x.classList.toggle('active', x === b)); f(b.dataset.v);
+  }));
+  seg('#sdPlanet', v => { key = v; reset(); });
+  seg('#sdSpeed', v => { speed = +v; });
+  $('#sdPlay').addEventListener('click', () => { play = !play; $('#sdPlay').textContent = play ? '⏸ 暫停' : '▶ 播放'; });
+  $('#sdReset').addEventListener('click', () => reset());
+  // 一開始讓小人剛好在日出的位置
+  const sunDir = tt => TAU * tt / PL[key].orb + Math.PI;                  // 從行星看太陽的方向
+  const spinAt = tt => PL[key].dir * TAU * tt / PL[key].sid + psi0;      // 小人站的方向
+  let psi0 = 0;
+  const hourAngle = tt => { const h = spinAt(tt) - sunDir(tt); return Math.atan2(Math.sin(h), Math.cos(h)); };   // 0＝正中午
+  function reset() {
+    t = 0; rises = 0; flash = 0;
+    psi0 = Math.PI + (PL[key].dir > 0 ? -Math.PI / 2 + 0.02 : Math.PI / 2 - 0.02);   // 剛跨進白天
+    wasDay = true; renderInfo(); draw();
+  }
+  function renderInfo() {
+    const p = PL[key], sd = solar(p);
+    $('#sdInfo').innerHTML = key === 'mercury'
+      ? `<h3>☿ 水星</h3><p>自轉一圈 <em>59 個地球天</em>、繞太陽一圈（一年）<em>88 個地球天</em>。可是小人從日出到下一次日出，要等 <em>${Math.round(sd)} 個地球天</em>，剛好是<em>兩年</em>！所以水星上白天 88 個地球天、晚上 88 個地球天。</p>`
+      : `<h3>♀ 金星</h3><p>自轉一圈要 <em>243 個地球天</em>，比繞太陽一圈（一年）的 <em>225 個地球天</em>還久！而且金星是<em>反著轉</em>的，太陽從西邊升起。小人從日出到下一次日出大約 <em>${Math.round(sd)} 個地球天</em>。</p>`;
+  }
+  function fit(c) {
+    const dpr = window.devicePixelRatio || 1, r = c.getBoundingClientRect();
+    const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, W: r.width, H: r.height };
+  }
+  function step(dt) {
+    t += dt * speed;
+    const day = Math.cos(hourAngle(t)) > 0;
+    if (day && !wasDay) { rises++; flash = 1.2; }
+    wasDay = day;
+    flash = Math.max(0, flash - dt);
+  }
+  function draw() {
+    const p = PL[key], { ctx, W, H } = fit($('#sdCanvas'));
+    const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.33, pr = Math.min(W, H) * 0.11;
+    ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, H);
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.setLineDash([4, 6]); ctx.strokeStyle = 'rgba(160,180,255,0.35)'; ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+    const sg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 34); sg.addColorStop(0, '#fff7d1'); sg.addColorStop(0.45, '#ffd166'); sg.addColorStop(1, 'rgba(255,159,67,0)');
+    ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(cx, cy, 34, 0, TAU); ctx.fill();
+    const th = TAU * t / p.orb, px = cx + R * Math.cos(th), py = cy - R * Math.sin(th);
+    // 行星：朝太陽的一半亮（白天）、背對的一半暗（晚上）
+    const toSun = th + Math.PI;
+    ctx.beginPath(); ctx.arc(px, py, pr, 0, TAU); ctx.fillStyle = '#1a1f38'; ctx.fill();
+    ctx.beginPath(); ctx.arc(px, py, pr, -toSun - Math.PI / 2, -toSun + Math.PI / 2); ctx.closePath(); ctx.fillStyle = p.col; ctx.fill();
+    ctx.beginPath(); ctx.arc(px, py, pr, 0, TAU); ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 1; ctx.stroke();
+    // 小人
+    const ps = spinAt(t), hx = px + Math.cos(ps) * pr, hy = py - Math.sin(ps) * pr, day = Math.cos(hourAngle(t)) > 0;
+    ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(px + Math.cos(ps) * pr * 1.45, py - Math.sin(ps) * pr * 1.45); ctx.strokeStyle = '#ff5a5a'; ctx.lineWidth = 3; ctx.stroke();
+    ctx.beginPath(); ctx.arc(px + Math.cos(ps) * pr * 1.55, py - Math.sin(ps) * pr * 1.55, 5, 0, TAU); ctx.fillStyle = '#ff5a5a'; ctx.fill();
+    if (flash > 0) { ctx.beginPath(); ctx.arc(hx, hy, 10 + (1.2 - flash) * 30, 0, TAU); ctx.strokeStyle = `rgba(255,209,102,${flash / 1.2})`; ctx.lineWidth = 3; ctx.stroke(); }
+    // 自轉方向的小箭頭（水星逆時針、金星順時針）
+    const a0 = Math.PI * 0.75, a1 = a0 + p.dir * 1.1, rr = pr * 1.9;
+    ctx.beginPath(); ctx.arc(px, py, rr, -a0, -a1, p.dir > 0); ctx.strokeStyle = 'rgba(110,231,183,0.9)'; ctx.lineWidth = 2.2; ctx.stroke();
+    const ex = px + rr * Math.cos(a1), ey = py - rr * Math.sin(a1), tang = -a1 - p.dir * Math.PI / 2;
+    ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex - 9 * Math.cos(tang - 0.5), ey - 9 * Math.sin(tang - 0.5)); ctx.lineTo(ex - 9 * Math.cos(tang + 0.5), ey - 9 * Math.sin(tang + 0.5)); ctx.closePath(); ctx.fillStyle = 'rgba(110,231,183,0.9)'; ctx.fill();
+    ctx.font = '700 14px "PingFang TC","Noto Sans TC",sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffd166'; ctx.fillText('太陽', cx, cy + 46);
+    ctx.fillStyle = '#e8eeff'; ctx.fillText(p.zh, px, py + pr + 18);
+    ctx.fillStyle = '#9ff0c9'; ctx.font = '13px "PingFang TC",sans-serif'; ctx.fillText(p.dir > 0 ? '自轉：逆時針' : '自轉：順時針（反著轉）', px, py - pr * 1.9 - 14);
+    ctx.fillStyle = '#ff9a9a'; ctx.fillText('紅色＝小人', 50, H - 16);
+    // 數字
+    $('#sdDays').textContent = Math.floor(t);
+    $('#sdYears').textContent = (t / p.orb).toFixed(2);
+    $('#sdSpins').textContent = (t / p.sid).toFixed(2);
+    $('#sdRises').textContent = rises;
+    const now = $('#sdNow');
+    now.className = 'card sd-now ' + (day ? 'day' : 'night');
+    now.textContent = flash > 0 ? '🌅 日出了！' : day ? '☀️ 小人現在是白天' : '🌙 小人現在是晚上';
+  }
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    const r = $('#sdCanvas').getBoundingClientRect();
+    if (play) step(dt);
+    if (r.bottom > 0 && r.top < innerHeight) draw();
+    requestAnimationFrame(frame);
+  }
+  reset(); requestAnimationFrame(frame);
+  window.__sd = { step, draw, reset, setKey: k => { key = k; reset(); }, get t() { return t; }, get rises() { return rises; } };   // 給測試用
 })();
 </script>
 </body>

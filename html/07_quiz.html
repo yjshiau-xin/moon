@@ -21,6 +21,7 @@
   .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:8px 20px;background:rgba(10,15,36,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   nav.top{display:flex;gap:8px;flex-wrap:wrap}
+  nav.top a[aria-current]{color:#0a0f24;background:var(--sun);border-color:transparent;font-weight:700}
   nav.top a{color:var(--muted);text-decoration:none;padding:4px 14px;border-radius:999px;border:1px solid var(--line);font-size:15px}
   .quiz-link{color:#1d1a0b;background:var(--sun);text-decoration:none;font-weight:800;padding:6px 16px;border-radius:999px;font-size:15px}
   .wrap{max-width:860px;margin:0 auto;padding:28px 20px 72px}
@@ -117,6 +118,7 @@
     <a href="04_planets.html">🪐 八大行星</a>
     <a href="05_pluto.html">🧊 冥王星</a>
     <a href="06_milky-way.html">🌌 銀河系</a>
+    <a href="07_quiz.html" aria-current="page">⭐ 小測驗</a>
   </nav>
 </header>
 <div class="wrap">
@@ -124,15 +126,15 @@
   <p class="sub">五個測驗分開玩：<a href="#moonQuiz">🌙 月亮與地球</a>・<a href="#planetQuiz">🪐 八大行星</a>・<a href="#listenQuiz">🎧 聽英文，找行星</a>・<a href="#plutoQuiz">🧊 冥王星</a>・<a href="#galaxyQuiz">🌌 銀河系</a>・<a href="#scoreBoard">🏆 我的成績</a></p>
   <section class="panel" id="moonQuiz">
     <div class="qhead">
-      <h2 class="qh">🌙 <span style="color:var(--moon)">月亮</span>與<span style="color:var(--moon)">地球</span><span class="qcount" id="moonCount">12 題</span></h2>
-      <span class="back"><a class="quiz-link" href="01_moon-phases.html">← 回去看 🌙 月亮變變變</a><a class="quiz-link" href="02_earth-moon-orbit.html">← 回去看 🌍 地球帶著月亮跑</a></span>
+      <h2 class="qh">🌙 <span style="color:var(--moon)">月亮</span>與<span style="color:var(--moon)">地球</span><span class="qcount" id="moonCount">14 題</span></h2>
+      <span class="back"><a class="quiz-link" href="01_moon-phases.html">← 回去看 🌙 月亮</a><a class="quiz-link" href="02_earth-moon-orbit.html">← 回去看 🌍 地球公轉</a></span>
     </div>
     <p class="qsub">「月亮變變變」7 題＋「地球帶著月亮跑」5 題，答錯了可以回去看動畫再來挑戰！</p>
     <div id="quiz"></div>
   </section>
   <section class="panel" id="planetQuiz">
     <div class="qhead">
-      <h2 class="qh">🪐 八大行星<span class="qcount" id="planetCount">14 題</span></h2>
+      <h2 class="qh">🪐 八大行星<span class="qcount" id="planetCount">15 題</span></h2>
       <span class="back"><a class="quiz-link" href="04_planets.html">← 回去看 🪐 八大行星</a></span>
     </div>
     <p class="qsub">題目都來自「🪐 八大行星」頁，答錯了可以回去再看看！</p>
@@ -162,7 +164,7 @@
   </section>
   <section class="panel" id="galaxyQuiz">
     <div class="qhead">
-      <h2 class="qh">🌌 銀河系 Milky Way<span class="qcount" id="galaxyCount">9 題</span></h2>
+      <h2 class="qh">🌌 銀河系 Milky Way<span class="qcount" id="galaxyCount">10 題</span></h2>
       <span class="back"><a class="quiz-link" href="06_milky-way.html">← 回去看 🌌 銀河系</a></span>
     </div>
     <p class="qsub">題目都來自「🌌 銀河系」頁，答錯了可以回去再看看！</p>
@@ -171,7 +173,7 @@
 
   <section class="panel board" id="scoreBoard">
     <h2 class="qh">🏆 我的成績</h2>
-    <p class="qsub">五個測驗都是一題一分：月亮與地球滿分 12 分、八大行星滿分 14 分、聽英文找行星滿分 8 分、冥王星滿分 7 分、銀河系滿分 9 分，加起來滿分 50 分。再玩一次的話，以最新的分數為準。</p>
+    <p class="qsub">五個測驗都是一題一分：月亮與地球滿分 14 分、八大行星滿分 15 分、聽英文找行星滿分 8 分、冥王星滿分 7 分、銀河系滿分 10 分，加起來滿分 54 分。再玩一次的話，以最新的分數為準。</p>
     <div class="board-rows">
       <a href="#moonQuiz" class="board-row"><span>🌙 月亮與地球</span><b data-k="moon">還沒玩</b></a>
       <a href="#planetQuiz" class="board-row"><span>🪐 八大行星</span><b data-k="planet">還沒玩</b></a>
@@ -179,14 +181,14 @@
       <a href="#plutoQuiz" class="board-row"><span>🧊 冥王星</span><b data-k="pluto">還沒玩</b></a>
       <a href="#galaxyQuiz" class="board-row"><span>🌌 銀河系</span><b data-k="galaxy">還沒玩</b></a>
     </div>
-    <div class="board-total">總分 <b id="totalPts">0</b> / <span id="maxPts">50</span> 分</div>
+    <div class="board-total">總分 <b id="totalPts">0</b> / <span id="maxPts">54</span> 分</div>
     <p class="board-msg" id="boardMsg">五個測驗都玩玩看，把總分加起來吧！</p>
   </section>
 </div>
 <script>
 // ---------- 五個測驗的分數和總分 ----------
 // 五個測驗都是一題一分
-window.QUIZ_MAX = { moon: 12, planet: 14, listen: 8, pluto: 7, galaxy: 9 };
+window.QUIZ_MAX = { moon: 14, planet: 15, listen: 8, pluto: 7, galaxy: 10 };
 const QUIZ_MAX_SUM = Object.values(QUIZ_MAX).reduce((a, b) => a + b, 0);
 window.QUIZ_SCORES = {};
 // 答完後按鈕倒數（例如「下一題 →（4）」），時間到自動換題；直接按就馬上換
@@ -359,6 +361,13 @@ window.reportScore = (key, right, total) => {
     { q: '發生<em>「月全食」</em>的時候，為什麼月亮不會完全黑掉，反而變成神祕的<em>「紅月亮」</em>？',
       opts: ['因為地球在太陽和月亮中間，<em>地球大氣層把陽光中的紅光折射</em>彎進地球本影裡照亮月亮', '因為月亮<em>自己會點火</em>發紅光', '因為月亮<em>跑到太陽前面</em>把太陽染紅了'], a: 0,
       why: '月食是「太陽 → 地球 → 月亮」排成一直線，滿月走進地球本影裡；陽光穿過地球大氣層時藍光被散射，紅光被折射彎進影子裡照在月球上，就變成紅月亮了！' },
+    // ↓ 月亮頁「④ 為什麼永遠只看得到月亮的同一面？」動畫、日食月食頁第 13 張卡（2026-11-19）
+    { q: '為什麼我們從地球<em>永遠只看得到月亮的同一面</em>？',
+      opts: ['月亮不會自轉', '月亮自轉一圈，剛好等於繞地球一圈（大約 27.3 天）', '月亮的背面被地球擋住了'], a: 1,
+      why: '月亮自轉和繞地球一圈都是大約 27.3 天，轉得剛剛好，正面永遠朝著地球。如果月亮不自轉，繞到另一邊時我們反而會看到它的背面！' },
+    { q: '日全食時，月亮為什麼能<em>剛好</em>把比它大很多的太陽遮住？',
+      opts: ['太陽和月亮其實一樣大', '日全食時月亮會變大', '太陽大約大 400 倍，但也遠了大約 400 倍，所以看起來差不多一樣大'], a: 2,
+      why: '太陽的直徑大約是月亮的 400 倍，離我們的距離也差不多是月亮的 400 倍，所以兩個在天上看起來差不多一樣大。這是一個大巧合！' },
   ];
   // 每回題目順序都打亂（給不同小朋友玩）；選項順序不動，因為有些選項是照大小或時間排的
   const shuffled = n => { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const m = Math.floor(Math.random() * (k + 1)); [a[k], a[m]] = [a[m], a[k]]; } return a; };
@@ -937,6 +946,10 @@ window.reportScore = (key, right, total) => {
     { q: '為什麼土星 Saturn 擋彗星的本領，<em>沒有木星 Jupiter 厲害</em>？',
       opts: ['土星 Saturn 有光環，會把引力擋住', '土星 Saturn 比較輕（只有木星 Jupiter 約三成重），又離太陽更遠', '土星 Saturn 轉得太慢'], a: 1, pl: 'saturn',
       why: '土星大約 95 個地球重，木星約 318 個；土星離太陽約 9.5 天文單位，比木星的 5.2 遠了快一倍，遇到彗星的機會少很多。光環不會擋住引力喔！' },
+    // ↓ 八大行星頁「🕐 水星和金星的一天」動畫（2026-11-19）
+    { q: '水星 Mercury 自轉一圈只要 59 個地球天，可是小人從日出到<em>下一次日出</em>，卻要等 <em>176 個地球天</em>。為什麼？',
+      opts: ['因為水星一邊自轉、一邊繞著太陽跑', '因為水星轉到一半會停下來休息', '因為太陽有時候會熄滅'], a: 0, pl: 'mercury',
+      why: '水星一邊自轉，一邊繞著太陽跑，太陽的方向也一直在變，小人要多轉一些才會再看到日出。所以從日出到日出要 176 個地球天，剛好繞太陽兩圈！「自轉一圈」和「一天」不一樣喔。' },
   ];
   // 每回題目順序都打亂（給不同小朋友玩）；選項順序不動，因為有些選項是照大小或時間排的
   const shuffled = n => { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const m = Math.floor(Math.random() * (k + 1)); [a[k], a[m]] = [a[m], a[k]]; } return a; };
@@ -1114,6 +1127,10 @@ window.reportScore = (key, right, total) => {
     { q: '在台灣，<em>哪個季節</em>的晚上，銀河 Milky Way 最亮最好看？',
       opts: ['冬天', '夏天', '春天'], a: 1,
       why: '夏天！晚上銀河中心在南方的人馬座，銀河從南方往上經過頭頂附近，最亮最寬。' },
+    // ↓ 銀河系頁「⏳ 抬頭看星星，就像坐時光機」卡（2026-11-19）
+    { q: '晚上抬頭看到<em>天狼星</em>，它的光是<em>多久以前</em>發出來的？',
+      opts: ['就是現在這一秒', '大約 8 分鐘前', '大約 8.6 年前'], a: 2,
+      why: '天狼星離我們很遠，光要跑大約 8.6 年才到地球，差不多是你出生那年就出發了！8 分鐘前發出來的是陽光。' },
     // ↓ 題目裡說了「銀河系是順時針」，所以一定排在「從北邊往下看，銀河系怎麼轉」那題後面
     { q: '從北邊往下看，銀河系 Milky Way 是<em>順時針</em>轉的。那太陽系的<em>八大行星繞太陽</em>，從北邊往下看是怎麼轉？',
       opts: ['也是順時針', '逆時針', '不會轉'], a: 1,
