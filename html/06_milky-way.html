@@ -98,10 +98,12 @@
     <a href="01_moon-phases.html">🌙 月亮</a>
     <a href="02_earth-moon-orbit.html">🌍 地球公轉</a>
     <a href="03_eclipses.html">📅 未來20年日食月食</a>
+    <a href="total-eclipses.html">🌘 日全食月全食</a>
     <a href="04_planets.html">🪐 八大行星</a>
     <a href="05_pluto.html">🧊 冥王星</a>
     <a href="06_milky-way.html" aria-current="page">🌌 銀河系</a>
-    <a href="07_quiz.html">⭐ 小測驗</a>
+    <a href="07_universe.html">🌠 宇宙</a>
+    <a href="08_quiz.html">⭐ 小測驗</a>
   </nav>
 
   <h1>🌌 <span>銀河系 Milky Way</span>：我們住在一個會轉的星星大漩渦裡</h1>
@@ -850,7 +852,8 @@
   const onEcl = (r, t) => add(add(SUNP, E1, r * Math.cos(t)), E2, r * Math.sin(t));
   const onGal = (r, t) => [r * Math.cos(t), r * Math.sin(t), 0];
   function drawPlanes(dt) {
-    if (pl.play) pl.az += dt * pl.speed * DEG;
+    // 整張圖繞著銀河中心「順時針」轉（從銀河系北邊看，銀河系是順時針轉）；行星在黃道面上逆時針繞太陽
+    if (pl.play) { pl.az -= dt * pl.speed * DEG; pl.tt = (pl.tt || 0) + dt; }
     const { ctx, W, H } = fit(pl.cv);
     const cx = W / 2, cy = H / 2 + H * 0.06, s = Math.min(W * 0.46, H * 0.62) / 16;
     const ca = Math.cos(pl.az), sa = Math.sin(pl.az), se = Math.sin(pl.el), ce = Math.cos(pl.el);
@@ -868,6 +871,10 @@
       ((tri[1][2] + tri[2][2]) / 2 < 0 ? below : above).push(tri);
     }
     for (const t of below) poly(t, 'rgba(255,209,102,0.16)');
+    // 黃道面上的三顆行星：角度變大＝從太陽系北邊看逆時針
+    const PLN = [[0.32, 3, '#e8743f'], [0.55, 5.5, '#5aa9f0'], [0.85, 10, '#dcb88c']].map(([k, per, col]) => ({ q: onEcl(ECL_R * k, 0.7 + TAU * (pl.tt || 0) / per), col }));
+    const dot = (q, col, a) => { const [x, y] = P(q); ctx.beginPath(); ctx.arc(x, y, 4, 0, TAU); ctx.globalAlpha = a; ctx.fillStyle = col; ctx.fill(); ctx.globalAlpha = 1; };
+    for (const pt of PLN) if (pt.q[2] < 0) dot(pt.q, pt.col, 0.45);   // 在銀河面下面的先畫（從上面看比較淡）
     // 銀河面：大盤面、核球的光、旋臂
     const disk = []; for (let k = 0; k <= 120; k++) disk.push(onGal(16, k / 120 * TAU));
     poly(disk, 'rgba(70,100,200,0.20)', 'rgba(150,180,255,0.6)', 1.4);
@@ -896,6 +903,8 @@
     const eRing = []; for (let k = 0; k <= 72; k++) eRing.push(onEcl(ECL_R, k / 72 * TAU));
     poly(eRing, null, 'rgba(255,209,102,0.9)', 1.6);
     arrowArc(onEcl, ECL_R * 0.72, 120 * DEG, 200 * DEG, '#ffd166', 2.6, 9);
+    for (const k of [0.32, 0.55, 0.85]) { const rr = []; for (let m = 0; m <= 48; m++) rr.push(onEcl(ECL_R * k, m / 48 * TAU)); poly(rr, null, 'rgba(255,209,102,0.25)', 1); }
+    for (const pt of PLN) if (pt.q[2] >= 0) dot(pt.q, pt.col, 1);
     // 交叉線（白色虛線，穿過太陽）
     const na = add(SUNP, E1, ECL_R * 1.5), nb = add(SUNP, E1, -ECL_R * 1.5);
     poly([nb, na], null, 'rgba(255,255,255,0.9)', 1.6, [6, 5]);

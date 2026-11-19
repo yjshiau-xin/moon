@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>宇宙 Universe</title>
+<style>
+  :root{
+    --bg:#0a0f24;--panel:rgba(22,31,70,.78);--line:rgba(160,180,255,.18);
+    --ink:#f2f4ff;--muted:#aab3dc;--sun:#ffd166;--radius:20px;
+    --faint:#8a93b8;--hot:#ff9a4a;--cold:#6fa8ff;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;min-height:100vh;color:var(--ink);font-size:17px;line-height:1.75;overflow-x:hidden;
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #26336f 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 25%, #1a2355 0%, transparent 55%),
+      var(--bg);
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.55;
+    background-image:
+      radial-gradient(1.2px 1.2px at 20px 30px,#fff,transparent),
+      radial-gradient(1px 1px at 140px 80px,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 210px 190px,#ffeebb,transparent),
+      radial-gradient(1px 1px at 60px 220px,#fff,transparent),
+      radial-gradient(1px 1px at 180px 20px,#cfe3ff,transparent);
+    background-size:260px 260px;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:0 20px 40px}
+  nav.top{display:flex;gap:8px;padding:8px 0;flex-wrap:wrap}
+  nav.top a{color:var(--muted);text-decoration:none;padding:4px 14px;border-radius:999px;border:1px solid var(--line);font-size:15px}
+  nav.top a[aria-current]{color:#0a0f24;background:var(--sun);border-color:transparent;font-weight:700}
+  h1{font-size:34px;margin:6px 0 0;line-height:1.3}
+  h1 span{color:var(--sun)}
+  .lead-txt{color:var(--muted);margin:0 0 12px}
+  h2{font-size:23px;margin:0 0 10px;line-height:1.4}
+  h3{font-size:18px;margin:4px 0 6px;color:var(--sun)}
+  em,strong{font-style:normal;color:var(--sun);font-weight:700}
+  p{margin:0 0 10px}
+  ul,ol{padding-left:1.4em;margin:0 0 10px}
+  li{margin:4px 0}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-top:16px}
+  .btn{background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:7px 14px;font:inherit;font-size:15px;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.14)}
+  .btn.primary{background:var(--sun);color:#1d1a0b;border-color:transparent;font-weight:700}
+  .btn.on{outline:2px solid var(--sun)}
+  input[type=range]{accent-color:var(--sun)}
+  .card{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+  .card p{margin:0}
+  .fun{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+  .two{display:grid;grid-template-columns:minmax(0,660px) minmax(0,1fr);gap:22px;align-items:start}
+  .fig{background:#03050d;border:1px solid var(--line);border-radius:16px;padding:10px}
+  canvas{display:block;width:100%;height:auto;border-radius:10px;touch-action:manipulation}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0 0}
+  .stat{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;padding:6px 12px}
+  .stat .k{font-size:13.5px;color:var(--muted)}
+  .stat .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;font-size:15px;color:var(--muted)}
+  .row label{display:flex;gap:6px;align-items:center}
+  .note{border-left:3px solid var(--sun);padding:4px 0 4px 14px;color:var(--muted);margin:14px 0 4px}
+  .cap{color:var(--muted);font-size:13.5px;margin:6px 2px 0}
+  .steps{display:grid;gap:10px}
+  .step{cursor:pointer;transition:border-color .2s,background .2s}
+  .step:hover{background:rgba(255,255,255,.09)}
+  .step.now{border-color:var(--sun);background:rgba(255,209,102,.10)}
+  .step .no{display:inline-block;min-width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;background:var(--sun);color:#1d1a0b;font-weight:700;margin-right:6px;font-size:15px}
+  .oneline{font-size:19px;line-height:1.8;border:2px solid var(--sun);border-radius:16px;padding:12px 16px;background:rgba(255,209,102,.08)}
+  .tl{list-style:none;padding:0;margin:0}
+  .tl li{display:grid;grid-template-columns:78px 1fr;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line)}
+  .tl b{color:var(--sun);font-variant-numeric:tabular-nums}
+  .lgcard{min-height:150px}
+  .lgcard h3{margin-top:0}
+  .tag{display:inline-block;font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 10px;margin-left:6px}
+  footer{text-align:center;color:var(--muted);font-size:13.5px;margin-top:22px}
+  @media (max-width:1000px){ .two{grid-template-columns:1fr} }
+  @media (max-width:640px){ h1{font-size:28px} .wrap{padding:0 12px 30px} .panel{padding:14px 12px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a href="../index.html" title="回首頁" aria-label="回首頁">🏠</a>
+    <a href="01_moon-phases.html">🌙 月亮</a>
+    <a href="02_earth-moon-orbit.html">🌍 地球公轉</a>
+    <a href="03_eclipses.html">📅 未來20年日食月食</a>
+    <a href="total-eclipses.html">🌘 日全食月全食</a>
+    <a href="04_planets.html">🪐 八大行星</a>
+    <a href="05_pluto.html">🧊 冥王星</a>
+    <a href="06_milky-way.html">🌌 銀河系</a>
+    <a href="07_universe.html" aria-current="page">🌠 宇宙</a>
+    <a href="08_quiz.html">⭐ 小測驗</a>
+  </nav>
+
+  <h1>🌠 <span>宇宙 Universe</span>：宇宙在長大，還留著小時候的光</h1>
+  <p class="lead-txt">從月亮、太陽系一路看到銀河系，最後一章把鏡頭拉到最遠：整個宇宙。宇宙一直在變大，而且到現在，天空裡還留著它「小時候」發出的光。</p>
+
+  <!-- 一、宇宙膨脹 -->
+  <section class="panel" id="expand">
+    <h2>🎈 一、宇宙在長大：星系都在互相遠離</h2>
+    <div class="two">
+      <div class="fig">
+        <canvas id="exCv" width="660" height="410" aria-label="宇宙膨脹動畫：星系之間的距離越來越大"></canvas>
+        <div class="row">
+          <button class="btn primary" id="exPlay">⏸ 暫停</button>
+          <button class="btn" id="exReset">↺ 重來</button>
+          <label><input type="checkbox" id="exArrow" checked> 顯示跑開的箭頭</label>
+          <label><input type="checkbox" id="exGrid" checked> 顯示空間的格子</label>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="k">星系之間的距離</div><div class="v" id="exScale">1.0 倍</div></div>
+          <div class="stat"><div class="k">現在當「家」的星系</div><div class="v" id="exHome">我們的銀河系</div></div>
+        </div>
+        <p class="cap">點任何一個星系，就把它當成「家」。箭頭越長，代表跑開得越快。格子是「空間」：格子被拉大，星系就跟著分開。</p>
+      </div>
+      <div>
+        <p>1929 年，天文學家<em>哈伯</em>發現：<em>離我們越遠的星系，跑開的速度越快</em>（叫做「哈伯定律」）。</p>
+        <p>這不是星系在太空裡「飛走」，而是星系和星系中間的<em>空間本身在變大</em>，這就叫做「宇宙膨脹」。</p>
+        <div class="fun" style="grid-template-columns:1fr">
+          <div class="card"><h3>🍞 像烤箱裡的葡萄乾麵包</h3><p>麵團膨脹時，每一顆葡萄乾都看到其他葡萄乾離自己越來越遠，而且離得越遠的，跑開得越快。星系就是宇宙麵包裡的葡萄乾。</p></div>
+          <div class="card"><h3>🎯 宇宙沒有中心</h3><p>在左邊點不同的星系當「家」，看出去的樣子都一樣：大家都在離自己遠去。所以不管住在哪個星系，都會覺得自己好像在中心。</p></div>
+          <div class="card"><h3>🧲 星系自己不會變大</h3><p>星系、太陽系和我們的身體，都被引力和其他力量抓得緊緊的，不會跟著膨脹。變大的是星系之間空空蕩蕩的地方。</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 二、背景輻射的故事 -->
+  <section class="panel" id="story">
+    <h2>📜 二、宇宙膨脹 ＋ 背景輻射：同一個故事的兩面</h2>
+    <p>宇宙在膨脹，所以<em>過去比較小、比較熱</em>；<em>宇宙背景輻射</em>就是那個高溫時期留下來的光。按右邊的四個步驟，或拖動下面的時間軸，看看宇宙怎麼從一團發光的霧，變成今天的樣子。</p>
+    <div class="two">
+      <div class="fig">
+        <canvas id="stCv" width="660" height="420" aria-label="宇宙歷史動畫：發光的霧、霧散了、光被拉長"></canvas>
+        <div class="row">
+          <button class="btn" id="stBack">⏪ 倒帶</button>
+          <button class="btn primary" id="stPlay">▶ 播放</button>
+          <input type="range" id="stRange" min="0" max="1000" value="1000" style="flex:1;min-width:160px" aria-label="宇宙的時間">
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="k">大爆炸後</div><div class="v" id="sTime">138 億年</div></div>
+          <div class="stat"><div class="k">溫度</div><div class="v" id="sTemp">2.7 K</div></div>
+          <div class="stat"><div class="k">宇宙比現在小</div><div class="v" id="sSize">1 倍</div></div>
+          <div class="stat"><div class="k">這批光是</div><div class="v" id="sLight">微波</div></div>
+        </div>
+        <p class="cap">🔵 質子　🔴 電子　🟡 光　⚛️ 原子（質子＋電子）。動畫是示意圖，粒子的大小和數量都不是真的比例。</p>
+      </div>
+      <div class="steps" id="steps">
+        <div class="card step" data-step="0"><h3><span class="no">1</span>⏪ 倒帶：過去的宇宙又熱又擠</h3><p>現在星系都在彼此遠離，表示空間在膨脹。把影片倒著播回去，越早期的宇宙越擠、溫度越高。</p></div>
+        <div class="card step" data-step="1"><h3><span class="no">2</span>🌫️ 早期宇宙像一團發光的霧</h3><p>大爆炸後最初約 <em>38 萬年</em>，宇宙太熱，原子組不起來，只有帶電的質子和電子到處亂跑。光一直被電子撞來撞去，走不遠，宇宙就像一團不透明的濃霧。</p></div>
+        <div class="card step" data-step="2"><h3><span class="no">3</span>✨ 冷到約 3000 K，光被放出來</h3><p>宇宙膨脹、冷卻到約 <em>3000 K</em> 時，電子和質子結合成原子，霧散了，光終於可以一直往前走。這批光從那時起就在宇宙裡旅行，就是<em>宇宙背景輻射</em>。它原本充滿整個空間，所以現在往任何方向看都看得到，而且幾乎一樣均勻。</p></div>
+        <div class="card step" data-step="3"><h3><span class="no">4</span>📏 膨脹把光拉長、變冷</h3><p>從那時到現在，宇宙大約又膨脹了 <em>1100 倍</em>，光的波長也被拉長 1100 倍（叫做「宇宙學紅移」）。原本約 3000 K、帶點橘紅色的光和紅外線，現在變成約 <em>2.7 K</em> 的微波，所以叫「宇宙微波背景輻射」。</p></div>
+      </div>
+    </div>
+    <p class="note">🌡️ K（克耳文）是科學家量溫度的單位。0 K 是最冷最冷的溫度（約 −273°C），所以 3000 K 大約是 2700°C，比熔化的鐵還燙；2.7 K 大約是 −270°C，只比最冷的溫度高一點點。</p>
+    <h3 style="margin-top:18px">🧠 想得更深一點：光為什麼會被拉長？</h3>
+    <div class="fun">
+      <div class="card"><h3>🧵 空間是一塊會伸縮的布</h3><p>以前的人以為空間是固定不動的大舞台。1915 年<em>愛因斯坦</em>的<em>廣義相對論</em>說：空間本身可以<em>彎曲、伸縮</em>，像一塊有彈性的布。後來科學家用他的方程式算出宇宙會一直變大，哈伯也真的看到星系都在遠離我們。</p></div>
+      <div class="card"><h3>〰️ 布上的光波也被拉長</h3><p>光在這塊布上前進。布被拉大，光波的波峰和波峰之間也跟著<em>變寬</em>。規則很簡單：<em>宇宙變大幾倍，波長就拉長幾倍</em>。背景輻射的光發出時，宇宙只有現在的 1/1100，所以波長被拉長了 <em>1100 倍</em>，叫做「宇宙學紅移」。</p></div>
+      <div class="card"><h3>🚑 跟救護車的聲音不一樣</h3><p>救護車開走時，警笛聲變低沉，是因為車子<em>在空間裡跑</em>。很遠的星系不一樣：它們現在遠離我們的速度甚至<em>超過光速</em>，卻不違反相對論，因為不是星系跑得比光快，而是<em>中間的空間在變大</em>。</p></div>
+      <div class="card"><h3>🔋 光的力氣跑去哪裡了？</h3><p>光波越長，能量越小，所以背景輻射的光<em>每一道都變弱了</em>，還被分散到更大的空間，溫度就從 3000 K 降到 2.7 K。少掉的能量<em>沒有跑去別的地方</em>：在一直變大的宇宙裡，「總能量不變」這條規則不適用，這也是廣義相對論告訴我們的。</p></div>
+    </div>
+  </section>
+
+  <!-- 三、背景輻射地圖、互相印證 -->
+  <section class="panel" id="cmb">
+    <h2>🗺️ 三、宇宙的「嬰兒照」：背景輻射地圖</h2>
+    <div class="two">
+      <div class="fig">
+        <canvas id="cmbCv" width="660" height="360" aria-label="宇宙背景輻射全天圖（示意）"></canvas>
+        <div class="row">
+          <button class="btn primary" id="cmbBoost">👀 照真實溫差畫</button>
+          <span id="cmbHint">現在：溫差放大了 10 萬倍，紅色是熱一點點、藍色是冷一點點的地方。</span>
+        </div>
+        <p class="cap">把整個天空攤平成一個橢圓（就像把地球儀攤平成世界地圖）。這是照真實背景輻射的斑點大小（大塊斑點加上約 1 度大的細斑點）用電腦模擬的圖，花紋和普朗克衛星的照片同一種，但不是真的照片。</p>
+      </div>
+      <div>
+        <p>不管望遠鏡朝哪個方向，背景輻射的溫度幾乎都是 <em>2.725 K</em>。仔細量，才會發現有大約<em>十萬分之一</em>的小小冷熱差別。</p>
+        <p>比較熱（紅）的地方，物質稍微多一點點；引力把它們越聚越多，幾億年後就長成了星星和<em>星系</em>。所以這張圖就像宇宙的「嬰兒照」，看得到星系的種子。</p>
+        <h3>🔬 兩件事怎麼互相證明？</h3>
+        <ul class="tl">
+          <li><b>1929 年</b><span>哈伯發現星系都在遠離我們，宇宙正在膨脹。</span></li>
+          <li><b>1948 年</b><span>科學家根據宇宙膨脹推算：如果宇宙以前又熱又擠，現在應該還留著一種充滿全宇宙、溫度很低的光。</span></li>
+          <li><b>1965 年</b><span>彭齊亞斯和威爾遜用天線找雜訊，意外發現四面八方都有一樣的微弱微波，溫度和預測相符！大爆炸理論從此成為主流（1978 年得到諾貝爾獎）。</span></li>
+          <li><b>1989 年起</b><span>COBE、WMAP、普朗克三代衛星把這張圖越畫越清楚。量出這些小小的溫差，就能反推出宇宙的年紀（約 <em>138 億年</em>）和膨脹得多快。</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="oneline">💡 <b>一句話：</b>宇宙膨脹說明過去很熱，背景輻射就是那時的熱留下的光；而它今天這麼冷，正是因為宇宙一直在膨脹。</p>
+  </section>
+
+  <!-- 四、本星系群 -->
+  <section class="panel" id="group">
+    <h2>🌌 四、銀河系的鄰居：本星系群</h2>
+    <div class="two">
+      <div class="fig">
+        <canvas id="lgCv" width="660" height="460" aria-label="銀河系周圍的星系立體圖"></canvas>
+        <div class="row">
+          <label style="flex:1">仰角 <input type="range" id="lgElev" min="5" max="90" value="30" style="flex:1"> <span id="lgElevV">30°</span></label>
+          <label style="flex:1">轉個方向看 <input type="range" id="lgYaw" min="0" max="359" value="320" style="flex:1"> <span id="lgYawV">320°</span></label>
+        </div>
+        <p class="cap">位置和距離照真實的天文資料畫（星系本身畫得比較大，才看得見）。拖滑桿只是換個角度看，星系並沒有動。可以點星系看介紹，直的細線是把星系投影到銀河系的盤面上；仙女座星系和三角座星系太遠了，在邊邊用箭頭指出方向。</p>
+      </div>
+      <div>
+        <p>銀河系不是孤單的。它和附近 80 多個星系組成一個「星系家族」，叫做<em>本星系群</em>，大約 1 千萬光年寬。家族裡最大的兩個是<em>仙女座星系</em>和<em>銀河系</em>，其他大多是很小的矮星系。</p>
+        <div class="card lgcard" id="lgInfo"><h3>👆 點一個星系看看</h3><p>例如離我們最近的大麥哲倫雲，或是邊邊箭頭指著的仙女座星系。</p></div>
+        <p class="note">🔄 <b>小跟班會繞著銀河系轉嗎？</b>人馬座矮星系、大小麥哲倫雲真的被銀河系的引力拉著跑，但繞一圈要<em>好幾億年以上</em>（大麥哲倫雲說不定是第一次經過），所以在我們一生裡，它們看起來都停在天空的同一個地方。</p>
+        <p class="note">本星系群又只是更大的「室女座超星系團」邊邊的一小群。宇宙裡的星系，至少有好幾千億個！</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 五、有趣的問題 -->
+  <section class="panel" id="fun">
+    <h2>🤩 五、宇宙的有趣問題</h2>
+    <div class="fun">
+      <div class="card"><h3>🌑 晚上的天空為什麼是黑的？</h3><p>如果宇宙無限大、又永遠存在，往每個方向看都會碰到一顆星星，夜空應該<em>亮得像白天</em>！夜空是黑的，是因為<em>宇宙有年紀</em>（約 138 億年），太遠的光<em>還沒到</em>；加上宇宙膨脹，把很遠的光<em>拉長、變暗</em>了。</p></div>
+      <div class="card"><h3>📺 你可能「看過」大爆炸的光</h3><p>以前的類比電視沒有訊號時，畫面會出現滿滿的雪花雜訊。其中<em>大約百分之一</em>，就是<em>宇宙背景輻射</em>！</p></div>
+      <div class="card"><h3>⭐ 你是星星做的</h3><p>大爆炸只做出了<em>氫和氦</em>這些最輕的元素。我們身體裡的<em>碳、氧、鐵</em>，是很久以前的<em>星星在肚子裡「煉」出來</em>，最後爆炸撒到太空，再變成太陽、地球和我們。</p></div>
+      <div class="card"><h3>👻 看得見的東西只有 5%</h3><p>星星、行星、氣體、我們自己，這些普通物質只占宇宙的<em>大約 5%</em>。剩下約 <em>27% 是看不見的「暗物質」</em>，約 <em>68% 是讓宇宙越脹越快的「暗能量」</em>，科學家還在研究它們到底是什麼。</p></div>
+      <div class="card"><h3>🚀 宇宙越脹越快</h3><p>本來以為引力會讓膨脹慢下來，但 <em>1998 年</em>科學家觀察很遠的超新星，發現宇宙的膨脹其實在<em>加速</em>！這個發現在 2011 年得到<em>諾貝爾獎</em>。</p></div>
+      <div class="card"><h3>📏 138 億年，卻看得到 465 億光年遠？</h3><p>光走了 <em>138 億年</em>才到地球，但光在路上的時候，<em>空間一直在變大</em>。所以那些最早發光的地方，現在已經被推到<em>大約 465 億光年遠</em>了。</p></div>
+      <div class="card"><h3>🏖️ 星星比沙子還多</h3><p>科學家估計，宇宙裡星星的數量，<em>比地球上所有沙灘的沙子加起來還要多</em>。光是銀河系，就有大約 <em>1000 到 4000 億顆</em>星星。</p></div>
+      <div class="card"><h3>👀 眼睛看得到最遠的東西</h3><p>秋天的晚上，在很暗的地方，眼睛就看得到<em>仙女座星系</em>：一小團模糊的光。那團光走了 <em>250 萬年</em>才到你的眼睛，當時地球上<em>還沒有現代人</em>呢！</p></div>
+    </div>
+  </section>
+
+  <footer>宇宙年齡、背景輻射溫度和星系距離採用目前常用的近似值（普朗克衛星：約 138 億年、2.725 K；大麥哲倫雲約 16 萬光年、仙女座星系約 250 萬光年）。</footer>
+</div>
+
+<script>
+(() => {
+  const DEG = Math.PI / 180, TAU = Math.PI * 2;
+  const $ = s => document.querySelector(s);
+  // 畫布：固定的邏輯大小，依螢幕密度放大
+  function setup(cv) {
+    const W = +cv.getAttribute('width'), H = +cv.getAttribute('height');
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = W * dpr; cv.height = H * dpr;
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, W, H };
+  }
+  const toLocal = (cv, e, W, H) => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height]; };
+  // 固定的亂數（每次打開畫面都一樣）
+  function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+  // 小星系：橢圓光暈＋亮亮的核心
+  function galaxy(ctx, x, y, r, rot, hue, alpha = 1) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(1, 0.45); ctx.globalAlpha = alpha;
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+    g.addColorStop(0, '#fff8e8'); g.addColorStop(0.25, `hsla(${hue},80%,78%,.9)`); g.addColorStop(1, `hsla(${hue},70%,60%,0)`);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill();
+    ctx.restore();
+  }
+  function arrow(ctx, x1, y1, x2, y2, col) {
+    const a = Math.atan2(y2 - y1, x2 - x1), L = Math.hypot(x2 - x1, y2 - y1); if (L < 3) return;
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    const h = Math.min(7, L * 0.5);
+    ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - h * Math.cos(a - 0.45), y2 - h * Math.sin(a - 0.45)); ctx.lineTo(x2 - h * Math.cos(a + 0.45), y2 - h * Math.sin(a + 0.45)); ctx.closePath(); ctx.fill();
+  }
+  const fmtNum = n => n.toLocaleString('zh-TW');
+  // 年數：萬年、億年
+  function fmtYears(t) {
+    if (t < 1) return '不到 1 年';
+    if (t < 1e4) return fmtNum(Math.round(t)) + ' 年';
+    if (t < 1e8) { const w = t / 1e4; return (w < 10 ? w.toFixed(1).replace(/\.0$/, '') : fmtNum(Math.round(w))) + ' 萬年'; }
+    const y = t / 1e8; return (y < 10 ? y.toFixed(1).replace(/\.0$/, '') : fmtNum(Math.round(y))) + ' 億年';
+  }
+
+  // ================= 一、宇宙膨脹 =================
+  const EX = (() => {
+    const cv = $('#exCv'), { ctx, W, H } = setup(cv);
+    const R = rng(7), gals = [];
+    for (let i = -5; i <= 5; i++) for (let j = -4; j <= 4; j++) {
+      gals.push({ x: i * 0.5 + (R() - 0.5) * 0.28, y: j * 0.5 + (R() - 0.5) * 0.28, rot: R() * Math.PI, hue: 20 + R() * 200, r: 7 + R() * 5 });
+    }
+    // 離 (0,0) 最近的當作銀河系
+    let mw = 0; gals.forEach((g, k) => { if (Math.hypot(g.x, g.y) < Math.hypot(gals[mw].x, gals[mw].y)) mw = k; });
+    gals[mw].hue = 45; gals[mw].r = 11;
+    const AMIN = 0.55, AMAX = 1.5, S = 118;
+    const st = { a: AMIN, play: true, home: mw, cx: gals[mw].x, cy: gals[mw].y, hold: 0, arrows: true, grid: true };
+    const pos = g => [W / 2 + (g.x - st.cx) * st.a * S, H / 2 + (g.y - st.cy) * st.a * S];
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, H);
+      if (st.grid) {   // 空間的格子：跟著宇宙一起被拉大
+        ctx.strokeStyle = 'rgba(120,150,255,.16)'; ctx.lineWidth = 1;
+        for (let k = -6; k <= 6; k++) {
+          const gx = W / 2 + ((k + 0.5) * 0.5 - st.cx) * st.a * S; ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+          const gy = H / 2 + ((k + 0.5) * 0.5 - st.cy) * st.a * S; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+        }
+      }
+      const home = gals[st.home], [hx, hy] = pos(home);
+      gals.forEach((g, k) => {
+        const [x, y] = pos(g); if (x < -20 || x > W + 20 || y < -20 || y > H + 20) return;
+        if (st.arrows && k !== st.home) {   // 跑開的速度和距離成正比（哈伯定律）
+          const dx = x - hx, dy = y - hy, f = 0.28;
+          arrow(ctx, x, y, x + dx * f, y + dy * f, 'rgba(255,209,102,.75)');
+        }
+        galaxy(ctx, x, y, g.r * (0.75 + 0.25 * st.a), g.rot, g.hue);
+      });
+      // 家
+      ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(hx, hy, 16, 0, TAU); ctx.stroke();
+      ctx.font = 'bold 14px "PingFang TC","Noto Sans TC",sans-serif'; ctx.fillStyle = '#ffd166'; ctx.textAlign = 'center';
+      ctx.fillText(st.home === mw ? '🏠 我們的銀河系' : '🏠 這裡當家', hx, hy - 22);
+      ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(170,179,220,.9)'; ctx.font = '13px "PingFang TC","Noto Sans TC",sans-serif';
+      ctx.fillText('越遠的星系，箭頭越長＝跑得越快', 10, H - 10);
+      $('#exScale').textContent = (st.a / AMIN).toFixed(1) + ' 倍';
+      $('#exHome').textContent = st.home === mw ? '我們的銀河系' : '另一個星系';
+    }
+    function step(dt) {
+      if (st.play) {
+        if (st.hold > 0) { st.hold -= dt; if (st.hold <= 0) st.a = AMIN; }
+        else { st.a += dt * 0.11; if (st.a >= AMAX) { st.a = AMAX; st.hold = 1.6; } }
+      }
+      const h = gals[st.home], k = Math.min(1, dt * 4);   // 換家時，畫面慢慢移過去
+      st.cx += (h.x - st.cx) * k; st.cy += (h.y - st.cy) * k;
+    }
+    cv.addEventListener('click', e => {
+      const [mx, my] = toLocal(cv, e, W, H); let best = -1, bd = 18;
+      gals.forEach((g, k) => { const [x, y] = pos(g), d = Math.hypot(x - mx, y - my); if (d < bd) { bd = d; best = k; } });
+      if (best >= 0) { st.home = best; draw(); }
+    });
+    $('#exPlay').addEventListener('click', () => { st.play = !st.play; $('#exPlay').textContent = st.play ? '⏸ 暫停' : '▶ 播放'; });
+    $('#exReset').addEventListener('click', () => { st.a = AMIN; st.hold = 0; st.home = mw; });
+    $('#exArrow').addEventListener('change', e => { st.arrows = e.target.checked; draw(); });
+    $('#exGrid').addEventListener('change', e => { st.grid = e.target.checked; draw(); });
+    return { st, step, draw, gals, pos, mw, W, H };
+  })();
+
+  // ================= 二、發光的霧 → 霧散了 → 光被拉長 =================
+  // u：0＝大爆炸剛發生，0.40＝38 萬年（開始變透明），0.47＝霧完全散了，1＝現在（138 億年）
+  const U_REC = 0.40, U_CLEAR = 0.47, U_GAL = 0.80;
+  const T_NOW = 1.38e10;
+  function uToYears(u) {
+    if (u <= U_REC) return 380000 * Math.pow(u / U_REC, 3);
+    if (u <= U_CLEAR) return 380000 + 20000 * (u - U_REC) / (U_CLEAR - U_REC);
+    const f = (u - U_CLEAR) / (1 - U_CLEAR), l0 = Math.log10(4e5), l1 = Math.log10(T_NOW);
+    return Math.pow(10, l0 + (l1 - l0) * f);
+  }
+  // 物質為主的宇宙：大小 ∝ 時間的 2/3 次方；溫度和大小成反比。38 萬年時剛好約 1/1100、約 3000 K
+  const scaleOf = t => Math.pow(Math.max(t, 1) / T_NOW, 2 / 3);
+  const tempOf = t => 2.725 / scaleOf(t);
+  const ST = (() => {
+    const cv = $('#stCv'), { ctx, W, H } = setup(cv);
+    const SH = 360;   // 上面是動畫，下面 60 px 是時間軸
+    const R = rng(21), NP = 64, NG = 40;
+    const P = [], E = [], G = [];
+    for (let k = 0; k < NP; k++) {
+      P.push({ x: R() * W, y: R() * SH, vx: (R() - 0.5) * 30, vy: (R() - 0.5) * 30 });
+      E.push({ x: R() * W, y: R() * SH, vx: (R() - 0.5) * 90, vy: (R() - 0.5) * 90, ang: R() * TAU });
+    }
+    for (let k = 0; k < NG; k++) { const a = R() * TAU; G.push({ x: R() * W, y: R() * SH, dx: Math.cos(a), dy: Math.sin(a), trail: [] }); }
+    const gx = [];   // 之後長出星系的位置
+    for (let k = 0; k < 7; k++) gx.push({ p: Math.floor(R() * NP), rot: R() * Math.PI, hue: 20 + R() * 200 });
+    const st = { u: 1, dir: 0, step: -1 };
+    const smooth = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+    const wrap = (v, m) => ((v % m) + m) % m;
+    function lightName(T) {
+      const lam = 2.898e-3 / T;   // 最亮的波長（公尺）
+      if (T > 2000) return '紅外線＋橘紅光';
+      if (lam < 1e-3) return '紅外線';
+      return '微波';
+    }
+    function waveColor(T) {
+      // 3000 K 橘色 → 600 K 暗紅 → 微波（眼睛看不見，用灰藍色表示）
+      const mix = (a, b, f) => a.map((v, i) => Math.round(v + (b[i] - v) * f));
+      let c;
+      if (T >= 3000) c = [255, 176, 80];
+      else if (T > 600) c = mix([255, 176, 80], [220, 40, 30], (3000 - T) / 2400);
+      else c = mix([220, 40, 30], [122, 134, 176], Math.min(1, Math.log(600 / T) / Math.log(600 / 30)));
+      return `rgb(${c})`;
+    }
+    function step(dt) {
+      if (st.dir) {
+        st.u += st.dir * dt * (st.dir > 0 ? 0.055 : 0.16);
+        const stop = st.dir < 0 ? 0.18 : 1;
+        if ((st.dir > 0 && st.u >= stop) || (st.dir < 0 && st.u <= stop)) { st.u = stop; setDir(0); }
+        $('#stRange').value = Math.round(st.u * 1000);
+      }
+      const u = st.u, kRec = smooth((u - U_REC) / (U_CLEAR - U_REC));
+      const heat = u < U_CLEAR ? 1 - 0.5 * kRec : 0.3;
+      P.forEach(p => { p.x = wrap(p.x + p.vx * dt * heat, W); p.y = wrap(p.y + p.vy * dt * heat, SH); });
+      E.forEach(e => { e.x = wrap(e.x + e.vx * dt * heat, W); e.y = wrap(e.y + e.vy * dt * heat, SH); e.ang += dt * 5; });
+      // 光：在霧裡一直被電子撞歪；霧散了以後直直往前走
+      const sp = 170, scatter = u < U_CLEAR ? 1 - kRec : 0;
+      G.forEach(g => {
+        g.x += g.dx * sp * dt; g.y += g.dy * sp * dt;
+        if (scatter > 0) {
+          for (const e of E) {
+            const ddx = g.x - e.x, ddy = g.y - e.y;
+            if (ddx * ddx + ddy * ddy < 400 && Math.random() < scatter) { const a = Math.random() * TAU; g.dx = Math.cos(a); g.dy = Math.sin(a); break; }
+          }
+        }
+        if (g.x < 0 || g.x > W || g.y < 0 || g.y > SH) { g.x = wrap(g.x, W); g.y = wrap(g.y, SH); g.trail = []; }
+        g.trail.push([g.x, g.y]); if (g.trail.length > (scatter > 0.5 ? 10 : 22)) g.trail.shift();
+      });
+    }
+    function draw() {
+      const u = st.u, t = uToYears(u), a = scaleOf(t), T = tempOf(t);
+      const kRec = smooth((u - U_REC) / (U_CLEAR - U_REC));
+      const fog = u < U_CLEAR ? 1 - kRec : 0;
+      ctx.clearRect(0, 0, W, H);
+      // 背景：霧的時候是發光的橘白色，越早越亮
+      ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, SH);
+      if (fog > 0) {
+        const bright = u < U_REC ? 1 - 0.35 * (u / U_REC) : 0.65;
+        const g = ctx.createRadialGradient(W / 2, SH / 2, 30, W / 2, SH / 2, W * 0.7);
+        g.addColorStop(0, `rgba(255,${Math.round(225 - 40 * (1 - bright))},${Math.round(170 - 80 * (1 - bright))},${0.85 * fog})`);
+        g.addColorStop(1, `rgba(255,140,60,${0.55 * fog})`);
+        ctx.fillStyle = g; ctx.fillRect(0, 0, W, SH);
+      }
+      // 膨脹：霧散了以後，畫面裡的東西越分越開（畫成比較溫和的倍數，真的是 1100 倍）
+      const f = u <= U_CLEAR ? 0 : Math.log(a * 1100) / Math.log(1100);
+      const sv = 1 + 2.6 * Math.max(0, f);
+      const cx = W / 2, cy = SH / 2;
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, SH); ctx.clip();
+      const tiles = sv > 1.05 ? Math.ceil(sv) : 0;
+      const place = (x, y, fn) => {
+        for (let ix = -tiles; ix <= tiles; ix++) for (let iy = -tiles; iy <= tiles; iy++) {
+          const X = cx + (x + ix * W - cx) * sv, Y = cy + (y + iy * SH - cy) * sv;
+          if (X > -12 && X < W + 12 && Y > -12 && Y < SH + 12) fn(X, Y);
+        }
+      };
+      // 質子（藍）和電子（紅）；結合以後畫成原子
+      const pr = 4.2 / Math.sqrt(sv);
+      P.forEach((p, k) => {
+        const e = E[k];
+        const bx = p.x + Math.cos(e.ang) * 8, by = p.y + Math.sin(e.ang) * 8;
+        const ex = e.x + (bx - e.x) * kRec, ey = e.y + (by - e.y) * kRec;
+        place(p.x, p.y, (X, Y) => {
+          ctx.fillStyle = '#5b8cff'; ctx.beginPath(); ctx.arc(X, Y, pr, 0, TAU); ctx.fill();
+          if (kRec > 0.98) { ctx.strokeStyle = 'rgba(255,120,120,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(X, Y, 8 / Math.sqrt(sv), 0, TAU); ctx.stroke(); }
+        });
+        place(ex, ey, (X, Y) => {
+          ctx.fillStyle = '#ff5a5a'; ctx.beginPath(); ctx.arc(X, Y, 2.3 / Math.sqrt(sv), 0, TAU); ctx.fill();
+        });
+      });
+      // 光子：霧裡畫出撞來撞去的折線；變透明以後只在膨脹前畫
+      const photonAlpha = u < U_CLEAR ? 1 : Math.max(0, 1 - (u - U_CLEAR) / 0.06);
+      if (photonAlpha > 0) {
+        G.forEach(g => {
+          ctx.strokeStyle = `rgba(255,236,140,${0.6 * photonAlpha})`; ctx.lineWidth = 1.4; ctx.beginPath();
+          g.trail.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke();
+          ctx.fillStyle = `rgba(255,250,200,${photonAlpha})`; ctx.beginPath(); ctx.arc(g.x, g.y, 2.6, 0, TAU); ctx.fill();
+        });
+      }
+      // 星系：大約 2～4 億年後，從物質比較多的地方長出來
+      if (u > U_GAL) {
+        const al = Math.min(1, (u - U_GAL) / 0.08);
+        gx.forEach(o => { const p = P[o.p]; place(p.x, p.y, (X, Y) => galaxy(ctx, X, Y, 16, o.rot, o.hue, al)); });
+      }
+      ctx.restore();
+      // 背景輻射的一道光：波長跟著宇宙一起被拉長
+      if (u > U_REC + 0.02) {
+        const al = Math.min(1, (u - U_REC - 0.02) / 0.04);
+        const lamPx = 16 * sv * sv, amp = 16, y0 = SH - 46, col = waveColor(T);
+        ctx.save(); ctx.globalAlpha = al; ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.beginPath();
+        const ph = (performance.now() / 1000) * 2.2;
+        for (let x = 20; x <= W - 20; x += 2) { const y = y0 + amp * Math.sin((x / lamPx) * TAU - ph); x === 20 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+        ctx.stroke();
+        ctx.fillStyle = col; ctx.font = 'bold 14px "PingFang TC","Noto Sans TC",sans-serif'; ctx.textAlign = 'left';
+        // 38 萬年時宇宙是現在的 1/1100，所以到現在被拉長了「大小 × 1100」倍
+        const stretch = Math.max(1, Math.round(a * 1100));
+        ctx.fillText(`背景輻射的光：${lightName(T)}${T < 600 ? '（眼睛看不見）' : ''}，波長被拉長 ${fmtNum(stretch)} 倍`, 20, y0 - 24);
+        ctx.restore();
+      }
+      // 上方的階段名稱
+      const phase = u < U_REC ? '🌫️ 發光的濃霧：光被電子撞來撞去，走不遠' : u < U_CLEAR ? '✨ 電子和質子結合成原子，霧散了！' : u < U_GAL ? '📏 宇宙繼續膨脹，光被拉長、變冷' : '🌌 星系長出來了，宇宙繼續膨脹';
+      ctx.font = 'bold 16px "PingFang TC","Noto Sans TC",sans-serif'; ctx.textAlign = 'left';
+      ctx.fillStyle = fog > 0.4 ? 'rgba(40,20,0,.85)' : '#ffd166'; ctx.fillText(phase, 14, 26);
+      // 時間軸
+      const x0 = 30, x1 = W - 30, ty = SH + 26;
+      ctx.fillStyle = '#0d1430'; ctx.fillRect(0, SH, W, H - SH);
+      const grad = ctx.createLinearGradient(x0, 0, x1, 0);
+      grad.addColorStop(0, '#fff2c0'); grad.addColorStop(U_REC, '#ff9a4a'); grad.addColorStop(U_CLEAR, '#3a2a40'); grad.addColorStop(1, '#1a2355');
+      ctx.fillStyle = grad; ctx.fillRect(x0, ty - 4, x1 - x0, 8);
+      const marks = [[0, '大爆炸'], [U_REC, '38 萬年'], [U_GAL, '第一批星系'], [1, '現在 138 億年']];
+      ctx.font = '12.5px "PingFang TC","Noto Sans TC",sans-serif';
+      marks.forEach(([m, s], i) => {
+        const x = x0 + (x1 - x0) * m; ctx.fillStyle = '#aab3dc'; ctx.fillRect(x - 1, ty - 9, 2, 18);
+        ctx.textAlign = i === 0 ? 'left' : i === marks.length - 1 ? 'right' : 'center'; ctx.fillText(s, x, ty + 24);
+      });
+      const xm = x0 + (x1 - x0) * u;
+      ctx.fillStyle = '#ffd166'; ctx.beginPath(); ctx.moveTo(xm, ty - 6); ctx.lineTo(xm - 7, ty - 17); ctx.lineTo(xm + 7, ty - 17); ctx.closePath(); ctx.fill();
+      // 數字
+      $('#sTime').textContent = u < 0.005 ? '剛開始' : fmtYears(t);
+      $('#sTemp').textContent = u < U_REC - 0.01 ? '比 3000 K 還熱' : T >= 100 ? fmtNum(Math.round(T / 10) * 10) + ' K' : T.toFixed(1) + ' K';
+      $('#sSize').textContent = u < U_REC - 0.01 ? '1100 倍以上' : 1 / a < 1.05 ? '1 倍（就是現在）' : fmtNum(Math.round(1 / a)) + ' 倍';
+      $('#sLight').textContent = u < U_REC - 0.01 ? '被困在霧裡' : lightName(T);
+      const s = u < 0.3 ? 1 : u < 0.455 ? 2 : u < 0.99 ? 3 : 0;
+      document.querySelectorAll('#steps .step').forEach(el => el.classList.toggle('now', +el.dataset.step === s));
+    }
+    function setDir(d) {
+      st.dir = d;
+      $('#stPlay').textContent = d > 0 ? '⏸ 暫停' : '▶ 播放';
+      $('#stBack').textContent = d < 0 ? '⏸ 暫停' : '⏪ 倒帶';
+    }
+    $('#stPlay').addEventListener('click', () => { if (st.dir > 0) setDir(0); else { if (st.u >= 0.999) st.u = 0; setDir(1); } });
+    $('#stBack').addEventListener('click', () => { if (st.dir < 0) setDir(0); else { if (st.u <= 0.19) st.u = 1; setDir(-1); } });
+    $('#stRange').addEventListener('input', e => { setDir(0); st.u = e.target.value / 1000; draw(); });
+    cv.addEventListener('click', e => {
+      const [mx, my] = toLocal(cv, e, W, H); if (my < SH) return;
+      setDir(0); st.u = Math.max(0, Math.min(1, (mx - 30) / (W - 60))); $('#stRange').value = Math.round(st.u * 1000); draw();
+    });
+    // 四個步驟：1 從現在倒帶、2 霧、3 霧散了、4 光被拉長
+    const STEP_U = [null, 0.22, 0.445, 0.72];
+    document.querySelectorAll('#steps .step').forEach(el => el.addEventListener('click', () => {
+      const k = +el.dataset.step;
+      if (k === 0) { st.u = 1; setDir(-1); }
+      else { setDir(0); st.u = STEP_U[k]; $('#stRange').value = Math.round(st.u * 1000); }
+      draw();
+    }));
+    return { st, step, draw, uToYears, scaleOf, tempOf, lightName, setDir };
+  })();
+
+  // ================= 三、背景輻射地圖（示意） =================
+  const CMB = (() => {
+    const cv = $('#cmbCv'), { ctx, W, H } = setup(cv);
+    const cx = W / 2, cy = H / 2 - 8, rx = W / 2 - 16, ry = (H - 60) / 2;
+    // 照真實背景輻射的「功率譜」做一張隨機的溫度圖：
+    // 大塊斑點（ℓ 小）加上大約 1 度大的細斑點（第一個聲學峰 ℓ≈220、第二個 ℓ≈540），跟普朗克衛星的圖是同一種花紋
+    const NX = 1024, NY = 512;   // 圖的寬度代表 360°，所以橫向第 k 個波 ≈ ℓ = k
+    function fft(re, im, n, inv) {   // 原地的 2 的次方 FFT
+      for (let i = 1, j = 0; i < n; i++) {
+        let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit;
+        if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; }
+      }
+      for (let len = 2; len <= n; len <<= 1) {
+        const ang = (inv ? 2 : -2) * Math.PI / len, wr = Math.cos(ang), wi = Math.sin(ang);
+        for (let i = 0; i < n; i += len) {
+          let cr = 1, ci = 0;
+          for (let k = 0; k < len / 2; k++) {
+            const a = i + k, b = a + len / 2, tr = re[b] * cr - im[b] * ci, ti = re[b] * ci + im[b] * cr;
+            re[b] = re[a] - tr; im[b] = im[a] - ti; re[a] += tr; im[a] += ti;
+            const nr = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = nr;
+          }
+        }
+      }
+    }
+    // D_ℓ（μK²）的大致形狀：平台＋聲學峰，越小的斑點越暗淡；再稍微抹平最細的斑點（像衛星照片縮小後的樣子），畫面才不會一顆一顆像雜訊
+    const Dl = l => (1100 + 4700 * Math.exp(-(((l - 220) / 80) ** 2)) + 2300 * Math.exp(-(((l - 540) / 90) ** 2))) * Math.exp(-((l / 650) ** 2));
+    const R = rng(2013), gauss = () => Math.sqrt(-2 * Math.log(R() + 1e-12)) * Math.cos(TAU * R());
+    const re = new Float64Array(NX * NY), im = new Float64Array(NX * NY);
+    for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+      const kx = i <= NX / 2 ? i : i - NX, ky = j <= NY / 2 ? j : j - NY;
+      const l = Math.hypot(kx, 2 * ky);   // 圖的高度是 180°，所以縱向要乘 2
+      if (l < 2) continue;
+      const amp = Math.sqrt(Dl(l) / (l * (l + 1)));
+      re[j * NX + i] = amp * gauss(); im[j * NX + i] = amp * gauss();
+    }
+    const rr = new Float64Array(NX), ri = new Float64Array(NX);
+    for (let j = 0; j < NY; j++) { rr.set(re.subarray(j * NX, j * NX + NX)); ri.set(im.subarray(j * NX, j * NX + NX)); fft(rr, ri, NX, true); re.set(rr, j * NX); im.set(ri, j * NX); }
+    const cr2 = new Float64Array(NY), ci2 = new Float64Array(NY);
+    for (let i = 0; i < NX; i++) {
+      for (let j = 0; j < NY; j++) { cr2[j] = re[j * NX + i]; ci2[j] = im[j * NX + i]; }
+      fft(cr2, ci2, NY, true);
+      for (let j = 0; j < NY; j++) re[j * NX + i] = cr2[j];
+    }
+    let s2 = 0; for (let k = 0; k < NX * NY; k++) s2 += re[k] * re[k];
+    const sd = Math.sqrt(s2 / (NX * NY));
+    const img = document.createElement('canvas'); img.width = NX; img.height = NY;
+    const ictx = img.getContext('2d'), data = ictx.createImageData(NX, NY);
+    // 普朗克衛星圖的配色：深藍 → 淺藍 → 米白 → 橘 → 深紅
+    const STOPS = [[-1, [0, 20, 110]], [-0.62, [10, 80, 220]], [-0.28, [120, 185, 255]], [0, [255, 238, 215]], [0.28, [255, 175, 85]], [0.62, [230, 70, 15]], [1, [110, 0, 5]]];
+    const cmap = v => {
+      for (let k = 1; k < STOPS.length; k++) if (v <= STOPS[k][0]) {
+        const [a0, c0] = STOPS[k - 1], [a1, c1] = STOPS[k], f = (v - a0) / (a1 - a0);
+        return c0.map((c, i) => Math.round(c + (c1[i] - c) * f));
+      }
+      return STOPS[STOPS.length - 1][1];
+    };
+    let boosted = true;
+    function render() {
+      for (let k = 0; k < NX * NY; k++) {
+        const o = k * 4, v = re[k] / (2.6 * sd);
+        // 真實的溫差只有十萬分之一，照真實比例畫出來看不出差別；放大以後才看得到
+        const c = cmap(boosted ? Math.max(-1, Math.min(1, v)) : v * 0.01);
+        data.data[o] = c[0]; data.data[o + 1] = c[1]; data.data[o + 2] = c[2]; data.data[o + 3] = 255;
+      }
+      ictx.putImageData(data, 0, 0);
+      ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, H);
+      // 外圍淡淡的光暈
+      ctx.save(); ctx.shadowColor = boosted ? 'rgba(255,170,90,.35)' : 'rgba(255,238,215,.3)'; ctx.shadowBlur = 18;
+      ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, TAU); ctx.fill(); ctx.restore();
+      ctx.save(); ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, TAU); ctx.clip();
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(img, cx - rx, cy - ry, rx * 2, ry * 2);
+      // 經緯線（攤平的天空）
+      ctx.strokeStyle = 'rgba(255,255,255,.13)'; ctx.lineWidth = 0.8;
+      for (let k = -2; k <= 2; k++) { ctx.beginPath(); ctx.ellipse(cx, cy, rx * Math.abs(k) / 3, ry, 0, 0, TAU); if (k) ctx.stroke(); }
+      [-0.5, 0, 0.5].forEach(f => { const y = cy + ry * f, w = rx * Math.sqrt(1 - f * f); ctx.beginPath(); ctx.moveTo(cx - w, y); ctx.lineTo(cx + w, y); ctx.stroke(); });
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, TAU); ctx.stroke();
+      // 色標
+      const bx = cx - 150, by = H - 30, bw = 300;
+      const g = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+      STOPS.forEach(([v, c]) => g.addColorStop((v + 1) / 2, `rgb(${c})`));
+      ctx.fillStyle = g; ctx.fillRect(bx, by, bw, 10);
+      ctx.font = '12.5px "PingFang TC","Noto Sans TC",sans-serif'; ctx.fillStyle = '#aab3dc';
+      ctx.textAlign = 'right'; ctx.fillText(boosted ? '冷一點點 2.7247 K' : '冷', bx - 8, by + 10);
+      ctx.textAlign = 'left'; ctx.fillText(boosted ? '熱一點點 2.7253 K' : '熱', bx + bw + 8, by + 10);
+      ctx.textAlign = 'center'; ctx.fillText('平均 2.725 K', cx, by - 6);
+    }
+    render();
+    $('#cmbBoost').addEventListener('click', () => {
+      boosted = !boosted; render();
+      $('#cmbBoost').textContent = boosted ? '👀 照真實溫差畫' : '🔍 把溫差放大 10 萬倍';
+      $('#cmbHint').textContent = boosted ? '現在：溫差放大了 10 萬倍，紅色是熱一點點、藍色是冷一點點的地方。' : '現在：照真實溫差畫，每個方向看起來都一樣，幾乎都是 2.725 K。';
+    });
+    return { render, isBoosted: () => boosted };
+  })();
+
+  // ================= 四、本星系群 =================
+  const LG = (() => {
+    const cv = $('#lgCv'), { ctx, W, H } = setup(cv);
+    const SUN = [-26000, 0, 0];   // 太陽離銀河中心約 2 萬 6 千光年
+    // l、b：銀道座標（度）；d：離太陽的距離（光年）；size：星系直徑（光年）
+    const D = [
+      { id: 'mw', zh: '銀河系', en: 'Milky Way', size: 100000, hue: 45, at: [0, 0, 0],
+        info: '我們的家！直徑大約 10 萬光年，有 1000 到 4000 億顆星星。太陽在其中一條旋臂上，離中心約 2 萬 6 千光年。' },
+      { id: 'sgr', zh: '人馬座矮星系', en: 'Sagittarius Dwarf', l: 5.6, b: -14.2, d: 70000, size: 10000, hue: 30,
+        info: '離太陽約 7 萬光年，躲在銀河中心的另一邊，1994 年才被發現。它正被銀河系的引力慢慢扯碎、吃掉。' },
+      { id: 'lmc', zh: '大麥哲倫雲', en: 'Large Magellanic Cloud', l: 280.5, b: -32.9, d: 160000, size: 32000, hue: 200,
+        info: '離我們約 16 萬光年，是銀河系最大的小跟班。在南半球用眼睛就看得到，像一小片雲；1987 年有一顆超新星在這裡爆炸。台灣太北邊，看不到。' },
+      { id: 'smc', zh: '小麥哲倫雲', en: 'Small Magellanic Cloud', l: 302.8, b: -44.3, d: 200000, size: 19000, hue: 190,
+        info: '離我們約 20 萬光年，和大麥哲倫雲是一對。名字來自 500 年前環遊世界的麥哲倫船隊，他們在南半球的夜空記下了這兩片「雲」。' },
+      { id: 'm31', zh: '仙女座星系', en: 'Andromeda (M31)', l: 121.2, b: -21.6, d: 2500000, size: 220000, hue: 260,
+        info: '離我們約 250 萬光年，是本星系群最大的星系，大約有 1 兆顆星星。它正以每秒約 110 公里的速度靠近我們，幾十億年後可能和銀河系擦身而過，或撞在一起合體。' },
+      { id: 'm33', zh: '三角座星系', en: 'Triangulum (M33)', l: 133.6, b: -31.3, d: 2730000, size: 60000, hue: 170,
+        info: '離我們約 270 萬光年，是本星系群第三大的星系，可能是仙女座星系的衛星。' },
+      { id: 'm32', zh: 'M32', en: 'M32', l: 121.15, b: -21.98, d: 2490000, size: 6500, hue: 30, small: true,
+        info: 'M32 和 M110 是仙女座星系的兩個小跟班，就像大、小麥哲倫雲跟著銀河系一樣。' },
+      { id: 'm110', zh: 'M110', en: 'M110', l: 120.7, b: -21.1, d: 2690000, size: 17000, hue: 30, small: true,
+        info: 'M32 和 M110 是仙女座星系的兩個小跟班，就像大、小麥哲倫雲跟著銀河系一樣。' },
+    ];
+    D.forEach(g => {
+      if (g.at) { g.p = g.at; return; }
+      const l = g.l * DEG, b = g.b * DEG;
+      g.p = [SUN[0] + g.d * Math.cos(b) * Math.cos(l), SUN[1] + g.d * Math.cos(b) * Math.sin(l), SUN[2] + g.d * Math.sin(b)];
+      g.dc = Math.hypot(...g.p);   // 離銀河中心
+    });
+    // 視角固定，只能用滑桿轉；原本會自動轉，看起來像星系跟著銀河系繞，容易誤會
+    const st = { far: false, elev: 30, yaw: 320, sel: null };
+    // 銀河系的旋臂點
+    const R = rng(3), arms = [];
+    for (let k = 0; k < 900; k++) {
+      const arm = k % 2, t = R(), r = 4000 + t * 46000, th = arm * Math.PI + Math.log(r / 4000) / Math.tan(12 * DEG * 1.8) + (R() - 0.5) * 0.5;
+      arms.push([r * Math.cos(th), r * Math.sin(th), (R() - 0.5) * 1500]);
+    }
+    function proj(p) {
+      const k = (st.far ? 205 / 3.0e6 : 200 / 230000), y = st.yaw * DEG, e = st.elev * DEG;
+      const X = p[0] * Math.cos(y) - p[1] * Math.sin(y), Y = p[0] * Math.sin(y) + p[1] * Math.cos(y);
+      return { x: W / 2 + X * k, y: H / 2 + 10 + k * (Y * Math.sin(e) - p[2] * Math.cos(e)), depth: Y * Math.cos(e) + p[2] * Math.sin(e), k };
+    }
+    const labelOf = g => g.dc ? `${g.zh}　${g.d >= 1e6 ? fmtNum(Math.round(g.d / 1e5) * 10) : fmtNum(Math.round(g.d / 1e4))} 萬光年` : g.zh;
+    let hits = [];
+    function draw() {
+      ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, H);
+      const font = '13px "PingFang TC","Noto Sans TC",sans-serif';
+      // 盤面上的距離圈
+      const rings = st.far ? [1e6, 2e6, 3e6] : [1e5, 2e5];
+      ctx.strokeStyle = 'rgba(120,150,255,.18)'; ctx.setLineDash([4, 5]); ctx.lineWidth = 1;
+      rings.forEach(r => {
+        ctx.beginPath();
+        for (let a = 0; a <= 64; a++) { const q = proj([r * Math.cos(a / 64 * TAU), r * Math.sin(a / 64 * TAU), 0]); a ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }
+        ctx.stroke();
+        const q = proj([r * Math.cos(-st.yaw * DEG + 0.4), r * Math.sin(-st.yaw * DEG + 0.4), 0]);
+        ctx.fillStyle = 'rgba(170,179,220,.55)'; ctx.font = '12px "PingFang TC","Noto Sans TC",sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText(fmtNum(r / 1e4) + ' 萬光年', q.x, q.y + 14);
+      });
+      ctx.setLineDash([]);
+      // 銀河系
+      const c0 = proj([0, 0, 0]);
+      if (c0.k * 50000 > 12) {
+        arms.forEach(p => { const q = proj(p); ctx.fillStyle = 'rgba(255,230,180,.55)'; ctx.fillRect(q.x, q.y, 1.4, 1.4); });
+        const gg = ctx.createRadialGradient(c0.x, c0.y, 0, c0.x, c0.y, 12); gg.addColorStop(0, '#fff6d8'); gg.addColorStop(1, 'rgba(255,220,150,0)');
+        ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(c0.x, c0.y, 12, 0, TAU); ctx.fill();
+        const s = proj(SUN); ctx.fillStyle = '#ffd166'; ctx.beginPath(); ctx.arc(s.x, s.y, 2.5, 0, TAU); ctx.fill();
+        ctx.font = '12px "PingFang TC","Noto Sans TC",sans-serif'; ctx.textAlign = 'left'; ctx.fillText('太陽', s.x + 5, s.y - 4);
+      } else galaxy(ctx, c0.x, c0.y, 9, -st.yaw * DEG, 45);
+      hits = [{ g: D[0], x: c0.x, y: c0.y }];
+      // 其他星系（遠的先畫）
+      const list = D.slice(1).map(g => ({ g, q: proj(g.p), b: proj([g.p[0], g.p[1], 0]) })).sort((A, B) => A.q.depth - B.q.depth);
+      const placed = [[c0.x - 40, c0.y - 10, 80, 20]];
+      list.forEach(({ g, q, b }) => {
+        const inside = q.x > 8 && q.x < W - 8 && q.y > 8 && q.y < H - 8;
+        if (!inside) {   // 在畫面外：在邊邊畫一個箭頭指過去
+          if (g.small) return;
+          const dx = q.x - c0.x, dy = q.y - c0.y, L = Math.hypot(dx, dy);
+          const tt = Math.min((W / 2 - 24) / Math.abs(dx || 1e-9), (H / 2 - 24) / Math.abs(dy || 1e-9));
+          const ex = c0.x + dx * Math.min(tt, 1) * 0.98, ey = c0.y + dy * Math.min(tt, 1) * 0.98;
+          arrow(ctx, ex - dx / L * 26, ey - dy / L * 26, ex, ey, 'rgba(200,170,255,.9)');
+          ctx.font = font; ctx.fillStyle = '#d6c8ff'; ctx.textAlign = ex > W / 2 ? 'right' : 'left';
+          ctx.fillText(labelOf(g), ex + (ex > W / 2 ? -6 : 6), ey + (ey > H / 2 ? -12 : 20));
+          hits.push({ g, x: ex, y: ey });
+          return;
+        }
+        ctx.strokeStyle = 'rgba(170,179,220,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(q.x, q.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        ctx.fillStyle = 'rgba(170,179,220,.5)'; ctx.beginPath(); ctx.arc(b.x, b.y, 1.6, 0, TAU); ctx.fill();
+        const r = Math.max(g.small ? 3 : 6, g.size * q.k * 0.9);
+        galaxy(ctx, q.x, q.y, r, g.id === 'm31' ? 0.6 : 0.2, g.hue);
+        if (st.sel === g) { ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(q.x, q.y, r + 6, 0, TAU); ctx.stroke(); }
+        hits.push({ g, x: q.x, y: q.y });
+        if (g.small && st.far) return;   // M32、M110 太靠近仙女座，名字不寫
+        // 名字：右邊放不下就放左邊／上下
+        ctx.font = font; const txt = labelOf(g), tw = ctx.measureText(txt).width;
+        const cands = [[q.x + r + 6, q.y + 4, 'left'], [q.x - r - 6, q.y + 4, 'right'], [q.x, q.y - r - 6, 'center'], [q.x, q.y + r + 16, 'center']];
+        let pick = cands[0];
+        for (const c of cands) {
+          const bx = c[2] === 'left' ? c[0] : c[2] === 'right' ? c[0] - tw : c[0] - tw / 2, box = [bx, c[1] - 12, tw, 16];
+          const ok = bx > 2 && bx + tw < W - 2 && box[1] > 2 && box[1] + 16 < H - 2 && !placed.some(p => !(box[0] > p[0] + p[2] || box[0] + box[2] < p[0] || box[1] > p[1] + p[3] || box[1] + box[3] < p[1]));
+          if (ok) { pick = c; placed.push(box); break; }
+        }
+        ctx.fillStyle = '#e8ecff'; ctx.textAlign = pick[2]; ctx.fillText(txt, pick[0], pick[1]);
+      });
+      ctx.font = font; ctx.fillStyle = '#ffd166'; ctx.textAlign = 'center';
+      ctx.fillText('銀河系', c0.x, c0.y + (c0.k * 50000 > 12 ? Math.max(24, c0.k * 50000 * Math.sin(st.elev * DEG) + 16) : 22));
+      ctx.textAlign = 'left'; ctx.fillStyle = '#aab3dc';
+      ctx.fillText(st.far ? '本星系群：大約 1 千萬光年寬' : '銀河系和它的小跟班', 12, 22);
+    }
+    function step() {}
+    function show(g) {
+      st.sel = g;
+      $('#lgInfo').innerHTML = `<h3>${g.zh} <span class="tag">${g.en}</span></h3><p>${g.info}</p>`;
+    }
+    cv.addEventListener('click', e => {
+      const [mx, my] = toLocal(cv, e, W, H); let best = null, bd = 22;
+      hits.forEach(h => { const d = Math.hypot(h.x - mx, h.y - my); if (d < bd) { bd = d; best = h.g; } });
+      if (best) { show(best); draw(); }
+    });
+    $('#lgElev').addEventListener('input', e => { st.elev = +e.target.value; $('#lgElevV').textContent = st.elev + '°'; draw(); });
+    $('#lgYaw').addEventListener('input', e => { st.yaw = +e.target.value; $('#lgYawV').textContent = st.yaw + '°'; draw(); });
+    return { st, draw, step, D, proj, show, hits: () => hits };
+  })();
+
+  // ================= 動畫迴圈：畫面外的圖不畫，省電 =================
+  const vis = { exCv: true, stCv: true, lgCv: true };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(en => { vis[en.target.id] = en.isIntersecting; }));
+    ['exCv', 'stCv', 'lgCv'].forEach(id => io.observe(document.getElementById(id)));
+  }
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (vis.exCv) { EX.step(dt); EX.draw(); }
+    if (vis.stCv) { ST.step(dt); ST.draw(); }
+    requestAnimationFrame(loop);
+  }
+  EX.draw(); ST.draw(); LG.draw();
+  requestAnimationFrame(loop);
+  window.__uni = { EX, ST, CMB, LG };   // 給測試用
+})();
+</script>
+</body>
+</html>

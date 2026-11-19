@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日全食與月全食</title>
+<style>
+  :root{
+    --bg:#0a0f24;--panel:rgba(22,31,70,.78);--line:rgba(160,180,255,.18);
+    --ink:#f2f4ff;--muted:#aab3dc;--sun:#ffd166;--radius:20px;
+    --red:#ff8a5c;--faint:#8a93b8;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;min-height:100vh;color:var(--ink);font-size:17px;line-height:1.75;overflow-x:hidden;
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #26336f 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 25%, #1a2355 0%, transparent 55%),
+      var(--bg);
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.55;
+    background-image:
+      radial-gradient(1.2px 1.2px at 20px 30px,#fff,transparent),
+      radial-gradient(1px 1px at 140px 80px,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 210px 190px,#ffeebb,transparent),
+      radial-gradient(1px 1px at 60px 220px,#fff,transparent),
+      radial-gradient(1px 1px at 180px 20px,#cfe3ff,transparent);
+    background-size:260px 260px;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:0 20px 40px}
+  nav.top{display:flex;gap:8px;padding:8px 0;flex-wrap:wrap}
+  nav.top a{color:var(--muted);text-decoration:none;padding:4px 14px;border-radius:999px;border:1px solid var(--line);font-size:15px}
+  nav.top a[aria-current]{color:#0a0f24;background:var(--sun);border-color:transparent;font-weight:700}
+  h1{font-size:34px;margin:6px 0 0;line-height:1.3}
+  h1 span{color:var(--sun)}
+  .lead-txt{color:var(--muted);margin:0 0 12px}
+  h2{font-size:23px;margin:0 0 10px;line-height:1.4}
+  h3{font-size:18px;margin:14px 0 6px;color:var(--sun)}
+  em,strong{font-style:normal;color:var(--sun);font-weight:700}
+  p{margin:0 0 10px}
+  ul,ol{padding-left:1.4em;margin:0 0 10px}
+  li{margin:4px 0}
+  a{color:var(--sun)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-top:16px}
+  .btn{background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:7px 14px;font:inherit;font-size:15px;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.14)}
+  .btn.primary{background:var(--sun);color:#1d1a0b;border-color:transparent;font-weight:700;min-width:96px}
+  .btn.small{padding:3px 12px;font-size:14px}
+  .card{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+  .card p{margin:0}
+  .fun{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:14px}
+  .scene{position:relative;background:#000;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .scene canvas{display:block;width:100%;height:auto;aspect-ratio:2/1}
+  .scene .msg{position:absolute;left:12px;top:10px;right:12px;font-size:16px;line-height:1.5;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9);pointer-events:none}
+  .scene .msg b{color:var(--sun);font-size:19px;margin-right:8px}
+  .tl{margin-top:12px}
+  .tl-row{display:flex;gap:10px;align-items:flex-start}
+  .tl-row .btn.primary{width:96px;flex:none}
+  .tl-bar{flex:1;min-width:0}
+  .tl-bar input[type=range]{width:100%;accent-color:var(--sun);margin:6px 0 0;height:22px;display:block}
+  .ticks{position:relative;height:60px;font-size:13.5px;color:var(--muted)}
+  .ticks span{position:absolute;top:4px;transform:translateX(-50%);white-space:nowrap;text-align:center;line-height:1.25}
+  .ticks span::before{content:"";display:block;width:2px;height:7px;background:var(--sun);margin:0 auto 1px}
+  .ticks span.first{transform:none;text-align:left}.ticks span.first::before{margin-left:7px}
+  .ticks span.last{transform:translateX(-100%);text-align:right}.ticks span.last::before{margin-right:7px;margin-left:auto}
+  .ticks span.low{top:24px}
+  .ticks span.low::before{height:27px;margin-top:-20px}
+  .ticks i.band{position:absolute;top:0;height:4px;border-radius:2px;background:#ff9a5c}
+  .ticks i.band b{position:absolute;left:50%;top:-24px;transform:translateX(-50%);font-size:12px;font-style:normal;font-weight:400;color:#ffb38a;white-space:nowrap;display:none}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center;font-size:15px;color:var(--muted)}
+  .row select{font:inherit;font-size:14px;background:#141c40;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:3px 8px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:10px 0 0}
+  .stat{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;padding:6px 12px}
+  .stat .k{font-size:13.5px;color:var(--muted)}
+  .stat .v{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
+  .note{border-left:3px solid var(--sun);padding:4px 0 4px 14px;color:var(--muted);margin:14px 0 4px}
+  .warn{border-left-color:#ff6b6b}
+  .cap{color:var(--muted);font-size:13.5px;margin:6px 2px 0}
+  table{width:100%;border-collapse:collapse;font-size:16px;margin:8px 0 4px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:500}
+  td:first-child{color:var(--muted);white-space:nowrap}
+  .tblwrap{overflow-x:auto}
+  footer{text-align:center;color:var(--muted);font-size:13.5px;margin-top:22px}
+  @media (max-width:640px){
+    h1{font-size:28px}
+    .scene .msg{font-size:13px}.scene .msg b{font-size:15px}
+    .ticks{font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top">
+    <a href="../index.html" title="回首頁" aria-label="回首頁">🏠</a>
+    <a href="01_moon-phases.html">🌙 月亮</a>
+    <a href="02_earth-moon-orbit.html">🌍 地球公轉</a>
+    <a href="03_eclipses.html">📅 未來20年日食月食</a>
+    <a href="total-eclipses.html" aria-current="page">🌘 日全食月全食</a>
+    <a href="04_planets.html">🪐 八大行星</a>
+    <a href="05_pluto.html">🧊 冥王星</a>
+    <a href="06_milky-way.html">🌌 銀河系</a>
+    <a href="07_universe.html">🌠 宇宙</a>
+    <a href="08_quiz.html">⭐ 小測驗</a>
+  </nav>
+
+  <h1>🌘 <span>日全食與月全食</span>：站在草原上，看天空的大變身</h1>
+  <p class="lead-txt">日全食時，白天會突然變成晚上；月全食時，月亮會變成紅銅色。拖動下面的橫條，從開始看到結束，感受一下大自然的奧妙！畫面是面向南方看：左邊是東，右邊是西。</p>
+
+  <!-- 日全食 -->
+  <section class="panel" id="solar">
+    <h2>🌞 日全食：白天突然變黑夜</h2>
+    <div class="scene">
+      <canvas id="sol-cv" width="1200" height="600" aria-label="日全食動畫：天空、太陽、月亮和草原"></canvas>
+      <div class="msg" id="sol-msg"></div>
+    </div>
+    <div class="tl">
+      <div class="tl-row">
+        <button class="btn primary" id="sol-play">▶ 播放</button>
+        <div class="tl-bar">
+          <input type="range" id="sol-u" min="0" max="1000" step="1" value="0" aria-label="日全食的時間">
+          <div class="ticks" id="sol-ticks"></div>
+        </div>
+      </div>
+      <div class="row">
+        <span>跳到：</span><span id="sol-jump" style="display:contents"></span>
+        <span style="margin-left:auto">速度</span>
+        <select id="sol-speed"><option value="0.5">慢</option><option value="1" selected>普通</option><option value="2">快</option></select>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">從初虧算起</div><div class="v" id="sol-el">0:00:00</div></div>
+      <div class="stat"><div class="k">時鐘（舉例）</div><div class="v" id="sol-clk">10:00</div></div>
+      <div class="stat"><div class="k">太陽被遮住</div><div class="v" id="sol-ob">0%</div></div>
+      <div class="stat"><div class="k">陽光剩下</div><div class="v" id="sol-br">100%</div></div>
+    </div>
+    <p class="cap">橫條上橘色那一段（全食前後各 8 分鐘）特別放大了，越靠近全食放得越大：真正的全食只有 4 分鐘左右，如果照比例畫，只占橫條的 2.5%，很難拖到。太陽和月亮也畫得比真的大很多（真的只有伸直手臂時小指頭的一半寬）。</p>
+
+    <div class="fun">
+      <div class="card"><h3>🌑 為什麼會發生？</h3><p>月亮剛好走到<em>太陽和地球中間</em>，排成一直線。月亮的影子落在地球上，站在影子正中間的人，就看到太陽被整個遮住。太陽比月亮大約 400 倍，可是也遠了約 400 倍，所以兩個看起來<em>差不多一樣大</em>，月亮才剛好能蓋住太陽。</p></div>
+      <div class="card"><h3>🌅 為什麼地平線一圈像夕陽？</h3><p>月亮的影子在地面上只有<em>一兩百公里寬</em>（最寬約 270 公里）。你站在影子裡面，可是遠方影子外面的地方<em>還有太陽照著</em>。那裡的陽光照亮了空氣，從四面八方的地平線透過來，看起來就像 <em>360 度的夕陽</em>，不管往哪個方向看都有。</p></div>
+      <div class="card"><h3>💨 影子衝過來</h3><p>月亮的影子在地面上跑得非常快，每小時一千多公里，<em>比聲音還快</em>。全食前幾秒，會看到西邊的天空先黑下來，像一大片烏雲壓過來。全食時氣溫會<em>下降好幾度</em>，鳥會安靜下來回巢。</p></div>
+      <div class="card"><h3>💎 貝里珠和鑽石環</h3><p>月亮表面有高山和山谷。快要全食時，陽光只能從山谷的縫隙漏出來，變成一顆顆小亮點，叫<em>貝里珠</em>。最後只剩一顆特別亮，加上周圍一圈淡淡的光，就像一枚<em>鑽石戒指</em>。</p></div>
+      <div class="card"><h3>👑 日冕：太陽的「頭髮」</h3><p>太陽外面有一層很稀薄的大氣，叫<em>日冕</em>，溫度超過 <em>100 萬°C</em>。它平常被太陽刺眼的光蓋住，只有全食時才看得到，像一圈白色的頭髮向外飄。邊緣還可能看到粉紅色的小火焰，叫<em>日珥</em>。</p></div>
+      <div class="card"><h3>✨ 白天看到星星</h3><p>全食時天空變成深藍色，最亮的<em>金星</em>和幾顆亮星會跑出來。全食通常只有 2～4 分鐘，最長也只有大約 <em>7 分半鐘</em>，所以很多人專程坐飛機去看。</p></div>
+    </div>
+    <p class="note warn">⚠️ <strong>千萬不可以直接看太陽！</strong>偏食的時候，就算只剩一點點太陽，光也強到會傷害眼睛，一定要戴合格的<em>日食眼鏡</em>（一般太陽眼鏡不行）。只有在<em>全食那幾分鐘</em>可以拿下眼鏡用眼睛看；鑽石環一出現，就要馬上戴回去。</p>
+  </section>
+
+  <!-- 月全食 -->
+  <section class="panel" id="lunar">
+    <h2>🌕 月全食：月亮變成紅銅色</h2>
+    <div class="scene">
+      <canvas id="lun-cv" width="1200" height="600" aria-label="月全食動畫：夜空、月亮和草原"></canvas>
+      <div class="msg" id="lun-msg"></div>
+    </div>
+    <div class="tl">
+      <div class="tl-row">
+        <button class="btn primary" id="lun-play">▶ 播放</button>
+        <div class="tl-bar">
+          <input type="range" id="lun-u" min="0" max="1000" step="1" value="0" aria-label="月全食的時間">
+          <div class="ticks" id="lun-ticks"></div>
+        </div>
+      </div>
+      <div class="row">
+        <span>跳到：</span><span id="lun-jump" style="display:contents"></span>
+        <span style="margin-left:auto">速度</span>
+        <select id="lun-speed"><option value="0.5">慢</option><option value="1" selected>普通</option><option value="2">快</option></select>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">從半影食始算起</div><div class="v" id="lun-el">0:00</div></div>
+      <div class="stat"><div class="k">時鐘（舉例）</div><div class="v" id="lun-clk">19:30</div></div>
+      <div class="stat"><div class="k">月亮在本影裡</div><div class="v" id="lun-ob">0%</div></div>
+      <div class="stat"><div class="k">月光</div><div class="v" id="lun-br">跟滿月一樣亮</div></div>
+    </div>
+    <p class="cap">橫條照真實比例。月亮畫得比真的大很多；圖上月亮慢慢從左（東）往右（西）移，是因為地球在自轉。</p>
+
+    <div class="fun">
+      <div class="card"><h3>🌍 為什麼會發生？</h3><p>這次換<em>地球走到太陽和月亮中間</em>。滿月的晚上，月亮跑進地球的影子裡。地球的影子有兩層：外面淡淡的叫<em>半影</em>，裡面黑黑的叫<em>本影</em>。月亮整個鑽進本影，就是月全食。</p></div>
+      <div class="card"><h3>🔴 為什麼月亮會變紅？</h3><p>陽光穿過地球周圍的大氣時，藍光被空氣散射掉（所以天空是藍的），剩下的<em>紅光</em>被大氣彎進影子裡，照到月亮。如果站在月亮上看地球，會看到地球外圍一圈紅光，那是<em>全世界同時在發生的日出和日落</em>。</p></div>
+      <div class="card"><h3>⏳ 為什麼比日全食久很多？</h3><p>地球的本影在月亮那裡，大約有<em>月亮的 2.7 倍寬</em>，月亮要走很久才穿得過去。全程（含半影）大約 <em>5～6 小時</em>，全食最長大約 <em>1 小時 40 多分鐘</em>。日全食的影子很小，全食只有幾分鐘。</p></div>
+      <div class="card"><h3>👀 可以直接看，大家一起看</h3><p>月全食<em>不刺眼</em>，用眼睛直接看就很安全，用望遠鏡看更漂亮。只要當時看得到月亮，地球上晚上那一半的人都能<em>同時</em>看到；日全食只有站在影子經過的那條窄窄的帶子裡才看得到。</p></div>
+      <div class="card"><h3>🌌 星星變多了</h3><p>滿月很亮，平常會把暗暗的星星都蓋住。全食時月光變暗，<em>星星一下子變多</em>，在光害少的地方還看得到銀河。草原也從銀白色的月光，變成暗暗帶一點紅。</p></div>
+      <div class="card"><h3>🤔 為什麼不是每個月都有？</h3><p>月亮繞地球的軌道和地球繞太陽的軌道<em>斜了大約 5°</em>，大部分的滿月，月亮會從地球影子的上面或下面經過。可以去「🌍 地球公轉」頁看看。未來幾年在台灣看得到哪幾場，可以查「<a href="03_eclipses.html">📅 未來20年日食月食</a>」頁。</p></div>
+    </div>
+  </section>
+
+  <section class="panel" id="compare">
+    <h2>⚖️ 日全食和月全食，比一比</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th></th><th>🌞 日全食</th><th>🌕 月全食</th></tr></thead>
+        <tbody>
+          <tr><td>誰在中間</td><td>月亮在太陽和地球中間</td><td>地球在太陽和月亮中間</td></tr>
+          <tr><td>發生在</td><td>新月（初一左右）、白天</td><td>滿月（十五左右）、晚上</td></tr>
+          <tr><td>誰的影子</td><td>月亮的影子落在地球上</td><td>地球的影子落在月亮上</td></tr>
+          <tr><td>全程</td><td>約 2～3 小時</td><td>約 5～6 小時（含半影）</td></tr>
+          <tr><td>全食多久</td><td>通常 2～4 分鐘，最長約 7 分半</td><td>最長約 1 小時 40 多分鐘</td></tr>
+          <tr><td>在哪裡看得到</td><td>只有影子經過的窄帶子（最寬約 270 公里）</td><td>當時是晚上、看得到月亮的地方都可以</td></tr>
+          <tr><td>可以直接看嗎</td><td>不行！要戴日食眼鏡，只有全食那幾分鐘可以拿下</td><td>可以，完全安全</td></tr>
+          <tr><td>最特別的景色</td><td>日冕、鑽石環、地平線一圈夕陽、白天看到星星</td><td>紅銅色的月亮、滿天星星</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>動畫的時間是一場典型日全食和月全食的例子，時鐘只是舉例。日全食：從初虧到復圓約 2 小時 40 分，全食約 4 分鐘。月全食：半影食全程約 5 小時 30 分，本影食約 3 小時 30 分，全食約 1 小時 30 分。</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+const W = 1200, H = 600, HZ = 430;   // 畫布邏輯尺寸、地平線高度
+
+// ---------- 小工具 ----------
+function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
+const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
+function css(c, al){
+  const r = Math.round(clamp(c[0], 0, 255)), g = Math.round(clamp(c[1], 0, 255)), b = Math.round(clamp(c[2], 0, 255));
+  return al == null ? 'rgb(' + r + ',' + g + ',' + b + ')' : 'rgba(' + r + ',' + g + ',' + b + ',' + al + ')';
+}
+function piece(kn, x){ // kn: [[x0,y0],[x1,y1],...] 遞增
+  if (x <= kn[0][0]) return kn[0][1];
+  for (let i = 1; i < kn.length; i++){
+    if (x <= kn[i][0]){ const a = kn[i - 1], b = kn[i]; return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]); }
+  }
+  return kn[kn.length - 1][1];
+}
+const flip = kn => kn.map(p => [p[1], p[0]]);
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function clock(startMin, t){ let m = Math.floor(startMin + t) % 1440; return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
+function hms(t){ const s = Math.round(t * 60); return Math.floor(s / 3600) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60); }
+function hm(t){ const m = Math.round(t); return Math.floor(m / 60) + ':' + pad(m % 60); }
+function durTxt(t){ const m = Math.round(t); const h = Math.floor(m / 60); return (h ? h + ' 小時 ' : '') + (m % 60) + ' 分'; }
+
+// 兩個圓重疊的面積（半徑 r1、r2，圓心距 d）
+function overlap(r1, r2, d){
+  if (d >= r1 + r2) return 0;
+  if (d <= Math.abs(r1 - r2)) return Math.PI * Math.min(r1, r2) ** 2;
+  const a = r1 * r1 * Math.acos((d * d + r1 * r1 - r2 * r2) / (2 * d * r1));
+  const b = r2 * r2 * Math.acos((d * d + r2 * r2 - r1 * r1) / (2 * d * r2));
+  const c = 0.5 * Math.sqrt((-d + r1 + r2) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2));
+  return a + b - c;
+}
+
+// ---------- 大地：山、草原、樹、看天空的人（兩段動畫共用） ----------
+function ridge(r, base, amp, step){
+  const fr = [0.004, 0.009, 0.021, 0.047], am = [1, 0.5, 0.25, 0.12], ph = fr.map(() => r() * 6.283);
+  const pts = [];
+  for (let x = -20; x <= W + 20; x += step){
+    let y = 0; for (let k = 0; k < fr.length; k++) y += Math.sin(x * fr[k] + ph[k]) * am[k];
+    y = (y / 1.87 + 1) / 2; pts.push([x, base - amp * y]);
+  }
+  return pts;
+}
+const LR = rng(20261119);
+const LAND = {
+  far: ridge(LR, HZ + 8, 78, 5),
+  mid: ridge(LR, HZ + 40, 46, 6),
+  near: ridge(LR, HZ + 92, 22, 8),
+  trees: [], firs: []
+};
+function ridgeY(pts, x){ const i = clamp(Math.round((x + 20) / (pts[1][0] - pts[0][0])), 0, pts.length - 1); return pts[i][1]; }
+// 左前方的闊葉樹叢
+[[70, 120], [140, 150], [215, 105], [1120, 135], [1175, 95]].forEach(([x, h]) => {
+  const blobs = [];
+  for (let i = 0; i < 9; i++) blobs.push([(LR() - 0.5) * h * 0.55, -h * (0.55 + LR() * 0.4), h * (0.17 + LR() * 0.12)]);
+  LAND.trees.push({ x, h, y: ridgeY(LAND.near, x) + 6, blobs });
+});
+// 中景山坡上的針葉樹
+for (let i = 0; i < 26; i++){
+  const x = 760 + i * 15 + (LR() - 0.5) * 10;
+  LAND.firs.push({ x, h: 18 + LR() * 16, y: ridgeY(LAND.mid, x) + 3 });
+}
+// 天空的範圍（遠山和中景山坡的上面），天上的東西只畫在這裡面
+const SKY_PATH = new Path2D();
+SKY_PATH.moveTo(-20, -20);
+LAND.far.forEach((p, i) => SKY_PATH.lineTo(p[0], Math.min(p[1], ridgeY(LAND.mid, p[0])) + 1));
+SKY_PATH.lineTo(W + 20, -20); SKY_PATH.closePath();
+const PEOPLE_X = 820, PEOPLE_Y = ridgeY(LAND.near, 820) + 30;
+
+function fillRidge(ctx, pts, col){
+  ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(pts[0][0], H + 5);
+  for (const p of pts) ctx.lineTo(p[0], p[1]);
+  ctx.lineTo(pts[pts.length - 1][0], H + 5); ctx.closePath(); ctx.fill();
+}
+// light: 地面亮度 0～1；sky: 地平線的天空顏色；tint: 額外加上的顏色（日全食的夕陽、月全食的紅光）
+function drawLand(ctx, o){
+  const farC = mix(o.sky, mul(o.farBase, o.light), 0.55);
+  fillRidge(ctx, LAND.far, css(farC));
+  const midC = add(mul(o.midBase, o.light), mul(o.tint, 0.6));
+  fillRidge(ctx, LAND.mid, css(midC));
+  const firC = css(mul(midC, 0.55));
+  ctx.fillStyle = firC;
+  for (const f of LAND.firs){
+    ctx.beginPath(); ctx.moveTo(f.x, f.y - f.h); ctx.lineTo(f.x + f.h * 0.28, f.y); ctx.lineTo(f.x - f.h * 0.28, f.y); ctx.closePath(); ctx.fill();
+  }
+  // 前景草原（越近越亮一點）
+  const g = ctx.createLinearGradient(0, HZ + 60, 0, H);
+  g.addColorStop(0, css(add(mul(o.nearBase, o.light * 0.85), o.tint)));
+  g.addColorStop(1, css(add(mul(o.nearBase, o.light * 1.05), mul(o.tint, 0.5))));
+  ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(-20, H + 5);
+  for (const p of LAND.near) ctx.lineTo(p[0], p[1]);
+  ctx.lineTo(W + 20, H + 5); ctx.closePath(); ctx.fill();
+  // 草叢的紋理
+  ctx.strokeStyle = css(add(mul(o.nearBase, o.light * 0.6), mul(o.tint, 0.4))); ctx.lineWidth = 1.2;
+  const gr = rng(7); ctx.beginPath();
+  for (let i = 0; i < 260; i++){
+    const x = gr() * W, y0 = ridgeY(LAND.near, x); const y = y0 + 12 + gr() * (H - y0 - 12);
+    const h = 3 + (y - HZ) * 0.04 * gr();
+    ctx.moveTo(x, y); ctx.lineTo(x + (gr() - 0.5) * 3, y - h);
+  }
+  ctx.stroke();
+  // 樹
+  const treeC = css(add(mul(o.treeBase, o.light), mul(o.tint, 0.25)));
+  ctx.fillStyle = treeC;
+  for (const t of LAND.trees){
+    ctx.fillRect(t.x - t.h * 0.035, t.y - t.h * 0.55, t.h * 0.07, t.h * 0.55);
+    for (const b of t.blobs){ ctx.beginPath(); ctx.arc(t.x + b[0], t.y + b[1], b[2], 0, 6.283); ctx.fill(); }
+  }
+  // 看天空的大人和小孩（剪影）
+  const pc = css(mul(add(mul(o.treeBase, o.light), mul(o.tint, 0.2)), 0.8));
+  ctx.fillStyle = pc; ctx.strokeStyle = pc; ctx.lineCap = 'round';
+  person(ctx, PEOPLE_X, PEOPLE_Y, 66, false);
+  person(ctx, PEOPLE_X + 34, PEOPLE_Y + 2, 44, true);
+}
+function person(ctx, x, y, h, point){
+  const hr = h * 0.11;
+  ctx.beginPath(); ctx.arc(x, y - h + hr, hr, 0, 6.283); ctx.fill();          // 頭（微微抬頭）
+  ctx.beginPath(); ctx.moveTo(x - h * 0.13, y - h * 0.5); ctx.lineTo(x - h * 0.11, y - h * 0.8);
+  ctx.quadraticCurveTo(x, y - h * 0.86, x + h * 0.11, y - h * 0.8); ctx.lineTo(x + h * 0.13, y - h * 0.5); ctx.closePath(); ctx.fill();
+  ctx.lineWidth = h * 0.09;
+  ctx.beginPath(); ctx.moveTo(x - h * 0.06, y - h * 0.5); ctx.lineTo(x - h * 0.08, y); ctx.moveTo(x + h * 0.06, y - h * 0.5); ctx.lineTo(x + h * 0.08, y); ctx.stroke();
+  ctx.lineWidth = h * 0.065; ctx.beginPath();
+  if (point){ ctx.moveTo(x - h * 0.1, y - h * 0.76); ctx.lineTo(x - h * 0.3, y - h * 1.12); }   // 小孩指著天空
+  else { ctx.moveTo(x + h * 0.1, y - h * 0.76); ctx.lineTo(x + h * 0.16, y - h * 0.52); }
+  ctx.moveTo(point ? x + h * 0.1 : x - h * 0.1, y - h * 0.76); ctx.lineTo(point ? x + h * 0.15 : x - h * 0.16, y - h * 0.52);
+  ctx.stroke();
+}
+function compass(ctx, alpha){
+  ctx.font = '600 15px "PingFang TC","Noto Sans TC",sans-serif'; ctx.textBaseline = 'bottom';
+  ctx.fillStyle = 'rgba(255,255,255,' + alpha + ')';
+  ctx.textAlign = 'left'; ctx.fillText('← 東', 14, H - 10);
+  ctx.textAlign = 'center'; ctx.fillText('面向南方', W / 2, H - 10);
+  ctx.textAlign = 'right'; ctx.fillText('西 →', W - 14, H - 10);
+}
+
+// ---------- 星星（兩段共用） ----------
+const SR = rng(4242), STARS = [];
+for (let i = 0; i < 520; i++){
+  const mag = 6 - 5.2 * Math.pow(SR(), 0.35) * (SR() < 0.03 ? 1.15 : 1);
+  const tint = SR();
+  STARS.push({ x: SR() * W, y: SR() * (HZ + 10), mag, c: tint < 0.15 ? [255, 210, 170] : tint < 0.3 ? [190, 210, 255] : [255, 255, 250] });
+}
+function drawStars(ctx, limit, fade){
+  for (const s of STARS){
+    const a = clamp((limit - s.mag) / 1.4, 0, 1) * fade;
+    if (a <= 0.02) continue;
+    const r = 0.5 + Math.max(0, 3.2 - s.mag) * 0.35;
+    ctx.fillStyle = css(s.c, a.toFixed(3));
+    ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, 6.283); ctx.fill();
+  }
+}
+
+// ---------- 畫布尺寸 ----------
+function fitCanvas(cv){
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const w = Math.max(300, Math.round(cv.clientWidth * dpr));
+  const h = Math.round(w / 2);
+  if (cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; return true; }
+  return false;
+}
+
+// ---------- 時間軸（橫條、刻度、跳到按鈕） ----------
+function makeTimeline(o){
+  const range = document.getElementById(o.id + '-u');
+  const ticks = document.getElementById(o.id + '-ticks');
+  const jump = document.getElementById(o.id + '-jump');
+  o.events.forEach((ev, i) => {
+    const u = o.uOf(ev.t);
+    const sp = document.createElement('span');
+    sp.innerHTML = ev.name + '<br>' + ev.time;
+    if (ev.low) sp.classList.add('low');
+    if (i === 0) sp.classList.add('first');
+    if (i === o.events.length - 1) sp.classList.add('last');
+    sp.style.left = 'calc(' + (u * 100).toFixed(2) + '% + ' + (8 - u * 16).toFixed(1) + 'px)';
+    ticks.appendChild(sp);
+    const b = document.createElement('button');
+    b.className = 'btn small'; b.textContent = ev.name;
+    b.addEventListener('click', () => { o.playing = false; o.setU(u); });
+    jump.appendChild(b);
+  });
+  if (o.zoomBand){
+    const [a, b] = o.zoomBand, band = document.createElement('i');
+    band.className = 'band'; band.title = '這一段放大了';
+    band.style.left = 'calc(' + (a * 100).toFixed(2) + '% + ' + (8 - a * 16).toFixed(1) + 'px)';
+    band.style.width = 'calc(' + ((b - a) * 100).toFixed(2) + '% - ' + ((b - a) * 16).toFixed(1) + 'px)';
+    ticks.appendChild(band);
+  }
+  range.addEventListener('input', () => { o.playing = false; o.setU(range.value / 1000); });
+  const play = document.getElementById(o.id + '-play');
+  play.addEventListener('click', () => {
+    if (o.playing){ o.playing = false; }
+    else { if (o.u >= 0.999) o.u = 0; o.playing = true; }
+    o.dirty = true;
+  });
+  document.getElementById(o.id + '-speed').addEventListener('change', e => { o.speed = +e.target.value; });
+  o.range = range; o.playBtn = play;
+}
+
+// =====================================================================
+// 日全食
+// =====================================================================
+const SOL = {
+  id: 'sol', K: 41 / 39,               // 月亮看起來比太陽大 5%
+  TM: 80, HT: 2, T: 160,               // 食甚在第 80 分鐘、全食 4 分鐘、全程 160 分鐘
+  start: 10 * 60,                       // 時鐘舉例：10:00 初虧
+  SX: 690, SY: 175, RS: 34, ANG: 0.32,
+  u: 0, playing: false, speed: 1, dirty: true, dur: 120   // 「普通」速度：整條橫條 2 分鐘播完
+};
+SOL.C2 = SOL.TM - SOL.HT; SOL.C3 = SOL.TM + SOL.HT;
+// 橫條放大：全食前後各 8 分鐘放大一些，前後各 3 分鐘放得更大
+SOL.kn = [[0, 0], [SOL.TM - 8, 0.3], [SOL.TM - 3, 0.4], [SOL.TM + 3, 0.6], [SOL.TM + 8, 0.7], [SOL.T, 1]];
+SOL.zoomBand = [0.3, 0.7];
+SOL.SWEEP = 0.75;                     // 月亮的影子掃過眼前的大地約 45 秒
+SOL.tOf = u => piece(flip(SOL.kn), u);
+SOL.uOf = t => piece(SOL.kn, t);
+SOL.events = [
+  { name: '初虧', t: 0, time: '10:00' },
+  { name: '食既', t: SOL.C2, time: '11:18' },
+  { name: '食甚', t: SOL.TM, time: '11:20', low: true },
+  { name: '生光', t: SOL.C3, time: '11:22' },
+  { name: '復圓', t: SOL.T, time: '12:40' }
+];
+SOL.setU = u => { SOL.u = clamp(u, 0, 1); SOL.dirty = true; };
+
+SOL.compute = function(t){
+  const K = SOL.K;
+  const dd = (SOL.TM - t) / SOL.TM * (1 + K);       // 月亮中心離太陽中心（太陽半徑為單位），正的在右邊（西）
+  const d = Math.abs(dd);
+  const ob = clamp(overlap(1, K, d) / Math.PI, 0, 1);
+  const f = 1 - ob;                                   // 剩下的陽光
+  const total = d < K - 1;
+  const e = d - (K - 1);                              // 正的：還有一條細細的月牙
+  const Bv = total ? 0 : Math.pow(f, 0.35);           // 天空亮度（人眼感覺）
+  const glow = 1 - smooth(0.02, 0.35, Bv);            // 地平線的夕陽光
+  const corona = total ? 1 : (e < 0.03 ? (1 - e / 0.03) * 0.55 : 0);
+  return { dd, d, ob, f, total, e, Bv, glow, corona,
+    mx: SOL.SX + dd * SOL.RS * Math.cos(SOL.ANG), my: SOL.SY + dd * SOL.RS * Math.sin(SOL.ANG) };
+};
+
+// 日冕：先畫在另一張畫布上
+function makeCorona(scale){
+  const RS = SOL.RS, size = RS * 11, c = document.createElement('canvas');
+  c.width = c.height = Math.ceil(size * scale);
+  const g = c.getContext('2d'); g.scale(scale, scale); g.translate(size / 2, size / 2);
+  g.globalCompositeOperation = 'lighter';
+  let rad = g.createRadialGradient(0, 0, RS * 0.95, 0, 0, RS * 3.2);
+  rad.addColorStop(0, 'rgba(250,250,255,0.95)'); rad.addColorStop(0.12, 'rgba(225,232,255,0.5)');
+  rad.addColorStop(0.4, 'rgba(190,205,255,0.14)'); rad.addColorStop(1, 'rgba(160,180,255,0)');
+  g.fillStyle = rad; g.beginPath(); g.arc(0, 0, RS * 3.2, 0, 6.283); g.fill();
+  const r = rng(99), tilt = 0.35;
+  for (let i = 0; i < 90; i++){
+    const th = r() * 6.283;
+    const eq = Math.abs(Math.cos(th - tilt));                     // 赤道方向的冕流比較長
+    const L = RS * (1.3 + r() * (0.6 + 3.6 * eq * eq));
+    const w = 0.025 + r() * 0.09 * (0.4 + eq);
+    const gg = g.createRadialGradient(0, 0, RS, 0, 0, L);
+    gg.addColorStop(0, 'rgba(240,244,255,' + (0.18 + r() * 0.22).toFixed(2) + ')'); gg.addColorStop(1, 'rgba(220,230,255,0)');
+    g.fillStyle = gg; g.beginPath();
+    g.moveTo(Math.cos(th - w) * RS, Math.sin(th - w) * RS);
+    g.quadraticCurveTo(Math.cos(th) * L * 0.6, Math.sin(th) * L * 0.6, Math.cos(th + w * 0.15) * L, Math.sin(th + w * 0.15) * L);
+    g.lineTo(Math.cos(th + w) * RS, Math.sin(th + w) * RS); g.closePath(); g.fill();
+  }
+  return c;
+}
+const PROM = [[0.6, 0.07, 0.10], [2.3, 0.05, 0.07], [3.5, 0.09, 0.08], [4.6, 0.04, 0.12], [5.6, 0.06, 0.06]]; // 日珥：角度、高度、寬度
+function valley(phi){ // 月亮邊緣的山谷深度（太陽半徑為單位）
+  const v = Math.sin(13 * phi + 1) + 0.6 * Math.sin(29 * phi + 2) + 0.4 * Math.sin(47 * phi + 0.5);
+  return 0.007 * Math.max(0, v) / 2;
+}
+const VENUS = { x: SOL.SX - 250, y: SOL.SY + 120 }, JUP = { x: SOL.SX + 330, y: SOL.SY - 70 };
+
+SOL.render = function(){
+  const cv = SOL.cv, ctx = SOL.ctx;
+  if (fitCanvas(cv) || !SOL.corona) SOL.coronaCv = makeCorona(cv.width / W), SOL.corona = true;
+  const k = cv.width / W;
+  ctx.setTransform(k, 0, 0, k, 0, 0);
+  const t = SOL.tOf(SOL.u), s = SOL.compute(t), RS = SOL.RS, K = SOL.K;
+  SOL.last = { t, s };
+
+  // 天空和大地（白天的藍天 → 全食的深藍，地平線加上一圈夕陽）
+  const B = s.Bv;
+  const skyC = SOL.drawBack(ctx, B, s.glow);
+
+  // 月亮的影子：全食前從西邊（右邊）的地平線升起一大片黑影，接著掃過眼前的大地；全食後往東邊（左邊）離開
+  const shd = SOL.shadow(t, B);
+  SOL.lastShadow = shd;
+  if (shd.wall){
+    const w = shd.wall, g = ctx.createRadialGradient(w.cx, HZ + 30, 0, w.cx, HZ + 30, w.r);
+    g.addColorStop(0, 'rgba(3,5,18,' + w.a.toFixed(3) + ')'); g.addColorStop(0.6, 'rgba(3,5,18,' + (w.a * 0.55).toFixed(3) + ')'); g.addColorStop(1, 'rgba(3,5,18,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, HZ + 60);
+  }
+  if (shd.edge != null){
+    // 影子裡面：先在另一張畫布畫「全食時的天空和大地」，再只留下影子蓋到的部分
+    if (!SOL.shCv || SOL.shCv.width !== cv.width || SOL.shCv.height !== cv.height){
+      SOL.shCv = document.createElement('canvas'); SOL.shCv.width = cv.width; SOL.shCv.height = cv.height;
+    }
+    const o = SOL.shCv.getContext('2d');
+    o.setTransform(k, 0, 0, k, 0, 0); o.globalCompositeOperation = 'source-over'; o.clearRect(0, 0, W, H);
+    SOL.drawBack(o, 0, 1);
+    o.globalCompositeOperation = 'destination-in';
+    o.fillStyle = SOL.shadowFill(o, shd); o.fillRect(0, 0, W, H);
+    o.globalCompositeOperation = 'source-over';
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(SOL.shCv, 0, 0); ctx.setTransform(k, 0, 0, k, 0, 0);
+  }
+
+  // 天上的東西（星星、行星、太陽）只畫在山的上面
+  ctx.save(); ctx.clip(SKY_PATH);
+  // 星星和行星
+  const starFade = 1 - smooth(0.05, 0.22, B);
+  if (starFade > 0){
+    drawStars(ctx, 2.6, starFade);
+    const pf = 1 - smooth(0.12, 0.38, B);
+    [[VENUS, 4.2, '金星', [255, 250, 225]], [JUP, 2.8, '木星', [255, 240, 215]]].forEach(([p, r, n, c]) => {
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 2.5);
+      g.addColorStop(0, css(c, pf)); g.addColorStop(0.35, css(c, pf * 0.8)); g.addColorStop(1, css(c, 0));
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r * 2.5, 0, 6.283); ctx.fill();
+      if (starFade > 0.5){
+        ctx.font = '14px "PingFang TC","Noto Sans TC",sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'rgba(220,228,255,' + ((starFade - 0.5) * 1.6).toFixed(2) + ')'; ctx.fillText(n, p.x + 12, p.y);
+      }
+    });
+  }
+
+  const SX = SOL.SX, SY = SOL.SY;
+  // 太陽刺眼的光暈
+  // 光暈只畫在太陽外面、也不畫在月亮上，月亮遮住的那一塊才看得出缺口
+  if (!s.total && s.f > 0){
+    const hr = RS * (1.6 + 6 * Math.pow(s.f, 0.6));
+    const g = ctx.createRadialGradient(SX, SY, RS, SX, SY, hr);
+    const a = 0.6 * Math.pow(s.f, 0.5);
+    g.addColorStop(0, 'rgba(255,252,235,' + a.toFixed(3) + ')'); g.addColorStop(0.25, 'rgba(255,245,215,' + (a * 0.35).toFixed(3) + ')'); g.addColorStop(1, 'rgba(255,240,210,0)');
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(s.mx, s.my, RS * K, 0, Math.PI * 2); ctx.clip('evenodd');
+    ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(SX, SY, RS, 0, Math.PI * 2); ctx.clip('evenodd');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(SX, SY, hr, 0, 6.283); ctx.fill();
+    ctx.restore();
+  }
+  // 日冕
+  if (s.corona > 0){
+    const c = SOL.coronaCv, size = RS * 11;
+    ctx.save(); ctx.globalAlpha = s.corona; ctx.globalCompositeOperation = 'lighter';
+    ctx.drawImage(c, SX - size / 2, SY - size / 2, size, size); ctx.restore();
+  }
+  // 太陽的月牙（扣掉月亮）
+  if (!s.total && s.e > 0.02){
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(s.mx, s.my, RS * K, 0, Math.PI * 2); ctx.clip('evenodd');
+    const g = ctx.createRadialGradient(SX - RS * 0.2, SY - RS * 0.2, 0, SX, SY, RS);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(0.75, '#fff6dc'); g.addColorStop(1, '#ffe2a8');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(SX, SY, RS, 0, 6.283); ctx.fill();
+    ctx.restore();
+  }
+  // 色球層和日珥（粉紅色），月亮蓋住的部分看不到
+  if (s.corona > 0){
+    ctx.save(); ctx.globalAlpha = Math.min(1, s.corona * 1.2);
+    ctx.strokeStyle = '#ff5a8a'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(SX, SY, RS + 0.6, 0, 6.283); ctx.stroke();
+    ctx.fillStyle = '#ff4f7f';
+    for (const [a, h, w] of PROM){
+      ctx.beginPath();
+      ctx.moveTo(SX + Math.cos(a - w) * RS, SY + Math.sin(a - w) * RS);
+      ctx.quadraticCurveTo(SX + Math.cos(a - w * 0.6) * RS * (1 + h * 1.6), SY + Math.sin(a - w * 0.6) * RS * (1 + h * 1.6),
+                           SX + Math.cos(a) * RS * (1 + h), SY + Math.sin(a) * RS * (1 + h));
+      ctx.quadraticCurveTo(SX + Math.cos(a + w * 0.6) * RS * (1 + h * 1.3), SY + Math.sin(a + w * 0.6) * RS * (1 + h * 1.3),
+                           SX + Math.cos(a + w) * RS, SY + Math.sin(a + w) * RS);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+    // 月亮：背對太陽的那一面沒有陽光，看起來跟太陽附近的天空差不多，只是再暗一點
+    const skyHere = mix(skyC[0], skyC[1], clamp(SY / (HZ + 10) / 0.55, 0, 1));
+    ctx.fillStyle = css(mul(skyHere, 0.8)); ctx.beginPath(); ctx.arc(s.mx, s.my, RS * K, 0, 6.283); ctx.fill();
+  }
+  // 貝里珠和鑽石環
+  let beads = 0;
+  if (!s.total && s.e <= 0.02){
+    for (let i = 0; i < 240; i++){
+      const th = i / 240 * 6.283;
+      const px = SX + Math.cos(th) * RS * 0.995, py = SY + Math.sin(th) * RS * 0.995;
+      const dx = (px - s.mx) / RS, dy = (py - s.my) / RS;
+      const Dm = Math.hypot(dx, dy), edge = K - valley(Math.atan2(dy, dx));
+      if (Dm > edge){
+        beads++;
+        const br = 1.2 + Math.min(2.2, (Dm - edge) * 260);
+        const g = ctx.createRadialGradient(px, py, 0, px, py, br * 2.2);
+        g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.5, 'rgba(255,250,230,0.7)'); g.addColorStop(1, 'rgba(255,240,210,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px, py, br * 2.2, 0, 6.283); ctx.fill();
+      }
+    }
+    if (beads > 0){
+      const ux = (SX - s.mx), uy = (SY - s.my), L = Math.hypot(ux, uy) || 1;
+      const px = SX + ux / L * RS, py = SY + uy / L * RS;
+      const gs = Math.sqrt(clamp(s.e / 0.02, 0.15, 1));
+      const rr = 14 + 46 * gs;
+      const g = ctx.createRadialGradient(px, py, 0, px, py, rr);
+      g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(255,252,240,0.65)'); g.addColorStop(1, 'rgba(255,245,225,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px, py, rr, 0, 6.283); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,' + (0.55 * gs).toFixed(2) + ')'; ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      for (let j = 0; j < 4; j++){ const a = j * Math.PI / 4 + 0.2; ctx.moveTo(px - Math.cos(a) * rr * 1.3, py - Math.sin(a) * rr * 1.3); ctx.lineTo(px + Math.cos(a) * rr * 1.3, py + Math.sin(a) * rr * 1.3); }
+      ctx.stroke();
+    }
+  }
+  SOL.beads = beads;
+  ctx.restore();
+  compass(ctx, 0.55 + 0.3 * (1 - B));
+};
+
+// 天空和大地：B 是天空亮度（0＝全食），glow 是地平線夕陽光的強度
+SOL.drawBack = function(ctx, B, glow){
+  const day = [[40, 105, 195], [90, 155, 220], [160, 200, 236], [205, 224, 242]];
+  const night = [[5, 9, 30], [14, 24, 62], [40, 44, 86], [70, 58, 82]];
+  const glowC = [null, [70, 60, 110], [245, 170, 95], [255, 120, 55]];
+  const glowW = [0, 0.25, 0.75, 0.95];
+  const stops = [0, 0.55, 0.86, 1];
+  const sky = stops.map((p, i) => { let c = mix(night[i], day[i], B); if (glowC[i]) c = mix(c, glowC[i], glow * glowW[i]); return c; });
+  const sg = ctx.createLinearGradient(0, 0, 0, HZ + 10);
+  stops.forEach((p, i) => sg.addColorStop(p, css(sky[i])));
+  ctx.fillStyle = sg; ctx.fillRect(0, 0, W, HZ + 60);
+  drawLand(ctx, {
+    light: 0.05 + 0.95 * Math.pow(B, 0.7), sky: sky[3], tint: mul([20, 9, 3], glow),
+    farBase: [70, 95, 125], midBase: [62, 98, 62], nearBase: [88, 140, 60], treeBase: [30, 58, 30]
+  });
+  // 遠方地平線一圈的橘光，也照在遠山的山頂
+  if (glow > 0.02){
+    const g = ctx.createLinearGradient(0, HZ - 80, 0, HZ + 20);
+    g.addColorStop(0, 'rgba(255,140,60,0)'); g.addColorStop(0.75, 'rgba(255,130,50,' + (0.22 * glow).toFixed(3) + ')'); g.addColorStop(1, 'rgba(255,130,50,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, HZ - 80, W, 100);
+  }
+  return sky;
+};
+
+// 影子的位置：edge 是影子邊緣的 x，dark 'R' 表示右邊在影子裡、'L' 表示左邊在影子裡
+SOL.shadow = function(t, B){
+  const out = { edge: null, wall: null, a: 0 };
+  const light = 0.05 + 0.95 * B;
+  const a = clamp(1 - 0.05 / light, 0, 0.97);   // 從現在的亮度暗到全食的亮度
+  const S = SOL.SWEEP, span = W + 500;
+  if (t < SOL.C2 && t > SOL.C2 - 3){
+    if (t >= SOL.C2 - S){ out.edge = W + 250 - (t - (SOL.C2 - S)) / S * span; out.dark = 'R'; }
+    const grow = smooth(SOL.C2 - 3, SOL.C2 - S, t);
+    out.wall = { cx: W + 120, r: 260 + 620 * grow, a: 0.75 * a * grow };
+  } else if (t > SOL.C3 && t < SOL.C3 + 3){
+    if (t <= SOL.C3 + S){ out.edge = W + 250 - (t - SOL.C3) / S * span; out.dark = 'L'; }
+    const fade = 1 - smooth(SOL.C3 + S, SOL.C3 + 3, t);
+    out.wall = { cx: -120, r: 260 + 620 * fade, a: 0.75 * a * fade };
+  }
+  out.a = a;
+  return out;
+};
+SOL.shadowFill = function(ctx, shd){   // 影子的形狀（邊緣是軟的，因為外面還有半影）
+  const g = ctx.createLinearGradient(shd.edge - 130, 0, shd.edge + 130, 0);
+  const on = 'rgba(0,0,0,1)', off = 'rgba(0,0,0,0)';
+  g.addColorStop(0, shd.dark === 'R' ? off : on); g.addColorStop(1, shd.dark === 'R' ? on : off);
+  return g;
+};
+
+SOL.info = function(){
+  const t = SOL.tOf(SOL.u), s = SOL.compute(t);
+  let name, msg;
+  if (t <= 0.4){ name = '初虧'; msg = '月亮從右邊（西邊）碰到太陽的邊，日食開始了！'; }
+  else if (t < 40){ name = '偏食'; msg = '月亮慢慢咬進太陽，天色還看不出變化。看太陽一定要戴日食眼鏡！'; }
+  else if (t < 70){ name = '偏食'; msg = '太陽被遮掉一大半，陽光變弱、空氣變涼，可是天空還是亮的。'; }
+  else if (t < SOL.C2 - 3){ name = '快要全食了'; msg = '天色越來越暗，好像傍晚一樣。陽光只剩一點點，空氣變涼了。'; }
+  else if (t < SOL.C2 - SOL.SWEEP){ name = '月亮的影子來了'; msg = '右邊（西邊）的地平線升起一大片黑影，那是月亮的影子！'; }
+  else if (t < SOL.C2 - 0.25){ name = '影子衝過來了'; msg = '月亮的影子比聲音還快，從右邊（西邊）掃過山和草原，一下子就到眼前！'; }
+  else if (t < SOL.C2){ name = '貝里珠・鑽石環'; msg = '陽光只能從月亮山谷的縫隙漏出來，最後一顆像鑽石戒指。'; }
+  else if (t <= SOL.C3){
+    const left = SOL.C3 - t;
+    name = Math.abs(t - SOL.TM) < 0.25 ? '食甚・全食' : (t - SOL.C2 < 0.15 ? '食既・全食開始' : '全食');
+    msg = '日冕出現了！地平線一圈都是橘紅色的「夕陽」，金星和星星也出來了。全食還剩 ' + Math.floor(left) + ' 分 ' + pad(Math.round(left * 60) % 60) + ' 秒。';
+  }
+  else if (t < SOL.C3 + 0.25){ name = '生光・鑽石環'; msg = '鑽石環又出現在另一邊，全食結束了，趕快戴回日食眼鏡！'; }
+  else if (t < SOL.C3 + SOL.SWEEP){ name = '影子跑走了'; msg = '右邊先亮起來，月亮的影子往左邊（東邊）掃過大地離開。'; }
+  else if (t < SOL.C3 + 3){ name = '偏食'; msg = '影子變成左邊（東邊）地平線上的一片黑影，越來越遠。'; }
+  else if (t < 92){ name = '偏食'; msg = '天色很快變回白天，可是太陽還缺一大塊。'; }
+  else if (t < SOL.T - 0.4){ name = '偏食'; msg = '月亮慢慢離開太陽，從左邊（東邊）退出。'; }
+  else { name = '復圓'; msg = '月亮完全離開太陽，日食結束了。'; }
+  return { t, s, name, msg };
+};
+SOL.ui = function(){
+  const i = SOL.info();
+  document.getElementById('sol-msg').innerHTML = '<b>' + i.name + '</b>' + i.msg;
+  document.getElementById('sol-el').textContent = hms(i.t);
+  document.getElementById('sol-clk').textContent = clock(SOL.start, i.t);
+  document.getElementById('sol-ob').textContent = (i.s.total ? '100' : (i.s.ob * 100).toFixed(i.s.ob > 0.99 ? 1 : 0)) + '%';
+  document.getElementById('sol-br').textContent = i.s.total ? '約百萬分之一' : (Math.max(0.01, i.s.f * 100)).toFixed(i.s.f < 0.1 ? (i.s.f < 0.01 ? 2 : 1) : 0) + '%';
+  SOL.range.value = Math.round(SOL.u * 1000);
+  SOL.playBtn.textContent = SOL.playing ? '⏸ 暫停' : '▶ 播放';
+};
+
+// =====================================================================
+// 月全食
+// =====================================================================
+const LUN = {
+  id: 'lun', RU: 2.7, RP: 4.75, B: 0.6, V: 0.0348,  // 本影、半影半徑（月亮半徑為單位）、影子中心偏離、每分鐘移動
+  start: 19 * 60 + 30, R: 40,
+  u: 0, playing: false, speed: 1, dirty: true, dur: 100   // 「普通」速度：整條橫條 100 秒播完
+};
+(function(){
+  const hP = Math.sqrt((LUN.RP + 1) ** 2 - LUN.B ** 2) / LUN.V;
+  const hU = Math.sqrt((LUN.RU + 1) ** 2 - LUN.B ** 2) / LUN.V;
+  const hT = Math.sqrt((LUN.RU - 1) ** 2 - LUN.B ** 2) / LUN.V;
+  LUN.TM = hP; LUN.T = 2 * hP;
+  LUN.P1 = 0; LUN.U1 = hP - hU; LUN.U2 = hP - hT; LUN.U3 = hP + hT; LUN.U4 = hP + hU; LUN.P4 = 2 * hP;
+})();
+LUN.tOf = u => u * LUN.T;
+LUN.uOf = t => t / LUN.T;
+LUN.events = [
+  { name: '半影食始', t: LUN.P1 }, { name: '初虧', t: LUN.U1 }, { name: '食既', t: LUN.U2 }, { name: '食甚', t: LUN.TM },
+  { name: '生光', t: LUN.U3 }, { name: '復圓', t: LUN.U4 }, { name: '半影食終', t: LUN.P4 }
+].map((e, i) => Object.assign(e, { time: clock(LUN.start, e.t), low: i % 2 === 1 }));
+LUN.setU = u => { LUN.u = clamp(u, 0, 1); LUN.dirty = true; };
+
+// 月面的明暗（月海）
+const MARIA = [[-0.3, -0.45, 0.28], [0.18, -0.38, 0.17], [0.36, -0.08, 0.22], [0.72, -0.3, 0.12], [-0.58, -0.05, 0.36],
+  [-0.15, 0.36, 0.2], [0.6, 0.15, 0.15], [-0.5, 0.42, 0.11], [0.05, 0.05, 0.12]];
+function makeAlbedo(n){
+  const a = new Float32Array(n * n), r = rng(31);
+  const noise = []; for (let i = 0; i < 40; i++) noise.push([r() * 2 - 1, r() * 2 - 1, 0.03 + r() * 0.06, r() < 0.7 ? -0.08 : 0.1]);
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++){
+    const X = (i + 0.5) / n * 2 - 1, Y = (j + 0.5) / n * 2 - 1, rr = X * X + Y * Y;
+    if (rr > 1){ a[j * n + i] = -1; continue; }
+    let v = 0.92;
+    for (const m of MARIA){ const d = Math.hypot(X - m[0], Y - m[1]) / m[2]; v -= 0.3 * (1 - smooth(0.55, 1.15, d)); }
+    for (const c of noise){ const d = Math.hypot(X - c[0], Y - c[1]) / c[2]; if (d < 1) v += c[3] * (1 - d); }
+    const ty = Math.hypot(X + 0.12, Y - 0.76); if (ty < 0.05) v += 0.15;     // 第谷坑
+    v *= 0.88 + 0.12 * Math.sqrt(1 - rr);                                      // 邊緣稍暗
+    a[j * n + i] = clamp(v, 0.35, 1);
+  }
+  return a;
+}
+// 夜空的銀河（淡淡一條）
+function makeMilkyWay(scale){
+  const c = document.createElement('canvas'); c.width = Math.ceil(W * scale); c.height = Math.ceil((HZ + 20) * scale);
+  const g = c.getContext('2d'); g.scale(scale, scale); const r = rng(77);
+  for (let i = 0; i < 260; i++){
+    const p = r(); const x = 120 + p * 520 + (r() - 0.5) * 70, y = 470 - p * 470 + (r() - 0.5) * 60;
+    const rad = 18 + r() * 40, gg = g.createRadialGradient(x, y, 0, x, y, rad);
+    gg.addColorStop(0, 'rgba(200,210,255,0.05)'); gg.addColorStop(1, 'rgba(200,210,255,0)');
+    g.fillStyle = gg; g.beginPath(); g.arc(x, y, rad, 0, 6.283); g.fill();
+  }
+  for (let i = 0; i < 900; i++){
+    const p = r(); const x = 120 + p * 520 + (r() - 0.5) * 110 * r(), y = 470 - p * 470 + (r() - 0.5) * 90 * r();
+    g.fillStyle = 'rgba(230,235,255,' + (0.2 + r() * 0.4).toFixed(2) + ')'; g.fillRect(x, y, 0.8, 0.8);
+  }
+  return c;
+}
+
+LUN.compute = function(t){
+  return { sx: -(LUN.TM - t) * LUN.V, sy: LUN.B };   // 影子中心相對月亮中心：一開始在左邊（東邊），慢慢往右移
+};
+const tone = x => (x / (x + 0.35)) * 1.35;
+LUN.render = function(){
+  const cv = LUN.cv, ctx = LUN.ctx;
+  const resized = fitCanvas(cv);
+  const k = cv.width / W;
+  if (resized || !LUN.off){
+    const n = Math.ceil(LUN.R * 2 * k);
+    LUN.off = document.createElement('canvas'); LUN.off.width = LUN.off.height = n; LUN.n = n;
+    LUN.offCtx = LUN.off.getContext('2d'); LUN.img = LUN.offCtx.createImageData(n, n);
+    LUN.alb = makeAlbedo(n); LUN.Ibuf = new Float32Array(n * n); LUN.mw = makeMilkyWay(k);
+  }
+  ctx.setTransform(k, 0, 0, k, 0, 0);
+  const t = LUN.tOf(LUN.u), sh = LUN.compute(t), n = LUN.n, alb = LUN.alb, Ib = LUN.Ibuf;
+  const RU = LUN.RU, RP = LUN.RP;
+
+  // 第一輪：每一點照到多少光
+  let sum = 0, cnt = 0, inU = 0;
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++){
+    const idx = j * n + i; if (alb[idx] < 0) continue;
+    const X = (i + 0.5) / n * 2 - 1, Y = (j + 0.5) / n * 2 - 1;
+    const s = Math.hypot(X - sh.sx, Y - sh.sy);
+    let I;
+    if (s >= RP) I = 1;
+    else if (s >= RU){ const q = (s - RU) / (RP - RU); I = 0.025 + 0.975 * Math.pow(q, 1.25); }
+    else { I = 0.035 * (0.5 + 0.5 * (s / RU) ** 2); inU++; }
+    Ib[idx] = I; sum += I; cnt++;
+  }
+  const meanI = sum / cnt, umbra = inU / cnt;
+  const E = 1 / (0.05 + 0.95 * meanI);   // 眼睛會慢慢適應黑暗：月亮越暗，看起來放大越多
+  // 第二輪：上色
+  const d = LUN.img.data, copper = [1, 0.4, 0.17];
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++){
+    const idx = j * n + i, p = idx * 4;
+    if (alb[idx] < 0){ d[p + 3] = 0; continue; }
+    const X = (i + 0.5) / n * 2 - 1, Y = (j + 0.5) / n * 2 - 1;
+    const s = Math.hypot(X - sh.sx, Y - sh.sy);
+    let col;
+    if (s < RU){
+      col = copper;
+      if (s > 0.9 * RU) col = mix(copper, [0.75, 0.82, 1], 0.35 * (s - 0.9 * RU) / (0.1 * RU));   // 本影邊緣淡淡的藍（臭氧層）
+    } else if (s < RP){
+      col = mix([1, 0.62, 0.42], [1, 0.98, 0.94], smooth(0, 0.35, (s - RU) / (RP - RU)));
+    } else col = [1, 0.98, 0.94];
+    const v = 255 * alb[idx] * Math.min(1.05, tone(Ib[idx] * E));
+    d[p] = v * col[0]; d[p + 1] = v * col[1]; d[p + 2] = v * col[2];
+    const rx = Math.hypot(X, Y); d[p + 3] = rx > 1 - 2 / n ? 255 * clamp((1 - rx) * n / 2, 0, 1) : 255;
+  }
+  LUN.offCtx.putImageData(LUN.img, 0, 0);
+
+  // 夜空：滿月時的藍黑色 → 全食時更黑，星星變多
+  const m = clamp(Math.sqrt(meanI), 0, 1);
+  const zen = mix([3, 5, 15], [14, 26, 62], m), mid = mix([6, 9, 24], [26, 42, 88], m), hor = mix([14, 16, 32], [48, 66, 110], m);
+  const sg = ctx.createLinearGradient(0, 0, 0, HZ + 10);
+  sg.addColorStop(0, css(zen)); sg.addColorStop(0.6, css(mid)); sg.addColorStop(1, css(hor));
+  ctx.fillStyle = sg; ctx.fillRect(0, 0, W, HZ + 60);
+  const dark = 1 - m;
+  if (dark > 0.05){ ctx.save(); ctx.globalAlpha = 0.85 * dark * dark; ctx.drawImage(LUN.mw, 0, 0, W, HZ + 20); ctx.restore(); }
+  drawStars(ctx, 1.9 + 4.2 * dark, 1);
+
+  // 月亮在天上的位置：慢慢從東（左）移到西（右）
+  const p = t / LUN.T, R = LUN.R;
+  const mx = W * (0.24 + 0.52 * p), my = H * (0.36 - 0.17 * Math.sin(Math.PI * p));
+  // 月亮周圍的光暈
+  const avg = umbra > 0.98 ? [255, 120, 60] : [235, 240, 255];
+  const hr = R * (2.2 + 3 * m), ha = 0.32 * m + (umbra > 0.98 ? 0.06 : 0);
+  const hg = ctx.createRadialGradient(mx, my, R * 0.9, mx, my, hr);
+  hg.addColorStop(0, css(avg, ha.toFixed(3))); hg.addColorStop(1, css(avg, 0));
+  ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(mx, my, hr, 0, 6.283); ctx.fill();
+  ctx.drawImage(LUN.off, mx - R, my - R, 2 * R, 2 * R);
+
+  // 大地：銀白色的月光 → 暗暗帶一點紅
+  const light = 0.06 + 0.94 * m;
+  drawLand(ctx, {
+    light, sky: hor, tint: mul([16, 4, 2], umbra * (1 - m)),
+    farBase: [70, 85, 115], midBase: [50, 68, 80], nearBase: [62, 82, 86], treeBase: [22, 32, 36]
+  });
+  compass(ctx, 0.55);
+  LUN.last = { t, meanI, umbra, m, mx, my };
+};
+LUN.info = function(){
+  const t = LUN.tOf(LUN.u), L = LUN;
+  const near = (a) => Math.abs(t - a) < 2.5;
+  let name, msg;
+  if (t <= 1){ name = '半影食始'; msg = '月亮碰到地球淡淡的半影，可是這時候幾乎看不出變化。'; }
+  else if (t < L.U1 - 2.5){ name = '半影食'; msg = '月亮在半影裡，只有左邊（東邊）稍微暗一點點，很難察覺。'; }
+  else if (near(L.U1)){ name = '初虧'; msg = '月亮的左邊（東邊）碰到黑黑的本影，好像被咬了一口！'; }
+  else if (t < L.U2 - 2.5){ name = '偏食'; msg = '本影慢慢吃掉月亮。被吃掉的地方很暗，仔細看帶一點紅色。'; }
+  else if (near(L.U2)){ name = '食既'; msg = '月亮整個鑽進本影，月全食開始！'; }
+  else if (t < L.U3 - 2.5){
+    name = near(L.TM) ? '食甚' : '全食';
+    msg = '月亮變成紅銅色！月光變暗，星星和銀河都出來了。全食還有 ' + durTxt(L.U3 - t) + '。';
+  }
+  else if (near(L.U3)){ name = '生光'; msg = '月亮的左邊（東邊）先走出本影，亮起來了，全食結束。'; }
+  else if (t < L.U4 - 2.5){ name = '偏食'; msg = '月亮慢慢走出本影，亮的部分越來越多，星星又變少了。'; }
+  else if (near(L.U4)){ name = '復圓'; msg = '月亮完全離開本影。'; }
+  else if (t < L.P4 - 1){ name = '半影食'; msg = '月亮還在半影裡，右邊（西邊）稍微暗一點點。'; }
+  else { name = '半影食終'; msg = '月亮離開地球的影子，又是一輪明亮的滿月。'; }
+  return { t, name, msg };
+};
+LUN.ui = function(){
+  const i = LUN.info(), l = LUN.last || {};
+  document.getElementById('lun-msg').innerHTML = '<b>' + i.name + '</b>' + i.msg;
+  document.getElementById('lun-el').textContent = hm(i.t);
+  document.getElementById('lun-clk').textContent = clock(LUN.start, i.t);
+  document.getElementById('lun-ob').textContent = Math.round((l.umbra || 0) * 100) + '%';
+  const mi = l.meanI == null ? 1 : l.meanI, um = l.umbra || 0;
+  document.getElementById('lun-br').textContent = um > 0.999 ? '剩幾千～幾萬分之一' : um > 0 ? '一部分變黑' : mi > 0.9 ? '跟滿月一樣亮' : mi > 0.65 ? '暗一點點' : '明顯變暗';
+  LUN.range.value = Math.round(LUN.u * 1000);
+  LUN.playBtn.textContent = LUN.playing ? '⏸ 暫停' : '▶ 播放';
+};
+
+// ---------- 啟動 ----------
+const ALL = [SOL, LUN];
+ALL.forEach(o => {
+  o.cv = document.getElementById(o.id + '-cv'); o.ctx = o.cv.getContext('2d');
+  makeTimeline(o);
+});
+function draw(o){ o.render(); o.ui(); o.dirty = false; }
+// 往前走一段時間（秒）；測試時也可以直接呼叫
+function step(o, sec){
+  if (!o.playing) return;
+  o.u += sec * o.speed / o.dur;
+  if (o.u >= 1){ o.u = 1; o.playing = false; }
+  o.dirty = true;
+}
+let lastT = 0;
+function loop(ts){
+  const dt = lastT ? Math.min(0.1, (ts - lastT) / 1000) : 0; lastT = ts;
+  for (const o of ALL){ step(o, dt); if (o.dirty) draw(o); }
+  requestAnimationFrame(loop);
+}
+ALL.forEach(draw);
+requestAnimationFrame(loop);
+window.addEventListener('resize', () => ALL.forEach(o => { o.dirty = true; }));
+window.__eclipse = { SOL, LUN, draw, step };
+})();
+</script>
+</body>
+</html>

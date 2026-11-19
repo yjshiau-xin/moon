@@ -115,21 +115,23 @@
     <a href="01_moon-phases.html">🌙 月亮</a>
     <a href="02_earth-moon-orbit.html">🌍 地球公轉</a>
     <a href="03_eclipses.html">📅 未來20年日食月食</a>
+    <a href="total-eclipses.html">🌘 日全食月全食</a>
     <a href="04_planets.html">🪐 八大行星</a>
     <a href="05_pluto.html">🧊 冥王星</a>
     <a href="06_milky-way.html">🌌 銀河系</a>
-    <a href="07_quiz.html" aria-current="page">⭐ 小測驗</a>
+    <a href="07_universe.html">🌠 宇宙</a>
+    <a href="08_quiz.html" aria-current="page">⭐ 小測驗</a>
   </nav>
 </header>
 <div class="wrap">
   <h1>⭐ 小測驗</h1>
-  <p class="sub">五個測驗分開玩：<a href="#moonQuiz">🌙 月亮與地球</a>・<a href="#planetQuiz">🪐 八大行星</a>・<a href="#listenQuiz">🎧 聽英文，找行星</a>・<a href="#plutoQuiz">🧊 冥王星</a>・<a href="#galaxyQuiz">🌌 銀河系</a>・<a href="#scoreBoard">🏆 我的成績</a></p>
+  <p class="sub">六個測驗分開玩：<a href="#moonQuiz">🌙 月亮與地球</a>・<a href="#planetQuiz">🪐 八大行星</a>・<a href="#listenQuiz">🎧 聽英文，找行星</a>・<a href="#plutoQuiz">🧊 冥王星</a>・<a href="#galaxyQuiz">🌌 銀河系</a>・<a href="#universeQuiz">🌠 宇宙</a>・<a href="#scoreBoard">🏆 我的成績</a></p>
   <section class="panel" id="moonQuiz">
     <div class="qhead">
-      <h2 class="qh">🌙 <span style="color:var(--moon)">月亮</span>與<span style="color:var(--moon)">地球</span><span class="qcount" id="moonCount">14 題</span></h2>
-      <span class="back"><a class="quiz-link" href="01_moon-phases.html">← 回去看 🌙 月亮</a><a class="quiz-link" href="02_earth-moon-orbit.html">← 回去看 🌍 地球公轉</a></span>
+      <h2 class="qh">🌙 <span style="color:var(--moon)">月亮</span>與<span style="color:var(--moon)">地球</span><span class="qcount" id="moonCount">15 題</span></h2>
+      <span class="back"><a class="quiz-link" href="01_moon-phases.html">← 回去看 🌙 月亮</a><a class="quiz-link" href="02_earth-moon-orbit.html">← 回去看 🌍 地球公轉</a><a class="quiz-link" href="total-eclipses.html">← 回去看 🌘 日全食</a></span>
     </div>
-    <p class="qsub">「月亮變變變」7 題＋「地球帶著月亮跑」5 題，答錯了可以回去看動畫再來挑戰！</p>
+    <p class="qsub">「月亮」8 題＋「地球公轉」5 題＋「日食月食」2 題，答錯了可以回去看動畫再來挑戰！</p>
     <div id="quiz"></div>
   </section>
   <section class="panel" id="planetQuiz">
@@ -170,25 +172,34 @@
     <p class="qsub">題目都來自「🌌 銀河系」頁，答錯了可以回去再看看！</p>
     <div id="gquiz"></div>
   </section>
+  <section class="panel" id="universeQuiz">
+    <div class="qhead">
+      <h2 class="qh">🌠 宇宙 Universe<span class="qcount" id="universeCount">5 題</span></h2>
+      <span class="back"><a class="quiz-link" href="07_universe.html">← 回去看 🌠 宇宙</a></span>
+    </div>
+    <p class="qsub">題目都來自「🌠 宇宙」頁，答錯了可以回去再看看！</p>
+    <div id="uquiz"></div>
+  </section>
 
   <section class="panel board" id="scoreBoard">
     <h2 class="qh">🏆 我的成績</h2>
-    <p class="qsub">五個測驗都是一題一分：月亮與地球滿分 14 分、八大行星滿分 15 分、聽英文找行星滿分 8 分、冥王星滿分 7 分、銀河系滿分 10 分，加起來滿分 54 分。再玩一次的話，以最新的分數為準。</p>
+    <p class="qsub">六個測驗都是一題一分：月亮與地球滿分 15 分、八大行星滿分 15 分、聽英文找行星滿分 8 分、冥王星滿分 7 分、銀河系滿分 10 分、宇宙滿分 5 分，加起來滿分 60 分。再玩一次的話，以最新的分數為準。</p>
     <div class="board-rows">
       <a href="#moonQuiz" class="board-row"><span>🌙 月亮與地球</span><b data-k="moon">還沒玩</b></a>
       <a href="#planetQuiz" class="board-row"><span>🪐 八大行星</span><b data-k="planet">還沒玩</b></a>
       <a href="#listenQuiz" class="board-row"><span>🎧 聽英文，找行星</span><b data-k="listen">還沒玩</b></a>
       <a href="#plutoQuiz" class="board-row"><span>🧊 冥王星</span><b data-k="pluto">還沒玩</b></a>
       <a href="#galaxyQuiz" class="board-row"><span>🌌 銀河系</span><b data-k="galaxy">還沒玩</b></a>
+      <a href="#universeQuiz" class="board-row"><span>🌠 宇宙</span><b data-k="universe">還沒玩</b></a>
     </div>
-    <div class="board-total">總分 <b id="totalPts">0</b> / <span id="maxPts">54</span> 分</div>
-    <p class="board-msg" id="boardMsg">五個測驗都玩玩看，把總分加起來吧！</p>
+    <div class="board-total">總分 <b id="totalPts">0</b> / <span id="maxPts">60</span> 分</div>
+    <p class="board-msg" id="boardMsg">六個測驗都玩玩看，把總分加起來吧！</p>
   </section>
 </div>
 <script>
-// ---------- 五個測驗的分數和總分 ----------
-// 五個測驗都是一題一分
-window.QUIZ_MAX = { moon: 14, planet: 15, listen: 8, pluto: 7, galaxy: 10 };
+// ---------- 六個測驗的分數和總分 ----------
+// 六個測驗都是一題一分
+window.QUIZ_MAX = { moon: 15, planet: 15, listen: 8, pluto: 7, galaxy: 10, universe: 5 };
 const QUIZ_MAX_SUM = Object.values(QUIZ_MAX).reduce((a, b) => a + b, 0);
 window.QUIZ_SCORES = {};
 // 答完後按鈕倒數（例如「下一題 →（4）」），時間到自動換題；直接按就馬上換
@@ -368,6 +379,10 @@ window.reportScore = (key, right, total) => {
     { q: '日全食時，月亮為什麼能<em>剛好</em>把比它大很多的太陽遮住？',
       opts: ['太陽和月亮其實一樣大', '日全食時月亮會變大', '太陽大約大 400 倍，但也遠了大約 400 倍，所以看起來差不多一樣大'], a: 2,
       why: '太陽的直徑大約是月亮的 400 倍，離我們的距離也差不多是月亮的 400 倍，所以兩個在天上看起來差不多一樣大。這是一個大巧合！' },
+    // ↓ 日全食月全食頁（total-eclipses.html，2026-11-19）
+    { q: '日全食的時候，為什麼<em>地平線一圈</em>看起來都像<em>夕陽</em>？',
+      opts: ['月亮的影子只有<em>一兩百公里寬</em>，影子外面<em>還有陽光</em>照亮遠方的空氣', '太陽躲到<em>地平線下面</em>了', '月亮會發出<em>橘色的光</em>'], a: 0,
+      why: '你站在月亮的影子裡，可是遠方影子外面的地方還有太陽照著。那裡被照亮的空氣從四面八方透過來，看起來就像 360 度的夕陽！' },
   ];
   // 每回題目順序都打亂（給不同小朋友玩）；選項順序不動，因為有些選項是照大小或時間排的
   const shuffled = n => { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const m = Math.floor(Math.random() * (k + 1)); [a[k], a[m]] = [a[m], a[k]]; } return a; };
@@ -1239,6 +1254,63 @@ window.reportScore = (key, right, total) => {
       fb.innerHTML = `<span class="${ok ? 'ok' : 'no'}">${ok ? '🎉 答對了！' : '🤔 再想想～'}</span> ${q.why}
         <div style="margin-top:10px"><button class="btn primary" data-act="next">${li === LQUIZ.length - 1 ? '看成績' : '下一題 →'}</button></div>`;
       autoNext(fb.querySelector('[data-act="next"]'), () => { li++; render(); });
+    }));
+  }
+  render();
+})();
+</script>
+<script>
+// ---------- 🌠 宇宙 5 題（內容都來自 07_universe.html；和其他測驗分開計分） ----------
+(() => {
+  const $ = s => document.querySelector(s);
+  const UQUIZ = [
+    { q: '哈伯發現：<em>離我們越遠的星系</em>，跑開的速度怎麼樣？',
+      opts: ['越慢', '越快', '都一樣快'], a: 1,
+      why: '越遠的跑得越快！因為星系之間的空間本身在變大，這就是「宇宙膨脹」，就像烤箱裡的葡萄乾麵包。' },
+    { q: '「<em>宇宙背景輻射</em>」是什麼？',
+      opts: ['太陽每天發出來的光', '大爆炸後約 38 萬年，宇宙的霧散掉時放出來、一直留到現在的光', '手機和電視的訊號'], a: 1,
+      why: '宇宙一開始像一團發光的濃霧，冷到約 3000 K 時霧散了，光開始自由旅行，到現在往任何方向都看得到。' },
+    { q: '宇宙背景輻射原本約 3000 K，為什麼<em>現在只剩約 2.7 K</em>、變成微波？',
+      opts: ['宇宙膨脹，把光的波長拉長了', '光被黑洞吃掉了一大半', '光走太久，累了'], a: 0,
+      why: '宇宙從那時到現在又膨脹了大約 1100 倍，光的波長也被拉長 1100 倍，溫度就從 3000 K 降到約 2.7 K。' },
+    { q: '銀河系的鄰居裡，<em>哪一個大星系正朝我們靠近</em>，幾十億年後可能和銀河系合體？',
+      opts: ['大麥哲倫雲', '仙女座星系', '三角座星系'], a: 1,
+      why: '仙女座星系！它離我們約 250 萬光年，是本星系群最大的星系，正以每秒約 110 公里的速度靠近我們。' },
+    { q: '星星、行星、我們自己這些「看得見的普通物質」，大約只占宇宙的多少？',
+      opts: ['5%', '50%', '95%'], a: 0,
+      why: '只有大約 5%！剩下約 27% 是看不見的暗物質，約 68% 是讓宇宙越脹越快的暗能量。' },
+  ];
+  // 每回題目順序都打亂（給不同小朋友玩）；選項順序不動
+  const shuffled = n => { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const m = Math.floor(Math.random() * (k + 1)); [a[k], a[m]] = [a[m], a[k]]; } return a; };
+  let ui = 0, uscore = 0, uorder = shuffled(UQUIZ.length);
+  const box = $('#uquiz');
+  $('#universeCount').textContent = UQUIZ.length + ' 題';
+  function render() {
+    if (ui >= UQUIZ.length) {
+      const stars = '⭐'.repeat(uscore) + '☆'.repeat(UQUIZ.length - uscore);
+      const msg = uscore === UQUIZ.length ? '太厲害了！你是宇宙小博士！' : uscore >= Math.ceil(UQUIZ.length * 0.7) ? '很棒喔！再去宇宙那頁多看看吧！' : '沒關係，去宇宙那頁看看，再挑戰一次！';
+      const r = reportScore('universe', uscore, UQUIZ.length);
+      box.innerHTML = `<div class="quiz-end"><div class="big">🌠</div><p class="quiz-q">答對 ${uscore} / ${UQUIZ.length} 題</p><p>${stars}</p><p class="pts">得分 <b>${r.pts}</b> / ${r.max} 分</p><p>${msg}</p><p class="tot">${r.line}</p><button class="btn primary" data-act="again">再玩一次</button></div>`;
+      box.querySelector('[data-act="again"]').addEventListener('click', () => { ui = 0; uscore = 0; uorder = shuffled(UQUIZ.length); render(); });
+      return;
+    }
+    const q = UQUIZ[uorder[ui]];
+    box.innerHTML = `
+      <div class="quiz-top"><span>第 ${ui + 1} / ${UQUIZ.length} 題</span><span>⭐ ${uscore}</span></div>
+      <p class="quiz-q">${ui + 1}. ${q.q}</p>
+      <div class="quiz-opts${q.opts.some(o => o.replace(/<[^>]+>/g, '').length > 14) ? ' long' : ''}">${q.opts.map((o, i) => `<button data-i="${i}"><b class="on">${i + 1}</b>${o}</button>`).join('')}</div>
+      <div class="quiz-fb" aria-live="polite"></div>`;
+    const btns = box.querySelectorAll('.quiz-opts button');
+    btns.forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.i, ok = i === q.a;
+      if (ok) uscore++;
+      playSfx(ok);
+      btns.forEach(x => { x.disabled = true; if (+x.dataset.i === q.a) x.classList.add('right'); });
+      if (!ok) b.classList.add('wrong');
+      const fb = box.querySelector('.quiz-fb');
+      fb.innerHTML = `<span class="${ok ? 'ok' : 'no'}">${ok ? '🎉 答對了！' : '🤔 再想想～'}</span> ${q.why}
+        <div style="margin-top:10px"><button class="btn primary" data-act="next">${ui === UQUIZ.length - 1 ? '看成績' : '下一題 →'}</button></div>`;
+      autoNext(fb.querySelector('[data-act="next"]'), () => { ui++; render(); });
     }));
   }
   render();
