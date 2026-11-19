@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>小測驗：月亮與地球、八大行星</title>
+<title>⭐ 小測驗</title>
 <style>
   :root{
     --bg:#0a0f24;--panel:rgba(22,31,70,.78);--panel2:rgba(255,255,255,.05);--line:rgba(160,180,255,.18);
@@ -154,7 +154,7 @@
   </section>
   <section class="panel" id="plutoQuiz">
     <div class="qhead">
-      <h2 class="qh">🧊 冥王星 Pluto<span class="qcount" id="plutoCount">5 題</span></h2>
+      <h2 class="qh">🧊 冥王星 Pluto<span class="qcount" id="plutoCount">7 題</span></h2>
       <span class="back"><a class="quiz-link" href="05_pluto.html">← 回去看 🧊 冥王星</a></span>
     </div>
     <p class="qsub">題目都來自「🧊 冥王星」頁，答錯了可以回去再看看！</p>
@@ -171,7 +171,7 @@
 
   <section class="panel board" id="scoreBoard">
     <h2 class="qh">🏆 我的成績</h2>
-    <p class="qsub">五個測驗都是一題一分：月亮與地球滿分 12 分、八大行星滿分 14 分、聽英文找行星滿分 8 分、冥王星滿分 5 分、銀河系滿分 9 分，加起來滿分 48 分。再玩一次的話，以最新的分數為準。</p>
+    <p class="qsub">五個測驗都是一題一分：月亮與地球滿分 12 分、八大行星滿分 14 分、聽英文找行星滿分 8 分、冥王星滿分 7 分、銀河系滿分 9 分，加起來滿分 50 分。再玩一次的話，以最新的分數為準。</p>
     <div class="board-rows">
       <a href="#moonQuiz" class="board-row"><span>🌙 月亮與地球</span><b data-k="moon">還沒玩</b></a>
       <a href="#planetQuiz" class="board-row"><span>🪐 八大行星</span><b data-k="planet">還沒玩</b></a>
@@ -179,14 +179,14 @@
       <a href="#plutoQuiz" class="board-row"><span>🧊 冥王星</span><b data-k="pluto">還沒玩</b></a>
       <a href="#galaxyQuiz" class="board-row"><span>🌌 銀河系</span><b data-k="galaxy">還沒玩</b></a>
     </div>
-    <div class="board-total">總分 <b id="totalPts">0</b> / <span id="maxPts">48</span> 分</div>
+    <div class="board-total">總分 <b id="totalPts">0</b> / <span id="maxPts">50</span> 分</div>
     <p class="board-msg" id="boardMsg">五個測驗都玩玩看，把總分加起來吧！</p>
   </section>
 </div>
 <script>
 // ---------- 五個測驗的分數和總分 ----------
 // 五個測驗都是一題一分
-window.QUIZ_MAX = { moon: 12, planet: 14, listen: 8, pluto: 5, galaxy: 9 };
+window.QUIZ_MAX = { moon: 12, planet: 14, listen: 8, pluto: 7, galaxy: 9 };
 const QUIZ_MAX_SUM = Object.values(QUIZ_MAX).reduce((a, b) => a + b, 0);
 window.QUIZ_SCORES = {};
 // 答完後按鈕倒數（例如「下一題 →（4）」），時間到自動換題；直接按就馬上換
@@ -1164,7 +1164,7 @@ window.reportScore = (key, right, total) => {
 })();
 </script>
 <script>
-// ---------- 🧊 冥王星 5 題（內容都來自 05_pluto.html；和其他測驗分開計分） ----------
+// ---------- 🧊 冥王星 7 題（內容都來自 05_pluto.html；和其他測驗分開計分） ----------
 (() => {
   const $ = s => document.querySelector(s);
   const LQUIZ = [
@@ -1183,6 +1183,13 @@ window.reportScore = (key, right, total) => {
     { q: '冥王星 Pluto 的軌道有一段跑進海王星 Neptune 裡面，<em>為什麼永遠不會相撞</em>？',
       opts: ['海王星看到冥王星會轉彎躲開', '海王星繞 3 圈、冥王星剛好繞 2 圈，加上冥王星的軌道斜了 17°，兩個總是錯開', '冥王星很小，撞上也沒關係'], a: 1,
       why: '3:2 的節奏讓它們在時間上錯開，17° 的傾斜讓它們在空間上錯開，兩個最近也還隔著大約 17 AU！' },
+    // ↓ 2026-11-19 加：冥王星頁新增的「雙矮行星」和「五顆矮行星」
+    { q: '冥王星 Pluto 和凱倫 Charon 被叫做「<em>雙矮行星</em>」，是因為什麼？',
+      opts: ['凱倫是冥王星的雙胞胎，長得一模一樣', '它們像手牽手，一起繞著兩個中間太空裡的「平衡點」轉', '它們都在同一天被發現'], a: 1,
+      why: '凱倫差不多有冥王星的一半大，兩個繞著中間的平衡點轉，這個點在冥王星外面的太空中。地球和月亮的平衡點在地球肚子裡，所以看起來只有月亮在繞地球。' },
+    { q: '五顆矮行星裡，<em>哪一顆住在火星和木星中間的主小行星帶</em>？',
+      opts: ['鬩神星', '冥王星', '穀神星'], a: 2,
+      why: '穀神星！它是五顆裡最小的，也是唯一住在海王星裡面的。冥王星、妊神星、鳥神星住在古柏帶，鬩神星住在更外面的散射盤。' },
   ];
   // 每回題目順序都打亂（給不同小朋友玩）；選項順序不動
   const shuffled = n => { const a = [...Array(n).keys()]; for (let k = n - 1; k > 0; k--) { const m = Math.floor(Math.random() * (k + 1)); [a[k], a[m]] = [a[m], a[k]]; } return a; };

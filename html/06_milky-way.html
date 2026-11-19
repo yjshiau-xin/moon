@@ -70,13 +70,16 @@
   /* 銀河中心 */
   .bh-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px;align-items:start}
   .bh-box{height:360px}
+  .planes-grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:18px;align-items:start}
+  .planes-box{aspect-ratio:1.35/1}
+  .planes-grid .card + .card{margin-top:10px}
   .name-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
   .name-cards .card + .card{margin-top:0}
   .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   footer{text-align:center;color:var(--muted);font-size:14px;margin-top:22px}
 
   @media (max-width:1100px){
-    .gal-grid,.bh-grid{grid-template-columns:1fr}
+    .gal-grid,.bh-grid,.planes-grid{grid-template-columns:1fr}
     .sky-box{aspect-ratio:1.6/1}
     .gal-box{height:520px}
   }
@@ -174,6 +177,47 @@
       <div class="card">
         <h3>📅 一年四季的銀河（台灣，晚上 9 點）</h3>
         <p>☀️ <em>夏天</em>最好看：銀河中心在<em>南方</em>的人馬座，最亮最寬，銀河從南方往上經過頭頂附近，延伸到北邊。<br>🍂 <em>秋天</em>：銀河中心慢慢沉到西南方，銀河從西南方經過頭頂，到東北方。<br>⛄ <em>冬天</em>：銀河從東南方經過頭頂附近到西北方；這時候看的是銀河的外側，比較淡。<br>🌸 <em>春天</em>：銀河躺在西邊天空，越來越低，5 月幾乎貼著地平線；要等半夜以後，銀河中心才從東南方升起。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 黃道面和銀河面 -->
+  <section class="panel" id="planes">
+    <h2>🔄 黃道面和銀河面：兩個斜斜交叉的大平面</h2>
+    <div class="planes-grid">
+      <div>
+        <div class="ctrl">
+          <button class="btn primary" id="pPlay">⏸ 暫停旋轉</button>
+          <div class="seg" id="pSpeed" aria-label="旋轉速度">
+            <button data-v="4">慢</button>
+            <button data-v="14" class="active">正常</button>
+          </div>
+          <div class="view-row">
+            <span>觀看角度：側面</span>
+            <input type="range" id="pView" min="0" max="90" step="1" value="22" aria-label="觀看角度，從側面到從銀河系北邊往下看">
+            <span>從銀河系北邊往下看</span>
+          </div>
+        </div>
+        <div class="cvbox planes-box"><canvas id="planesCanvas" aria-label="黃道面和銀河面交叉的立體圖，會自動旋轉"></canvas></div>
+        <p class="cap">示意圖：藍色大盤面是銀河系（銀河面），太陽在獵戶臂上，離銀河中心大約 2 萬 6 千光年。黃色小盤面是行星繞太陽的平面（黃道面），真實的太陽系小到根本畫不出來，這裡<em>放大了大約一千萬倍</em>（畫成約 8 千光年寬；太陽系到古柏帶外緣大約 100 天文單位寬）。圖繞著銀河中心轉。</p>
+      </div>
+      <div>
+        <div class="card">
+          <h3>📐 兩個平面斜了大約 60 度</h3>
+          <p>八大行星都在<em>黃道面</em>上繞太陽；銀河系的星星大多在<em>銀河面</em>上繞銀河中心。這兩個平面不是平行的，「太陽系的北邊」和「銀河系的北邊」差了大約 <em>60 度</em>。</p>
+        </div>
+        <div class="card">
+          <h3>🔁 一個順時針、一個逆時針</h3>
+          <p>從<em>銀河系的北邊</em>看，銀河系是順時針轉；從<em>太陽系的北邊</em>看，行星繞太陽是逆時針轉。看看圖上的藍色和黃色箭頭！因為兩個北邊不是同一個方向，所以不能說它們在同一個平面上剛好反著轉。</p>
+        </div>
+        <div class="card">
+          <h3>🎯 交叉線指向銀河中心</h3>
+          <p>兩個平面的交叉線（白色虛線），一頭幾乎就指向<em>人馬座的銀河中心</em>（只差 6 度多），另一頭指向<em>金牛座和雙子座</em>交界附近。所以每年 <em>12 月 18 日</em>前後，從地球看，太陽剛好跑到銀河中心的方向；<em>6 月 18 日</em>前後跑到反方向。</p>
+        </div>
+        <div class="card">
+          <h3>🌌 所以夏天晚上看得到銀河中心</h3>
+          <p>夏天時，太陽在銀河中心的反方向，到了晚上，銀河中心就在我們頭上的天空裡，所以夏天的銀河最亮最寬。冬天時，太陽擋在銀河中心前面，白天才在天上，晚上就看不到了。</p>
+        </div>
       </div>
     </div>
   </section>
@@ -779,6 +823,121 @@
   syncSkyUI();
   window.addEventListener('resize', () => { sky.dirty = true; });
 
+  // =====================================================================
+  // 黃道面和銀河面（3D、會自動旋轉、繞著銀河中心轉）
+  // 跟上面的銀河圖用同一套座標（kpc）：銀河中心在原點、太陽在 (0, −8.2, 0) 的獵戶臂上、z 指向銀河系的北邊。
+  // 黃道北極在銀道座標 l = 96.38°、b = 29.81°；換到這套座標：銀道的「往銀河中心」＝ +y、「銀經 90°」＝ −x。
+  // 兩個北邊夾 60.19°；交叉線一頭在銀經 6.4°（從太陽看，離銀河中心只差 6 度多）。
+  // 黃道面畫成半徑 2.5 kpc（約 8 千光年），太陽系到古柏帶外緣約 50 天文單位，等於放大了大約一千萬倍。
+  // =====================================================================
+  const pl = { cv: $('#planesCanvas'), az: 20 * DEG, el: 22 * DEG, play: true, speed: 14 };
+  watch(pl.cv);
+  $('#pPlay').addEventListener('click', () => { pl.play = !pl.play; $('#pPlay').textContent = pl.play ? '⏸ 暫停旋轉' : '▶ 開始旋轉'; });
+  $('#pView').addEventListener('input', e => { pl.el = +e.target.value * DEG; });
+  pl.speed = segInit('#pSpeed', v => { pl.speed = v; });
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const norm = v => { const n = Math.hypot(...v); return v.map(c => c / n); };
+  const g2m = ([x, y, z]) => [-y, x, z];   // 銀道座標（x 往銀河中心、y 往銀經 90°）→ 銀河圖的座標
+  const NEP_G = (() => { const l = 96.38 * DEG, b = 29.81 * DEG; return [Math.cos(b) * Math.cos(l), Math.cos(b) * Math.sin(l), Math.sin(b)]; })();
+  let E1_G = norm(cross([0, 0, 1], NEP_G)); if (E1_G[0] < 0) E1_G = E1_G.map(c => -c);   // 交叉線：取指向銀河中心那一頭
+  const NEP = g2m(NEP_G), E1 = g2m(E1_G), E2 = cross(NEP, E1);                          // E1 × E2 ＝ 黃道北極
+  const SUNP = [0, -SUN_R, 0], ECL_R = 2.5;
+  const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
+  const onEcl = (r, t) => add(add(SUNP, E1, r * Math.cos(t)), E2, r * Math.sin(t));
+  const onGal = (r, t) => [r * Math.cos(t), r * Math.sin(t), 0];
+  function drawPlanes(dt) {
+    if (pl.play) pl.az += dt * pl.speed * DEG;
+    const { ctx, W, H } = fit(pl.cv);
+    const cx = W / 2, cy = H / 2 + H * 0.06, s = Math.min(W * 0.46, H * 0.62) / 16;
+    const ca = Math.cos(pl.az), sa = Math.sin(pl.az), se = Math.sin(pl.el), ce = Math.cos(pl.el);
+    const P = ([x, y, z]) => { const X = x * ca - y * sa, Y = x * sa + y * ca; return [cx + s * X, cy - s * (Y * se + z * ce)]; };
+    const poly = (pts, fill, stroke, lw = 1, dash) => {
+      ctx.beginPath(); pts.forEach((q, k) => { const [x, y] = P(q); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+      if (fill) { ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.setLineDash(dash || []); ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); ctx.setLineDash([]); }
+    };
+    ctx.fillStyle = '#03050d'; ctx.fillRect(0, 0, W, H);
+    // 黃道面切成小扇形：在銀河面下面的那一半先畫（從上面看會被銀河面擋住），上面那一半最後畫
+    const N = 72, below = [], above = [];
+    for (let k = 0; k < N; k++) {
+      const t0 = k / N * TAU, t1 = (k + 1) / N * TAU, tri = [SUNP, onEcl(ECL_R, t0), onEcl(ECL_R, t1)];
+      ((tri[1][2] + tri[2][2]) / 2 < 0 ? below : above).push(tri);
+    }
+    for (const t of below) poly(t, 'rgba(255,209,102,0.16)');
+    // 銀河面：大盤面、核球的光、旋臂
+    const disk = []; for (let k = 0; k <= 120; k++) disk.push(onGal(16, k / 120 * TAU));
+    poly(disk, 'rgba(70,100,200,0.20)', 'rgba(150,180,255,0.6)', 1.4);
+    const [gx, gy] = P([0, 0, 0]);
+    const gr = ctx.createRadialGradient(gx, gy, 0, gx, gy, s * 4.5);
+    gr.addColorStop(0, 'rgba(255,225,170,0.75)'); gr.addColorStop(0.4, 'rgba(255,200,130,0.25)'); gr.addColorStop(1, 'rgba(255,200,130,0)');
+    ctx.save(); ctx.translate(gx, gy); ctx.scale(1, Math.max(0.12, se)); ctx.translate(-gx, -gy); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(gx, gy, s * 4.5, 0, TAU); ctx.fill(); ctx.restore();
+    for (const arm of ARMS) {
+      const pts = []; for (let r = 2.8; r <= 15.5; r *= 1.03) { const th = SUN_TH + Math.log(r / arm.R) / PITCH; pts.push(onGal(r, th)); }
+      poly(pts, null, 'rgba(170,195,255,0.18)', 7); poly(pts, null, 'rgba(200,215,255,0.55)', 1.6);
+    }
+    const spur = []; for (let k = 0; k <= 20; k++) { const th = SUN_TH - 0.3 + 0.6 * k / 20; spur.push(onGal(8.25 * Math.exp(Math.tan(14 * DEG) * (th - SUN_TH)), th)); }
+    poly(spur, null, 'rgba(255,209,102,0.25)', 7); poly(spur, null, 'rgba(255,220,150,0.8)', 1.8);
+    // 銀河系的轉動方向（從銀河系北邊看順時針）：外圈的箭頭
+    const arrowArc = (f, r, t0, t1, color, w = 3, head = 11) => {
+      const pts = []; for (let k = 0; k <= 30; k++) pts.push(f(r, t0 + (t1 - t0) * k / 30));
+      poly(pts, null, color, w);
+      const [x1, y1] = P(f(r, t1)), [x0, y0] = P(f(r, t1 - (t1 - t0) * 0.06)), a = Math.atan2(y1 - y0, x1 - x0);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x1 - head * Math.cos(a - 0.45), y1 - head * Math.sin(a - 0.45)); ctx.lineTo(x1 - head * Math.cos(a + 0.45), y1 - head * Math.sin(a + 0.45)); ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+    };
+    arrowArc(onGal, 14.2, 150 * DEG, 100 * DEG, '#8fb0ff');
+    // 從太陽往銀河中心的細線
+    poly([SUNP, [0, -0.6, 0]], null, 'rgba(255,255,255,0.35)', 1, [2, 4]);
+    // 黃道面在銀河面上面的那一半、圈圈、行星的轉動方向（從太陽系北邊看逆時針）
+    for (const t of above) poly(t, 'rgba(255,209,102,0.30)');
+    const eRing = []; for (let k = 0; k <= 72; k++) eRing.push(onEcl(ECL_R, k / 72 * TAU));
+    poly(eRing, null, 'rgba(255,209,102,0.9)', 1.6);
+    arrowArc(onEcl, ECL_R * 0.72, 120 * DEG, 200 * DEG, '#ffd166', 2.6, 9);
+    // 交叉線（白色虛線，穿過太陽）
+    const na = add(SUNP, E1, ECL_R * 1.5), nb = add(SUNP, E1, -ECL_R * 1.5);
+    poly([nb, na], null, 'rgba(255,255,255,0.9)', 1.6, [6, 5]);
+    // 兩個北邊（從太陽出發）和夾角
+    const arrow = (v, len, color) => {
+      const [x0, y0] = P(SUNP), [x1, y1] = P(add(SUNP, v, len)), a = Math.atan2(y1 - y0, x1 - x0);
+      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.strokeStyle = color; ctx.lineWidth = 2.4; ctx.stroke();
+      if (Math.hypot(x1 - x0, y1 - y0) > 8) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x1 - 11 * Math.cos(a - 0.4), y1 - 11 * Math.sin(a - 0.4)); ctx.lineTo(x1 - 11 * Math.cos(a + 0.4), y1 - 11 * Math.sin(a + 0.4)); ctx.closePath(); ctx.fillStyle = color; ctx.fill(); }
+      return [x1, y1];
+    };
+    const ng = arrow([0, 0, 1], 5, '#8fb0ff'), ne = arrow(NEP, 5, '#ffd166');
+    const arcPts = []; for (let k = 0; k <= 30; k++) { const f = k / 30; arcPts.push(add(SUNP, norm([NEP[0] * f, NEP[1] * f, 1 - f + NEP[2] * f]), 1.8)); }
+    poly(arcPts, null, '#ffffff', 1.4);
+    const mid = P(add(SUNP, norm([NEP[0], NEP[1], 1 + NEP[2]]), 2.6));
+    // 太陽
+    const [sx, sy] = P(SUNP);
+    ctx.beginPath(); ctx.arc(sx, sy, 5, 0, TAU); ctx.fillStyle = '#ffd166'; ctx.fill();
+    ctx.beginPath(); ctx.arc(gx, gy, 3, 0, TAU); ctx.fillStyle = '#ffffff'; ctx.fill();
+
+    // ---------- 名字：依重要性一個一個放，後放的要避開先放的；擠不下的次要名字就不畫 ----------
+    const boxes = [[sx - 7, sy - 7, sx + 7, sy + 7], [gx - 5, gy - 5, gx + 5, gy + 5]];
+    const free = b => b[0] > 2 && b[2] < W - 2 && b[1] > 2 && b[3] < H - 2 && !boxes.some(o => b[0] < o[2] && o[0] < b[2] && b[1] < o[3] && o[1] < b[3]);
+    const place = (t, sz, color, cands, must) => {
+      ctx.font = `700 ${sz}px "PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif`;
+      const w = ctx.measureText(t).width, box = ([x, y]) => [x - w / 2 - 2, y - sz / 2 - 1, x + w / 2 + 2, y + sz / 2 + 1];
+      let c = cands.find(q => free(box(q)));
+      if (!c && must) c = cands.find(q => { const b = box(q); return b[0] > 2 && b[2] < W - 2 && b[1] > 2 && b[3] < H - 2; }) || cands[0];
+      if (!c) return;
+      boxes.push(box(c)); label(ctx, t, c[0], c[1], color, sz);
+    };
+    const ring8 = (x, y, d) => [[x, y - d], [x, y + d], [x + d * 2.2, y], [x - d * 2.2, y], [x + d * 1.6, y - d], [x - d * 1.6, y - d], [x + d * 1.6, y + d], [x - d * 1.6, y + d]];
+    const around = (x, y, d) => [...ring8(x, y, d), ...ring8(x, y, d * 2), ...ring8(x, y, d * 3)];   // 一圈一圈往外找
+    const small = W < 560;
+    const toYou = q => Math.hypot(q[0] - sx, q[1] - sy) < 24 ? '（朝著你）' : '';
+    place('☀️ 太陽系', 12, '#ffd166', around(sx, sy, 16), true);   // 放大倍數寫在圖下的說明，圖上保持簡潔
+    place('銀河中心', 13, '#ffffff', around(gx, gy, 14), true);
+    place((small ? '銀河北' : '銀河系的北邊') + toYou(ng), 13, '#a9c2ff', around(ng[0], ng[1], 14), true);
+    place((small ? '太陽系北' : '太陽系的北邊') + toYou(ne), 13, '#ffd166', around(ne[0], ne[1], 14), true);
+    const along = (sign) => [1.5, 1.3, 1.1].flatMap(k => { const [x, y] = P(add(SUNP, E1, sign * ECL_R * k)); return [[x, y - 12], [x, y + 12]]; });
+    place(small ? '→ 人馬座' : '→ 人馬座（銀河中心）', 12, '#ffffff', along(1), false);
+    place('約 60°', 12, '#ffffff', [[mid[0], mid[1]], ...around(mid[0], mid[1], 11)], false);
+    const rim = (f, r) => [250, 300, 200, 340, 160, 20, 120, 60].map(d => { const [x, y] = P(f(r, d * DEG)); return [x, y + 12]; });
+    place('銀河面（銀河系的盤面）', 13, '#a9c2ff', rim(onGal, 16), false);
+    place('黃道面', 12, '#ffd166', rim(onEcl, ECL_R), false);
+  }
+
   // ---------- 動畫迴圈 ----------
   let last = performance.now();
   function frame(now) {
@@ -788,12 +947,13 @@
     stepSky(dt);
     if (isVis(sky.cv) && sky.dirty) drawSky();
     if (isVis(bh.cv)) drawBH(dt);
+    if (isVis(pl.cv)) drawPlanes(dt);
     $('#gRead').textContent = `經過 ${gal.t ? fmtYears(gal.t) : '0 年'}｜太陽繞了 ${(gal.t / GAL_YEAR).toFixed(2)} 圈`;
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
   // 給測試用
-  window.__mw = { gal, drawGalaxy, sky, drawSky, syncSkyUI };
+  window.__mw = { gal, drawGalaxy, sky, drawSky, syncSkyUI, pl, drawPlanes };
 })();
 </script>
 </body>

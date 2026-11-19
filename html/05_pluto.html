@@ -66,6 +66,7 @@
   .controls{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;font-size:15px;color:var(--muted)}
   .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13.5px;color:var(--muted);margin:8px 0 10px}
   .sw{display:inline-block;width:18px;vertical-align:middle;margin-right:6px}
+  .legend .btn{padding:3px 12px;font-size:14px}
   table{width:100%;max-width:460px;border-collapse:collapse;font-size:16px;margin:8px 0 14px}
   th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
   th{color:var(--muted);font-weight:500}
@@ -73,6 +74,15 @@
   .note{border-left:3px solid var(--sun);padding:4px 0 4px 14px;color:var(--muted);margin:14px 0 4px}
   .cap{color:var(--muted);font-size:13.5px;margin:6px 2px 0}
   footer{text-align:center;color:var(--muted);font-size:13.5px;margin-top:22px}
+  .tblwrap{overflow-x:auto;margin:10px 0 0}
+  table.dwt{max-width:none;min-width:860px;font-size:15px}
+  table.dwt td{vertical-align:middle}
+  table.dwt td:first-child{white-space:nowrap;font-weight:700}
+  table.dwt small{color:var(--muted);font-weight:400}
+  table.dwt tr.ref td{color:var(--muted);border-bottom-style:dashed}
+  table.dwt .ball{display:block;margin:auto;border-radius:50%;box-shadow:inset -5px -4px 9px rgba(0,0,0,.45)}
+  table.cmp{max-width:none;font-size:15px}
+  table.cmp td:first-child{color:var(--muted);white-space:nowrap}
   @media (max-width:1000px){ .two{grid-template-columns:1fr} }
   @media (max-width:640px){ h1{font-size:28px} }
 </style>
@@ -100,10 +110,60 @@
       <div class="card"><h3>🔭 1930 年才被發現</h3><p>美國天文學家<em>湯博</em>比對同一片星空、不同晚上拍的照片，發現有一個小光點在移動，就是冥王星。</p></div>
       <div class="card"><h3>👧 名字是 11 歲女孩取的</h3><p>英國女孩<em>維妮夏</em>想到用羅馬神話裡的冥王「Pluto」來命名：冥王住在又黑又冷的地底，就像這顆離太陽很遠的星球。</p></div>
       <div class="card"><h3>🌕 比月亮還小</h3><p>冥王星的直徑大約 <em>2377 公里</em>，比我們的月亮（約 3474 公里）還小，大概只有月亮的三分之二。</p></div>
-      <div class="card"><h3>🌑 有 5 顆衛星</h3><p>最大的衛星叫<em>凱倫</em>（Charon），差不多有冥王星的一半大，兩個常常被說成一對「雙星」。</p></div>
+      <div class="card"><h3>🌑 有 5 顆衛星</h3><p>最大的衛星叫<em>凱倫</em>（Charon），差不多有冥王星的一半大，兩個常常被說成一對「雙矮行星」（看下面「<a href="#binary" style="color:var(--sun)">雙矮行星</a>」的動畫）。</p></div>
       <div class="card"><h3>💗 冰做的「愛心」</h3><p>2015 年，<em>新視野號</em>飛過冥王星，拍到一大片像愛心的冰原，後來以發現者的名字叫做「湯博區」。</p></div>
       <div class="card"><h3>⏳ 繞太陽一圈要 248 年</h3><p>從 1930 年被發現到現在，冥王星<em>還沒繞完一圈</em>，要到 2178 年才第一次繞完。那裡非常冷，大約零下 230°C。它住在海王星外面的<em>古柏帶</em>（可以去「🪐 八大行星」頁看古柏帶的動畫）。</p></div>
     </div>
+  </section>
+
+  <!-- 其他矮行星 -->
+  <section class="panel" id="dwarfs">
+    <h2>🧊 冥王星不孤單：太陽系的五顆矮行星</h2>
+    <p>符合行星的第 1、2 個條件（繞太陽、夠大夠圓），但沒有「清空軌道」的天體，就叫<strong>矮行星</strong>（下面的「一、行星的定義」會說明）。國際天文學聯合會（IAU）目前正式承認 <strong>5 顆</strong>：</p>
+    <div class="tblwrap">
+      <table class="dwt">
+        <thead><tr><th>矮行星</th><th>大小比一比</th><th class="num">直徑</th><th>住在哪裡</th><th class="num">平均離太陽</th><th class="num">繞太陽一圈</th><th class="num">軌道傾斜</th><th class="num">發現</th><th>特色</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot" style="background:#ff9a6b"></span>冥王星<br><small>Pluto</small></td><td><i class="ball" style="width:59px;height:59px;background:#e8c9a8"></i></td><td class="num">2377 公里</td><td>古柏帶</td><td class="num">39 AU</td><td class="num">248 年</td><td class="num">17°</td><td class="num">1930</td><td>五顆裡最大；和凱倫是雙矮行星，有 5 顆衛星</td></tr>
+          <tr><td><span class="dot" style="background:#c9a6ff"></span>鬩神星<br><small>Eris</small></td><td><i class="ball" style="width:58px;height:58px;background:#eef0f5"></i></td><td class="num">2326 公里</td><td>散射盤（古柏帶更外面）</td><td class="num">68 AU<br><small>現在約 96</small></td><td class="num">約 560 年</td><td class="num">44°</td><td class="num">2005</td><td>比冥王星小一點點，卻<em>比冥王星重</em>；它引起「冥王星還算不算行星」的爭論，名字取自希臘神話「爭吵」的女神</td></tr>
+          <tr><td><span class="dot" style="background:#6fdcc4"></span>妊神星<br><small>Haumea</small></td><td><i class="ball" style="width:58px;height:26px;background:#dfe6ef"></i></td><td class="num">約 2300×1000 公里</td><td>古柏帶</td><td class="num">43 AU</td><td class="num">約 284 年</td><td class="num">28°</td><td class="num">2004～2005</td><td>約 <em>4 小時</em>自轉一圈，被甩成橄欖球形；有環和 2 顆衛星</td></tr>
+          <tr><td><span class="dot" style="background:#ff6f91"></span>鳥神星<br><small>Makemake</small></td><td><i class="ball" style="width:36px;height:36px;background:#d9a07a"></i></td><td class="num">1430 公里</td><td>古柏帶</td><td class="num">45 AU</td><td class="num">約 305 年</td><td class="num">29°</td><td class="num">2005</td><td>復活節後不久發現，名字取自復活節島神話的創造之神；紅棕色的冰</td></tr>
+          <tr><td><span class="dot" style="background:#b5b0a8"></span>穀神星<br><small>Ceres</small></td><td><i class="ball" style="width:24px;height:24px;background:#8d8a86"></i></td><td class="num">940 公里</td><td>主小行星帶（火星和木星之間）</td><td class="num">2.8 AU</td><td class="num">4.6 年</td><td class="num">11°</td><td class="num">1801</td><td>五顆裡最小，唯一住在海王星裡面；黎明號拍到亮亮的鹽巴斑點</td></tr>
+          <tr class="ref"><td>參考：月亮<br><small>Moon</small></td><td><i class="ball" style="width:87px;height:87px;background:#c9c9c9"></i></td><td class="num">3474 公里</td><td>繞著地球</td><td class="num">1 AU</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td>五顆矮行星都比月亮小</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">「大小比一比」的圓圈照真實比例畫。表格太寬時可以左右滑動。</p>
+
+    <h3>🧭 五顆矮行星在黃道面的哪裡？</h3>
+    <div class="two">
+      <div class="fig">
+        <svg id="dw3-svg" viewBox="0 0 680 560" role="img" aria-label="五顆矮行星的軌道和黃道面的立體圖">
+          <defs><clipPath id="dw3-clip"><rect width="680" height="560"/></clipPath></defs>
+          <g id="dw3-g" clip-path="url(#dw3-clip)"></g>
+        </svg>
+        <div class="legend" id="dw3-legend"></div>
+        <div class="controls">
+          <span>視角仰角</span><input type="range" id="dw3-el" min="0" max="90" step="1" value="15"><span id="dw3-elV" style="min-width:40px;text-align:right">15°</span>
+          <span>水平旋轉</span><input type="range" id="dw3-az" min="0" max="360" step="1" value="250"><span id="dw3-azV" style="min-width:40px;text-align:right">250°</span>
+        </div>
+        <div class="row">
+          <button class="btn primary" id="dw3-all">看全部（到 100 AU）</button>
+          <button class="btn" id="dw3-zoom">放大看穀神星</button>
+        </div>
+      </div>
+      <div>
+        <ul>
+          <li><strong>黃道面</strong>就是地球繞太陽的那個平面。八大行星的軌道都幾乎貼著它（最斜的水星也只有 7°）。</li>
+          <li>矮行星的軌道<strong>斜很多</strong>：穀神星 11°、冥王星 17°、妊神星 28°、鳥神星 29°，鬩神星最斜，有 <strong>44°</strong>。實線是在黃道面上方的部分，虛線是在下方的部分；直的細線把每顆星「投影」到黃道面上。</li>
+          <li>它們的軌道也比較<strong>扁</strong>：鬩神星最近離太陽約 38 AU，最遠約 98 AU，現在剛好在最遠的地方附近。</li>
+          <li><strong>住在哪個帶</strong>：冥王星、妊神星、鳥神星住在海王星外面的<strong>古柏帶</strong>（約 30～50 AU，淺藍色的圈）；鬩神星住在更外面的<strong>散射盤</strong>（淡紫色），軌道又斜又扁，會跑進古柏帶再跑出去；穀神星住在火星和木星之間的<strong>主小行星帶</strong>（約 2.2～3.3 AU），在全圖裡小到看不見，按「放大看穀神星」才看得到。</li>
+          <li>圖上的帶子畫成平平的，其實古柏帶和散射盤是「厚厚的甜甜圈」，裡面很多天體都像這些矮行星一樣斜斜地繞。</li>
+        </ul>
+        <p class="note">圓點是大約 2026 年的位置。軌道用的是近似值，圓點大小不是比例。</p>
+      </div>
+    </div>
+    <p class="note">除了這 5 顆，古柏帶和更遠的地方還有很多「候選者」，例如創神星、共工星、賽德娜。天文學家估計，可能有上百顆天體夠大夠圓，只是還沒有被正式承認。</p>
   </section>
 
   <!-- 一、行星的定義 -->
@@ -149,6 +209,7 @@
   <section class="panel" id="resonance">
     <h2>二、冥王星和海王星的軌道交叉</h2>
     <p>冥王星的近日點約 29.7 AU，比海王星的軌道（約 30.1 AU）更靠近太陽。1979 到 1999 年間，冥王星確實比海王星更接近太陽。但兩者永遠不會相撞，主要原因有兩個：<strong>3:2 軌道共振</strong>，以及<strong>軌道傾角</strong>。（1 AU＝地球到太陽的距離，大約 1.5 億公里。）</p>
+    <p class="note"><strong>「共振」是什麼意思？</strong>想像操場上有兩個人在跑步：跑內圈的海王星跑 3 圈的時間，跑外圈的冥王星剛好跑 2 圈，然後兩人又回到一模一樣的相對位置，一直重複下去。每次經過時，海王星的引力都會輕輕拉冥王星一下，把這個 3:2 的節奏「固定」住，冥王星想跑快或跑慢都會被拉回來。這種「被引力鎖住的固定節奏」就叫做<strong>軌道共振</strong>。</p>
     <div class="two">
       <div>
         <h3 style="margin-top:0">圖一：3:2 軌道共振（俯視）</h3>
@@ -199,7 +260,7 @@
   <!-- 圖二：立體 -->
   <section class="panel" id="tilt">
     <h2>圖二：立體空間中的兩條軌道</h2>
-    <p>按「從平面轉到北極俯視」，視角會從貼著黃道面的側視，慢慢升到太陽系北極正上方往下看。也可以自己拖動滑桿調整角度。</p>
+    <p>拖動「視角仰角」滑桿，可以從貼著黃道面的側視（0°），慢慢升到太陽系北極正上方往下看（90°）；「水平旋轉」可以繞著太陽轉一圈看。</p>
     <div class="two">
       <div class="fig">
         <svg id="t-svg" viewBox="0 0 680 470" role="img" aria-label="海王星與冥王星軌道立體視角，可從側視轉到俯視">
@@ -218,7 +279,11 @@
           <text id="t-periT">近日點，在黃道面上方約 8 AU</text>
           <circle id="t-nep" r="7" fill="var(--nep)"/>
           <line id="t-pluDrop" stroke="var(--plu)" stroke-width=".8" opacity=".6"/>
+          <path id="t-ring" fill="none" stroke="#d8d4cc" stroke-width=".9" stroke-dasharray="2 3" opacity=".8"/>
           <circle id="t-plu" r="5" fill="var(--plu)"/>
+          <circle id="t-cha" r="3.2" fill="#b9b4ad"/>
+          <text id="t-nepT" style="fill:var(--nep)">海王星</text>
+          <text id="t-pluT" style="fill:var(--plu)">冥王星＋凱倫</text>
           <text id="t-view" x="340" y="455" text-anchor="middle"></text>
         </svg>
         <div class="legend">
@@ -226,14 +291,12 @@
           <span><span class="sw" style="border-top:2px solid var(--plu)"></span>冥王星軌道：黃道面上方</span>
           <span><span class="sw" style="border-top:2px dashed var(--plu);opacity:.6"></span>黃道面下方</span>
           <span><span class="sw" style="height:10px;background:var(--faint);opacity:.3"></span>黃道面</span>
+          <span><span class="sw" style="border-top:2px dotted #d8d4cc"></span>凱倫的軌道（放大約 4 萬倍，側躺著轉）</span>
+          <button class="btn" id="t-play">暫停公轉</button>
         </div>
         <div class="controls">
           <span>視角仰角</span><input type="range" id="t-el" min="0" max="90" step="1" value="12"><span id="t-elV" style="min-width:40px;text-align:right">12°</span>
           <span>水平旋轉</span><input type="range" id="t-az" min="0" max="360" step="1" value="250"><span id="t-azV" style="min-width:40px;text-align:right">250°</span>
-        </div>
-        <div class="row">
-          <button class="btn primary" id="t-sweep">從平面轉到北極俯視</button>
-          <button class="btn" id="t-play">暫停公轉</button>
         </div>
       </div>
       <div>
@@ -243,8 +306,63 @@
           <li>冥王星跑進海王星軌道內側的那一段在近日點附近，那時它在黃道面<strong>上方約 8 AU</strong>。</li>
         </ol>
         <p>也就是說，冥王星在海王星的平面上時，位置在海王星軌道外面；它跑進海王星軌道裡面時，又不在那個平面上。兩條軌道在空間中沒有交點，只有從正上方俯視時看起來像交叉。</p>
+        <p class="note">冥王星旁邊的虛線圈是凱倫的軌道。兩者只相距約 2 萬公里，和到太陽的距離（約 60 億公里）比起來太小，所以放大約 4 萬倍才看得到；互轉的速度也放慢了非常多。注意看：冥王星繞太陽時，這個圈圈的方向一直不變。</p>
       </div>
     </div>
+  </section>
+
+  <!-- 冥王星和凱倫：雙矮行星 -->
+  <section class="panel" id="binary">
+    <h2>🌑🌑 冥王星和凱倫：一對手牽手的「雙矮行星」</h2>
+    <div class="two">
+      <div class="fig">
+        <svg id="pc-svg" viewBox="0 0 500 486" role="img" aria-label="冥王星和凱倫繞著共同的平衡點轉的動畫">
+          <circle id="pc-orbC" cx="250" cy="229" fill="none" stroke="var(--faint)" stroke-width=".8" stroke-dasharray="3 4" opacity=".7"/>
+          <circle id="pc-orbP" cx="250" cy="229" fill="none" stroke="var(--plu)" stroke-width=".8" stroke-dasharray="2 3" opacity=".8"/>
+          <line id="pc-link" stroke="var(--faint)" stroke-width=".7" stroke-dasharray="3 3"/>
+          <circle id="pc-plu" r="13.7" fill="#e8c9a8"/>
+          <circle id="pc-pluEye" r="2.6" fill="#5b4636"/>
+          <circle id="pc-cha" r="7" fill="#b9b4ad"/>
+          <circle id="pc-chaEye" r="1.8" fill="#4a4743"/>
+          <g stroke="var(--sun)" stroke-width="2"><line x1="244" y1="229" x2="256" y2="229"/><line x1="250" y1="223" x2="250" y2="235"/></g>
+          <text id="pc-pluT" text-anchor="middle">冥王星</text>
+          <text id="pc-chaT" text-anchor="middle">凱倫</text>
+          <text x="250" y="478" text-anchor="middle">✚ 平衡點（在冥王星外面）　大小和距離照真實比例</text>
+        </svg>
+        <div class="row">
+          <button class="btn primary" id="pc-play">暫停</button>
+          <span>已經過</span><span id="pc-day" style="min-width:70px">0.0 天</span>
+          <span>（每秒約 1 天，6.4 天轉一圈）</span>
+        </div>
+      </div>
+      <div>
+        <p>一般的衛星繞著行星轉。但凱倫（直徑約 1212 公里）差不多有冥王星（2377 公里）的一半大，重量大約是冥王星的 <strong>八分之一</strong>，大到冥王星也被它拉著跑。和地球、月亮比一比：</p>
+        <table class="cmp">
+          <thead><tr><th></th><th>地球和月亮</th><th>冥王星和凱倫</th></tr></thead>
+          <tbody>
+            <tr><td>重量比</td><td>月亮約地球的 <strong>1/81</strong></td><td>凱倫約冥王星的 <strong>1/8</strong></td></tr>
+            <tr><td>大小比（直徑）</td><td>月亮約地球的 1/4</td><td>凱倫約冥王星的 1/2</td></tr>
+            <tr><td>平衡點在哪裡</td><td>地球<strong>裡面</strong>（離地心約 4700 公里）</td><td>冥王星<strong>外面</strong>（離中心約 2100 公里，冥王星半徑才約 1200 公里）</td></tr>
+          </tbody>
+        </table>
+        <p>月亮比地球輕 81 倍，凱倫只比冥王星輕 8 倍：凱倫「相對來說」比月亮重了大約 10 倍。</p>
+        <ul>
+          <li><strong>兩個一起繞圈</strong>：它們繞著中間的一個「平衡點」轉，就像兩個小朋友手牽手轉圈圈，重的那個轉小圈、輕的那個轉大圈。</li>
+          <li><strong>平衡點在冥王星外面</strong>：地球和月亮的平衡點在地球「肚子裡」（離地心約 4700 公里，地球半徑約 6400 公里），所以看起來只有月亮在繞地球；冥王星和凱倫的平衡點卻在兩者之間的太空中。這就是它們被叫做「雙矮行星」的原因。</li>
+          <li><strong>永遠面對面</strong>：兩個都是 <strong>6.4 天</strong>自轉一圈，也是 6.4 天互繞一圈，所以永遠用同一面看著對方（圖中的小黑點）。站在冥王星的一邊，凱倫會一直掛在天上同一個地方不動；站在另一邊，就永遠看不到凱倫。</li>
+          <li>另外 4 顆小衛星（尼克斯、許德拉、科伯若斯、斯堤克斯）都只有幾十公里大，它們繞的也是這個平衡點，不是冥王星本身。</li>
+        </ul>
+        <p class="note">「雙矮行星」是很多天文學家的說法，國際天文學聯合會（IAU）還沒有正式定義，所以凱倫正式的身分仍然是冥王星的衛星。</p>
+      </div>
+    </div>
+
+    <h3>🌀 它們怎麼一起繞太陽？</h3>
+    <ul>
+      <li><strong>一起繞太陽</strong>：冥王星和凱倫手牽手，沿著冥王星那條斜斜的軌道繞太陽，248 年一圈。它們的平衡點才是真正走在這條軌道上的點。</li>
+      <li><strong>互轉很多很多圈</strong>：繞太陽一圈的時間裡，它們互轉大約 <strong>1 萬 4 千圈</strong>。</li>
+      <li><strong>側躺著轉</strong>：凱倫繞的圈圈和冥王星繞太陽的軌道面差了大約 <strong>120°</strong>，幾乎是「躺著」轉，有點像天王星。而且繞太陽的時候，這個圈圈的方向一直不變。因為躺著轉，冥王星的季節很極端：有些地方會連續好幾十年都是白天，或都是黑夜。</li>
+    </ul>
+    <p>上面的「<a href="#tilt" style="color:var(--sun)">圖二：立體空間中的兩條軌道</a>」裡，冥王星旁邊的虛線圈就是凱倫的軌道，可以看到它們一起繞太陽、海王星也在旁邊繞。</p>
   </section>
 
   <!-- 三、結論 -->
@@ -262,6 +380,137 @@
 </div>
 
 <script>
+// ---------- 冥王星和凱倫：繞平衡點互轉 ----------
+(function(){
+  // 真實比例：兩者距離約 19600 km，平衡點離冥王星中心約 2130 km；1 km = 0.0115 px
+  const K=0.0115,cx=250,cy=229,rP=2130*K,rC=(19600-2130)*K,PER=6.39;
+  let day=0,run=true,last=null;
+  const $=id=>document.getElementById(id);
+  $('pc-orbP').setAttribute('r',rP);$('pc-orbC').setAttribute('r',rC);
+  function at(id,x,y){$(id).setAttribute('cx',x);$(id).setAttribute('cy',y);}
+  function draw(){
+    const a=2*Math.PI*day/PER,c=Math.cos(a),s=Math.sin(a);
+    const PX=cx-rP*c,PY=cy+rP*s,CX=cx+rC*c,CY=cy-rC*s;
+    at('pc-plu',PX,PY);at('pc-cha',CX,CY);
+    at('pc-pluEye',PX+10*c,PY-10*s);at('pc-chaEye',CX-4.6*c,CY+4.6*s);   // 永遠面向對方的那一點
+    const l=$('pc-link');l.setAttribute('x1',PX);l.setAttribute('y1',PY);l.setAttribute('x2',CX);l.setAttribute('y2',CY);
+    // 名字放在星球外側（離平衡點的方向），依方向選對齊，不會壓到圓圈
+    function put(id,X,Y,dx,dy,r){const t=$(id),d=r+6;
+      t.setAttribute('x',X+dx*d);t.setAttribute('y',Y+dy*d+(dy<-0.35?-2:dy>0.35?12:5));
+      t.setAttribute('text-anchor',dx>0.35?'start':dx<-0.35?'end':'middle');}
+    put('pc-pluT',PX,PY,-c,s,13.7);put('pc-chaT',CX,CY,c,-s,7);
+    $('pc-day').textContent=day.toFixed(1)+' 天';
+  }
+  function loop(ts){
+    if(last!==null&&run)day+=(ts-last)/1000;
+    last=ts;draw();requestAnimationFrame(loop);
+  }
+  $('pc-play').onclick=function(){run=!run;this.textContent=run?'暫停':'播放';};
+  draw();requestAnimationFrame(loop);
+  window.__pc={step:d=>{day+=d;draw();},rP,rC};   // 給測試用
+})();
+
+// ---------- 立體圖共用：軌道位置、投影 ----------
+const ORB=(function(){
+  const D=Math.PI/180;
+  function kep(M,e){let E=M;for(let i=0;i<12;i++)E-=(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));return E;}
+  // o: a(AU) e i O w（度）；回傳黃道座標 [x,y,z]
+  function pos(o,nu){
+    const r=o.a*(1-o.e*o.e)/(1+o.e*Math.cos(nu)),u=o.w*D+nu,O=o.O*D,inc=o.i*D;
+    return[r*(Math.cos(O)*Math.cos(u)-Math.sin(O)*Math.sin(u)*Math.cos(inc)),
+           r*(Math.sin(O)*Math.cos(u)+Math.cos(O)*Math.sin(u)*Math.cos(inc)),
+           r*Math.sin(u)*Math.sin(inc)];
+  }
+  function nuOf(M,e){const E=kep(M,e);return 2*Math.atan2(Math.sqrt(1+e)*Math.sin(E/2),Math.sqrt(1-e)*Math.cos(E/2));}
+  function proj(v,p){const X1=p[0]*Math.cos(v.az)-p[1]*Math.sin(v.az),Y1=p[0]*Math.sin(v.az)+p[1]*Math.cos(v.az);
+    return[v.cx+X1*v.S,v.cy-(Y1*Math.sin(v.el)+p[2]*Math.cos(v.el))*v.S];}
+  function f(q){return q[0].toFixed(1)+' '+q[1].toFixed(1);}
+  // 一條軌道：分成黃道面上方（實線）和下方（虛線）
+  function orbitPaths(v,o){let ab='',be='',pa=0,pb=0;
+    for(let k=0;k<=360;k++){const p=pos(o,k*D),q=proj(v,p);
+      if(p[2]>=0){ab+=(pa?'L':'M')+f(q);pa=1;pb=0;}else{be+=(pb?'L':'M')+f(q);pb=1;pa=0;}}
+    return{ab,be};}
+  function ring(v,R){let s='';for(let k=0;k<=72;k++){const a=k*5*D;s+=(k?'L':'M')+f(proj(v,[R*Math.cos(a),R*Math.sin(a),0]));}return s;}
+  function plane(v,R){let s='';for(let k=0;k<72;k++){const a=k*5*D;s+=f(proj(v,[R*Math.cos(a),R*Math.sin(a),0]))+' ';}return s;}
+  return{D,pos,nuOf,proj,f,orbitPaths,ring,plane};
+})();
+
+// ---------- 五顆矮行星在黃道面的哪裡 ----------
+(function(){
+  const {D,pos,nuOf,proj,f,orbitPaths,ring,plane}=ORB,$=id=>document.getElementById(id);
+  // 軌道根數（近似）；M＝約 2026 年的平近點角（圈）
+  const B=[
+    {n:'穀神星',c:'#b5b0a8',a:2.77,e:0.076,i:10.6,O:80.3,w:73.6,M:0.863,inner:1},
+    {n:'冥王星',c:'#ff9a6b',a:39.48,e:0.249,i:17.2,O:110.3,w:113.8,M:0.150},
+    {n:'妊神星',c:'#6fdcc4',a:43.1,e:0.195,i:28.2,O:122.2,w:239,M:0.626},
+    {n:'鳥神星',c:'#ff6f91',a:45.4,e:0.161,i:29.0,O:79.6,w:297,M:0.477},
+    {n:'鬩神星',c:'#c9a6ff',a:67.9,e:0.437,i:44.0,O:35.9,w:151.6,M:0.588}];
+  // belts：[內半徑, 外半徑, 名字, 顏色, 透明度, 名字放在幾 AU]
+  const MODES={all:{S:2.6,R:100,refs:[[30.07,'海王星','var(--nep)']],
+                    belts:[[30,50,'古柏帶','#8fd3ff',.18,40],[50,100,'散射盤','#c9a6ff',.08,78]]},
+               zoom:{S:48,R:6,refs:[[1,'地球','#5fa8ff'],[1.52,'火星','#e07050'],[5.2,'木星','#d8b48a']],
+                    belts:[[2.2,3.3,'主小行星帶','#d8b48a',.25,2.75]]}};
+  function annulus(r0,r1){let s='';
+    for(let k=0;k<72;k++){const a=k*5*D;s+=(k?'L':'M')+f(proj(v,[r1*Math.cos(a),r1*Math.sin(a),0]));}s+='Z';
+    for(let k=0;k<72;k++){const a=-k*5*D;s+=(k?'L':'M')+f(proj(v,[r0*Math.cos(a),r0*Math.sin(a),0]));}return s+'Z';}
+  const v={cx:340,cy:280,S:2.6,el:15*D,az:250*D};
+  let mode='all';
+  $('dw3-legend').innerHTML=B.map(b=>'<span><span class="dot" style="background:'+b.c+'"></span>'+b.n+'</span>').join('')+
+    '<span><span class="sw" style="height:10px;background:var(--faint);opacity:.3"></span>黃道面</span>'+
+    '<span><span class="sw" style="height:10px;background:#d8b48a;opacity:.5"></span>主小行星帶（放大才看得到）</span>'+
+    '<span><span class="sw" style="height:10px;background:#8fd3ff;opacity:.4"></span>古柏帶</span>'+
+    '<span><span class="sw" style="height:10px;background:#c9a6ff;opacity:.25"></span>散射盤</span>';
+  function draw(){
+    const m=MODES[mode];v.S=m.S;
+    const list=B.filter(b=>mode==='all'?!b.inner:b.inner);
+    let below='',above='',drops='',dots='',lbls='';
+    // 已經佔用的字的範圍 [左, 右, 上, 下]：底下的說明列、參考軌道的名字
+    const placed=[[0,680,532,560]];
+    const hit=r=>placed.some(p=>r[0]<p[1]&&p[0]<r[1]&&r[2]<p[3]&&p[2]<r[3]);
+    // 置中的名字：撞到就上下交替挪開，回傳 y
+    function putMid(x,y0,w){const box=y=>[x-w/2-2,x+w/2+2,y-14,y+5];let y=y0;
+      for(let t=1;t<16&&hit(box(y));t++)y=y0+(t%2?1:-1)*Math.ceil(t/2)*10;placed.push(box(y));return y;}
+    let belts='',refs='';
+    m.belts.forEach(b=>{belts+='<path d="'+annulus(b[0],b[1])+'" fill="'+b[3]+'" fill-opacity="'+b[4]+'" fill-rule="evenodd" stroke="'+b[3]+'" stroke-width=".5" stroke-opacity=".4"/>';
+      const q=proj(v,[0,b[5],0]),y=putMid(q[0],q[1]+4,b[2].length*13);
+      belts+='<text x="'+q[0].toFixed(1)+'" y="'+y.toFixed(1)+'" text-anchor="middle" style="fill:'+b[3]+';font-size:13px">'+b[2]+'</text>';});
+    m.refs.forEach(r=>{refs+='<path d="'+ring(v,r[0])+'" fill="none" stroke="'+r[2]+'" stroke-width="1.2" opacity=".85"/>';
+      const q=proj(v,[0,-r[0],0]),y=putMid(q[0],q[1]+14,r[1].length*12);
+      refs+='<text x="'+q[0].toFixed(1)+'" y="'+y.toFixed(1)+'" text-anchor="middle" style="fill:'+r[2]+'">'+r[1]+'</text>';});
+    list.forEach(b=>{
+      const o=orbitPaths(v,b);
+      below+='<path d="'+o.be+'" fill="none" stroke="'+b.c+'" stroke-width="1.2" stroke-dasharray="3 4" opacity=".55"/>';
+      above+='<path d="'+o.ab+'" fill="none" stroke="'+b.c+'" stroke-width="1.8"/>';
+      // 每隔 30° 從軌道畫一條細線到黃道面
+      for(let k=0;k<360;k+=30){const p=pos(b,k*D),q=proj(v,p),g=proj(v,[p[0],p[1],0]);
+        drops+='<line x1="'+q[0].toFixed(1)+'" y1="'+q[1].toFixed(1)+'" x2="'+g[0].toFixed(1)+'" y2="'+g[1].toFixed(1)+'" stroke="'+b.c+'" stroke-width=".5" opacity=".35"/>';}
+      const p=pos(b,nuOf(2*Math.PI*b.M,b.e)),q=proj(v,p),g=proj(v,[p[0],p[1],0]);
+      drops+='<line x1="'+q[0].toFixed(1)+'" y1="'+q[1].toFixed(1)+'" x2="'+g[0].toFixed(1)+'" y2="'+g[1].toFixed(1)+'" stroke="'+b.c+'" stroke-width="1" opacity=".8"/><circle cx="'+g[0].toFixed(1)+'" cy="'+g[1].toFixed(1)+'" r="2" fill="'+b.c+'" opacity=".7"/>';
+      dots+='<circle cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="5.5" fill="'+b.c+'" stroke="#03050d" stroke-width="1"/>';
+      // 名字：放在圓點旁邊，跟已經放好的名字太近就往下挪
+      const right=q[0]<560,x=q[0]+(right?9:-9),W=46;
+      const box=y=>right?[x,x+W,y-16,y+5]:[x-W,x,y-16,y+5];
+      let y=q[1]-8;   // 先放右上，撞到就上下交替挪開
+      for(let t=1;t<14&&hit(box(y));t++)y=q[1]-8+(t%2?1:-1)*Math.ceil(t/2)*9;
+      placed.push(box(y));
+      lbls+='<text x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" text-anchor="'+(right?'start':'end')+'" style="fill:'+b.c+';font-size:14px;font-weight:700">'+b.n+'</text>';
+    });
+    const s=proj(v,[0,0,0]),d=Math.round(v.el/D);
+    $('dw3-g').innerHTML=below+'<polygon points="'+plane(v,m.R)+'" fill="var(--faint)" fill-opacity=".12" stroke="var(--faint)" stroke-width=".6" stroke-opacity=".5"/>'+
+      belts+refs+'<circle cx="'+s[0]+'" cy="'+s[1]+'" r="'+(mode==='all'?6:9)+'" fill="var(--sun)"/>'+drops+above+dots+lbls+
+      '<text x="340" y="548" text-anchor="middle">'+(d<=3?'側視：沿著黃道面看過去':d>=87?'俯視：從太陽系北極上方往下看':'仰角 '+d+'°')+
+      (mode==='all'?'　黃道面畫到 100 AU':'　黃道面畫到 6 AU')+'</text>';
+    $('dw3-el').value=d;$('dw3-elV').textContent=d+'°';$('dw3-azV').textContent=Math.round(v.az/D)+'°';
+  }
+  function setMode(m){mode=m;$('dw3-all').classList.toggle('primary',m==='all');$('dw3-zoom').classList.toggle('primary',m==='zoom');draw();}
+  $('dw3-all').onclick=()=>setMode('all');
+  $('dw3-zoom').onclick=()=>setMode('zoom');
+  $('dw3-el').oninput=ev=>{v.el=ev.target.value*D;draw();};
+  $('dw3-az').oninput=ev=>{v.az=ev.target.value*D;draw();};
+  draw();
+  window.__dw3={set:(m,el,az)=>{v.el=el*D;v.az=az*D;setMode(m);},B};   // 給測試用
+})();
+
 // ---------- 圖一：3:2 軌道共振（俯視） ----------
 (function(){
   const S=4.5,cx=340,cy=250,aN=30.1,aP=39.5,e=0.25,PN=164.8;
@@ -297,7 +546,7 @@
 (function(){
   const D=Math.PI/180,S=4.1,cx=340,cy=225;
   const aP=39.48,e=0.2488,inc=17.16*D,Om=110.3*D,w=113.8*D,pp=aP*(1-e*e),aN=30.07,vp=Om+w;
-  let el=12*D,az=250*D,t=0,play=true,last=null,sweeping=null;
+  let el=12*D,az=250*D,t=0,play=true,last=null;
   const $=id=>document.getElementById(id);
   function pl(nu){const r=pp/(1+e*Math.cos(nu)),u=w+nu;return[r*(Math.cos(Om)*Math.cos(u)-Math.sin(Om)*Math.sin(u)*Math.cos(inc)),r*(Math.sin(Om)*Math.cos(u)+Math.cos(Om)*Math.sin(u)*Math.cos(inc)),r*Math.sin(u)*Math.sin(inc)];}
   function pr(p){const X1=p[0]*Math.cos(az)-p[1]*Math.sin(az),Y1=p[0]*Math.sin(az)+p[1]*Math.cos(az);return[cx+X1*S,cy-(Y1*Math.sin(el)+p[2]*Math.cos(el))*S];}
@@ -327,20 +576,37 @@
     const lam=vp+Math.PI/2+2*Math.PI*t;
     setXY('t-nep',pr([aN*Math.cos(lam),aN*Math.sin(lam),0]));
     const E=kep(2*Math.PI*t*2/3),nu=2*Math.atan2(Math.sqrt(1+e)*Math.sin(E/2),Math.sqrt(1-e)*Math.cos(E/2));
-    const p=pl(nu),q=pr(p),g=pr([p[0],p[1],0]);setXY('t-plu',q);
+    const p=pl(nu),q=pr(p),g=pr([p[0],p[1],0]);
     const L=$('t-pluDrop');L.setAttribute('x1',q[0]);L.setAttribute('y1',q[1]);L.setAttribute('x2',g[0]);L.setAttribute('y2',g[1]);
+    // 凱倫：繞平衡點 p 轉，軌道面垂直於冥王星自轉軸（固定方向），半徑放大約 4 萬倍
+    let r='';for(let k=0;k<=48;k++){const a=k*7.5*D,c=Math.cos(a)*RB,s=Math.sin(a)*RB;
+      r+=(k?'L':'M')+f(pr([p[0]+c*U[0]+s*W[0],p[1]+c*U[1]+s*W[1],p[2]+c*U[2]+s*W[2]]));}
+    $('t-ring').setAttribute('d',r);
+    const c=Math.cos(spin),s=Math.sin(spin),dir=[0,1,2].map(k=>c*U[k]+s*W[k]);
+    setXY('t-cha',pr(p.map((x,k)=>x+dir[k]*RB)));
+    setXY('t-plu',pr(p.map((x,k)=>x-dir[k]*RB*0.122)));
+    const nq=pr([aN*Math.cos(lam),aN*Math.sin(lam),0]);
+    lbl('t-nepT',nq,nq[0]>cx?10:-10,-10);lbl('t-pluT',q,q[0]>cx?24:-24,-14);
+    // 兩個名字撞在一起時，冥王星的名字改放到下面
+    const a=$('t-nepT').getBBox(),b=$('t-pluT').getBBox();
+    if(a.x<b.x+b.width&&b.x<a.x+a.width&&a.y<b.y+b.height&&b.y<a.y+a.height)$('t-pluT').setAttribute('y',q[1]+(b.y<a.y?-30:34));
   }
+  // 冥王星自轉軸在黃道座標的方向（由 IAU 北極 RA 133.0°、Dec −6.2° 換算）；U、W 是凱倫軌道面上的兩個方向
+  const N=[-0.678,0.624,-0.388],Nl=Math.hypot(...N);N.forEach((x,k)=>N[k]=x/Nl);
+  const cr=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  let U=cr(N,[0,0,1]);const Ul=Math.hypot(...U);U=U.map(x=>x/Ul);const W=cr(N,U);
+  const RB=5;   // 放大後的凱倫軌道半徑（AU）
+  let spin=0;
   function sync(){$('t-el').value=Math.round(el/D);$('t-elV').textContent=Math.round(el/D)+'°';$('t-azV').textContent=Math.round(az/D)+'°';}
-  $('t-el').oninput=ev=>{el=ev.target.value*D;sweeping=null;sync();drawStatic();};
+  $('t-el').oninput=ev=>{el=ev.target.value*D;sync();drawStatic();};
   $('t-az').oninput=ev=>{az=ev.target.value*D;sync();drawStatic();};
-  $('t-sweep').onclick=()=>{sweeping={s:performance.now()};};
   $('t-play').onclick=function(){play=!play;this.textContent=play?'暫停公轉':'繼續公轉';};
   function loop(ts){
-    if(last!==null&&play)t+=(ts-last)/1000*0.12;last=ts;
-    if(sweeping){const k=Math.min(1,(ts-sweeping.s)/4500),s=k*k*(3-2*k);el=s*90*D;sync();drawStatic();if(k>=1)sweeping=null;}
+    if(last!==null&&play){t+=(ts-last)/1000*0.12;spin+=(ts-last)/1000*2*Math.PI/2.5;}last=ts;   // 互轉 2.5 秒一圈（放慢很多）
     drawMoving();requestAnimationFrame(loop);
   }
   sync();drawStatic();drawMoving();requestAnimationFrame(loop);
+  window.__tilt={step:(dt,sp)=>{t+=dt;spin+=sp;drawMoving();},view:(e1,a1)=>{el=e1*D;az=a1*D;sync();drawStatic();drawMoving();},N,U,W};   // 給測試用
 })();
 </script>
 </body>
